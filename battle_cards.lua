@@ -562,7 +562,7 @@ local CARDS =
     PC_ALAN_SPARK_2b =
     {
         name = "火花助推",
-        icon = "battle/violent_explosion.tex",
+        icon = "battle/overloaded_spark_hammer_hatch.tex",
         anim = "throw",
         flavour = "'火花最好随拿随用，不然放一块太久了容易起反应。'",
         desc = "花费1{SPARK_RESERVE}:造成的伤害+4.",
@@ -766,7 +766,6 @@ local CARDS =
         anim = "taunt",
         flavour = "'......抱歉忘记扔垃圾了，现在扔给你'",
         target_type = TARGET_TYPE.SELF,
-        flavour = "'You can't fight what you can't find.'",
 
         rarity = CARD_RARITY.UNIQUE,
         cost = 3,
@@ -799,7 +798,7 @@ local CARDS =
     PC_ALAN_MEDICINE_e = 
     {
         name = "灰尘弹",
-        icon = "battle/gun_smoke.tex",
+        icon = "battle/gunsmoke.tex",
         anim = "throw",
         flavour = "'我承认这主意有那么点蠢。'",
         rarity = CARD_RARITY.UNIQUE,
@@ -815,7 +814,7 @@ local CARDS =
     PC_ALAN_MEDICINE_e_upgraded =
     {
         name = "增强灰尘弹",
-        icon = "battle/gun_smoke.tex",
+        icon = "battle/gunsmoke.tex",
         anim = "throw",
         rarity = CARD_RARITY.UNIQUE,
         cost = 0,
@@ -880,11 +879,11 @@ local CARDS =
     PC_ALAN_MEDICINE_g = 
     {
         name = "弱化蓝明手雷",
-        icon = "battle/lumin_grenate.tex",
+        icon = "battle/lumin_grenade.tex",
         anim = "throw",
-        desc = "获得{1}{LUMIN_RESERVE}.",
+        desc = "施加{1}{lumin_burnt}.",
         desc_fn = function(self, fmt_str)
-        return loc.format(fmt_str, CalculateConditionText(self, "LUMIN_RESERVE", self.lumin_res_amt))
+        return loc.format(fmt_str, CalculateConditionText(self, "lumin_burnt", self.lumin_burnt_amt))
     end,
         flavour = "'我承认这主意有那么点蠢。'",
         rarity = CARD_RARITY.UNIQUE,
@@ -893,14 +892,14 @@ local CARDS =
         flags = CARD_FLAGS.EXPEND | CARD_FLAGS.RANGED,
         lumin_res_amt = 3,
         OnPostResolve = function(self, battle, attack)
-            attack:AddCondition("LUMIN_RESERVE", self.lumin_res_amt, self)
+            attack:AddCondition("lumin_burnt", self.lumin_res_amt, self)
         end,
     },
 
     PC_ALAN_MEDICINE_g_upgraded =
     {
         name = "增强弱化蓝明手雷",
-        icon = "battle/lumin_grenate.tex",
+        icon = "battle/lumin_grenade.tex",
         anim = "throw",
         rarity = CARD_RARITY.UNIQUE,
         cost = 0,
