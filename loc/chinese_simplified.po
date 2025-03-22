@@ -735,3 +735,33 @@ msgstr "施加{1}{lumin_burnt}."
 msgctxt "ATTACK.PC_ALAN_MEDICINE_G_UPGRADED.FLAVOUR" 
 msgid "" 
 msgstr "‘说是弱化手雷，其实只是单纯把蓝明和炸药塞进一个瓶子里然后堵住。’" 
+
+#. ATTACK.PC_ALAN_MEDICINE_G.NAME 
+msgctxt "ATTACK.PC_ALAN_MEDICINE_G.NAME" 
+msgid "" 
+msgstr "火花混合物"
+
+#. ATTACK.PC_ALAN_MEDICINE_G.DESC 
+msgctxt "ATTACK.PC_ALAN_MEDICINE_G.DESC" 
+msgid "" 
+msgstr "获得{1}{SPARK_RESERVE}\n施加{1}{SPARK_RESERVE}." 
+
+#. ATTACK.PC_ALAN_MEDICINE_G.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_MEDICINE_G.FLAVOUR" 
+msgid "" 
+msgstr "‘毕竟绑的不是那么牢靠，丢的过程在身上落下一点残留物很正常。’" 
+
+#. ATTACK.PC_ALAN_MEDICINE_G_UPGRADED.NAME 
+msgctxt "ATTACK.PC_ALAN_MEDICINE_G_UPGRADED.NAME" 
+msgid "" 
+msgstr "增强火花混合物"
+
+#. ATTACK.PC_ALAN_MEDICINE_G_UPGRADED.DESC 
+msgctxt "ATTACK.PC_ALAN_MEDICINE_G_UPGRADED.DESC" 
+msgid "" 
+msgstr "获得{1}{SPARK_RESERVE}\n施加{1}{SPARK_RESERVE}." 
+
+#. ATTACK.PC_ALAN_MEDICINE_G_UPGRADED.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_MEDICINE_G_UPGRADED.FLAVOUR" 
+msgid "" 
+msgstr "‘毕竟绑的不是那么牢靠，丢的过程在身上落下一点残留物很正常。’" 
