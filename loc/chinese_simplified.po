@@ -19,7 +19,7 @@ msgstr "火花储备"
 #. BATTLE_FEATURE.SPARK_RESERVE.DESC
 msgctxt "BATTLE_FEATURE.SPARK_RESERVE.DESC"
 msgid ""
-msgstr "至多拥有15层，当拥有15层火花储备时便立即使层数清零并使承受体力上限20%的伤害."
+msgstr "至多拥有15层，当拥有15层火花储备时便立即使层数清零并使承受体力上限25%的伤害."
 
 #. BATTLE_FEATURE.LUMIN_RESERVE.NAME
 msgctxt "BATTLE_FEATURE.LUMIN_RESERVE.NAME"
@@ -154,7 +154,7 @@ msgstr "丢空瓶"
 #. ATTACK.PC_ALAN_THROW_BOTTLE.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE.FLAVOUR" 
 msgid "" 
-msgstr "‘作为一个胆汁贩子，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
+msgstr "‘身为一个燃料商人，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
 
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2A.NAME 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2A.NAME" 
@@ -164,7 +164,7 @@ msgstr "增强丢空瓶"
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2A.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2A.FLAVOUR" 
 msgid "" 
-msgstr "‘作为一个胆汁贩子，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
+msgstr "‘身为一个燃料商人，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
 
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2B.NAME 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2B.NAME" 
@@ -174,7 +174,7 @@ msgstr "一次性丢空瓶"
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2B.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2B.FLAVOUR" 
 msgid "" 
-msgstr "‘作为一个胆汁贩子，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
+msgstr "‘身为一个燃料商人，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
 
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2C.NAME 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2C.NAME" 
@@ -189,7 +189,7 @@ msgstr "<#UPGRADE>抽1张牌</>."
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2C.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2C.FLAVOUR" 
 msgid "" 
-msgstr "‘作为一个胆汁贩子，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
+msgstr "‘身为一个燃料商人，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
 
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2D.NAME 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2D.NAME" 
@@ -199,7 +199,7 @@ msgstr "沉重丢空瓶"
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2D.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2D.FLAVOUR" 
 msgid "" 
-msgstr "‘作为一个胆汁贩子，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
+msgstr "‘身为一个燃料商人，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
 
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2E.NAME 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2E.NAME" 
@@ -214,7 +214,7 @@ msgstr "<#UPGRADE>施加{1}{lumin_burnt}</>."
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2E.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2E.FLAVOUR" 
 msgid "" 
-msgstr "‘作为一个胆汁贩子，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
+msgstr "‘身为一个燃料商人，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
 
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2F.NAME 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2F.NAME" 
@@ -229,7 +229,7 @@ msgstr "<#UPGRADE>{PC_ALAN_WEIGHTED}{1}：造成两倍与手牌中花费最高�
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2F.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2F.FLAVOUR" 
 msgid "" 
-msgstr "‘作为一个胆汁贩子，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
+msgstr "‘身为一个燃料商人，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
 
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2G.NAME 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2G.NAME" 
@@ -239,7 +239,7 @@ msgstr "猛烈丢空瓶"
 #. ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2G.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_THROW_BOTTLE_PLUS2G.FLAVOUR" 
 msgid "" 
-msgstr "‘作为一个胆汁贩子，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
+msgstr "‘身为一个燃料商人，我最好得准备多点瓶子，不管是用来装还是用来丢。’" 
 
 #. ATTACK.PC_ALAN_READY_FOR_DODGE.NAME 
 msgctxt "ATTACK.PC_ALAN_READY_FOR_DODGE.NAME" 
@@ -309,7 +309,7 @@ msgstr "火花准备闪躲"
 #. ATTACK.PC_ALAN_READY_FOR_DODGE_PLUS2D.DESC 
 msgctxt "ATTACK.PC_ALAN_READY_FOR_DODGE_PLUS2D.DESC" 
 msgid "" 
-msgstr "施加{1}{DEFEND}\n<#UPGRADE>获得{2}{SPARK_RESERVE}\n花费1{SPARK_RESERVE}：额外施加{1}{DEFEND}</>." 
+msgstr "施加{1}{DEFEND}.\n<#UPGRADE>获得{2}{SPARK_RESERVE}.\n花费1{SPARK_RESERVE}：额外施加{1}{DEFEND}</>." 
 
 #. ATTACK.PC_ALAN_READY_FOR_DODGE_PLUS2D.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_READY_FOR_DODGE_PLUS2D.FLAVOUR" 
@@ -324,7 +324,7 @@ msgstr "重量准备闪躲"
 #. ATTACK.PC_ALAN_READY_FOR_DODGE_PLUS2E.DESC 
 msgctxt "ATTACK.PC_ALAN_READY_FOR_DODGE_PLUS2E.DESC" 
 msgid "" 
-msgstr "施加{1}{DEFEND}\n<#UPGRADE>{PC_ALAN_WEIGHTED}{2}：获得1点行动点</>." 
+msgstr "施加{1}{DEFEND}.\n<#UPGRADE>{PC_ALAN_WEIGHTED}{2}：获得1点行动点</>." 
 
 #. ATTACK.PC_ALAN_READY_FOR_DODGE_PLUS2E.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_READY_FOR_DODGE_PLUS2E.FLAVOUR" 
@@ -339,7 +339,7 @@ msgstr "轻量准备闪躲"
 #. ATTACK.PC_ALAN_READY_FOR_DODGE_PLUS2F.DESC 
 msgctxt "ATTACK.PC_ALAN_READY_FOR_DODGE_PLUS2F.DESC" 
 msgid "" 
-msgstr "施加{1}{DEFEND}\n<#UPGRADE>{PC_ALAN_LIGHTWEIGHT}{2}：额外施加3防御</>." 
+msgstr "施加{1}{DEFEND}.\n<#UPGRADE>{PC_ALAN_LIGHTWEIGHT}{2}：额外施加3防御</>." 
 
 #. ATTACK.PC_ALAN_READY_FOR_DODGE_PLUS2F.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_READY_FOR_DODGE_PLUS2F.FLAVOUR" 
@@ -459,7 +459,7 @@ msgstr "火花投掷"
 #. ATTACK.PC_ALAN_SPARK_2A.DESC 
 msgctxt "ATTACK.PC_ALAN_SPARK_2A.DESC" 
 msgid "" 
-msgstr "获得{1}{SPARK_RESERVE}\n施加{2}{SPARK_RESERVE}." 
+msgstr "获得{1}{SPARK_RESERVE}.\n施加{2}{SPARK_RESERVE}." 
 
 #. ATTACK.PC_ALAN_SPARK_2A.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_SPARK_2A.FLAVOUR" 
@@ -744,7 +744,7 @@ msgstr "火花混合物"
 #. ATTACK.PC_ALAN_MEDICINE_H.DESC 
 msgctxt "ATTACK.PC_ALAN_MEDICINE_H.DESC" 
 msgid "" 
-msgstr "获得{1}{SPARK_RESERVE}\n施加{1}{SPARK_RESERVE}." 
+msgstr "获得{1}{SPARK_RESERVE}.\n施加{1}{SPARK_RESERVE}." 
 
 #. ATTACK.PC_ALAN_MEDICINE_H.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_MEDICINE_H.FLAVOUR" 
@@ -759,9 +759,1259 @@ msgstr "增强火花混合物"
 #. ATTACK.PC_ALAN_MEDICINE_H_UPGRADED.DESC 
 msgctxt "ATTACK.PC_ALAN_MEDICINE_H_UPGRADED.DESC" 
 msgid "" 
-msgstr "获得{1}{SPARK_RESERVE}\n施加{1}{SPARK_RESERVE}." 
+msgstr "获得{1}{SPARK_RESERVE}.\n施加{1}{SPARK_RESERVE}." 
 
 #. ATTACK.PC_ALAN_MEDICINE_H_UPGRADED.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_MEDICINE_H_UPGRADED.FLAVOUR" 
 msgid "" 
 msgstr "‘毕竟绑的不是那么牢靠，丢的过程在身上落下一点残留物很正常。’" 
+
+#. ATTACK.PC_ALAN_INERTIAL_IMPACT.NAME 
+msgctxt "ATTACK.PC_ALAN_INERTIAL_IMPACT.NAME" 
+msgid "" 
+msgstr "惯性撞击"
+
+#. ATTACK.PC_ALAN_INERTIAL_IMPACT.DESC 
+msgctxt "ATTACK.PC_ALAN_INERTIAL_IMPACT.DESC" 
+msgid "" 
+msgstr "获得{1}{DEFEND}." 
+
+#. ATTACK.PC_ALAN_INERTIAL_IMPACT.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_INERTIAL_IMPACT.FLAVOUR" 
+msgid "" 
+msgstr "‘一个简单的惯性利用就能让重物飞到你脸上。’" 
+
+#. ATTACK.PC_ALAN_INERTIAL_IMPACT_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_INERTIAL_IMPACT_PLUS.NAME" 
+msgid "" 
+msgstr "远见惯性撞击"
+
+#. ATTACK.PC_ALAN_INERTIAL_IMPACT_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_INERTIAL_IMPACT_PLUS.DESC" 
+msgid "" 
+msgstr "获得{1}{DEFEND}." 
+
+#. ATTACK.PC_ALAN_INERTIAL_IMPACT_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_INERTIAL_IMPACT_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘一个简单的惯性利用就能让重物飞到你脸上。’" 
+
+#. ATTACK.PC_ALAN_INERTIAL_IMPACT_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_INERTIAL_IMPACT_PLUS2.NAME" 
+msgid "" 
+msgstr "重量惯性撞击"
+
+#. ATTACK.PC_ALAN_INERTIAL_IMPACT_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_INERTIAL_IMPACT_PLUS2.DESC" 
+msgid "" 
+msgstr "获得{1}{DEFEND}.\n<#UPGRADE>{PC_ALAN_WEIGHTED}{2}：获得1点行动点</>." 
+
+#. ATTACK.PC_ALAN_INERTIAL_IMPACT_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_INERTIAL_IMPACT_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘一个简单的惯性利用就能让重物飞到你脸上。’" 
+
+#. ATTACK.PC_ALAN_LUMIN_DAGGER.NAME 
+msgctxt "ATTACK.PC_ALAN_LUMIN_DAGGER.NAME" 
+msgid "" 
+msgstr "蓝明小刀"
+
+#. ATTACK.PC_ALAN_LUMIN_DAGGER.DESC 
+msgctxt "ATTACK.PC_ALAN_LUMIN_DAGGER.DESC" 
+msgid "" 
+msgstr "当你有任意{LUMIN_RESERVE}时，造成3额外伤害." 
+
+#. ATTACK.PC_ALAN_LUMIN_DAGGER.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_LUMIN_DAGGER.FLAVOUR" 
+msgid "" 
+msgstr "‘一把有着蓝明涂层的小刀，制作工艺相对简单，比蓝明先锋的匕首还烂。’" 
+
+#. ATTACK.PC_ALAN_LUMIN_DAGGER_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_LUMIN_DAGGER_PLUS.NAME" 
+msgid "" 
+msgstr "增强蓝明小刀"
+
+#. ATTACK.PC_ALAN_LUMIN_DAGGER_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_LUMIN_DAGGER_PLUS.DESC" 
+msgid "" 
+msgstr "当你有任意{LUMIN_RESERVE}时，造成<#UPGRADE>6</>额外伤害." 
+
+#. ATTACK.PC_ALAN_LUMIN_DAGGER_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_LUMIN_DAGGER_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘一把有着蓝明涂层的小刀，制作工艺相对简单，比蓝明先锋的匕首还烂。’" 
+
+#. ATTACK.PC_ALAN_LUMIN_DAGGER_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_LUMIN_DAGGER_PLUS2.NAME" 
+msgid "" 
+msgstr "镜像蓝明小刀"
+
+#. ATTACK.PC_ALAN_LUMIN_DAGGER_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_LUMIN_DAGGER_PLUS2.DESC" 
+msgid "" 
+msgstr "当你有任意{LUMIN_RESERVE}时，造成3额外伤害<#UPGRADE>并攻击两次</>." 
+
+#. ATTACK.PC_ALAN_LUMIN_DAGGER_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_LUMIN_DAGGER_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘一把有着蓝明涂层的小刀，制作工艺相对简单，比蓝明先锋的匕首还烂。’" 
+
+#. ATTACK.PC_ALAN_SPARK_PROPULSION.NAME 
+msgctxt "ATTACK.PC_ALAN_SPARK_PROPULSION.NAME" 
+msgid "" 
+msgstr "火花动力"
+
+#. ATTACK.PC_ALAN_SPARK_PROPULSION.DESC 
+msgctxt "ATTACK.PC_ALAN_SPARK_PROPULSION.DESC" 
+msgid "" 
+msgstr "消耗1{SPARK_RESERVE}：这张牌花费为0." 
+
+#. ATTACK.PC_ALAN_SPARK_PROPULSION.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SPARK_PROPULSION.FLAVOUR" 
+msgid "" 
+msgstr "‘只要懂了原理，这其实很简单。’" 
+
+#. ATTACK.PC_ALAN_SPARK_PROPULSION_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_SPARK_PROPULSION_PLUS.NAME" 
+msgid "" 
+msgstr "强力火花动力"
+
+#. ATTACK.PC_ALAN_SPARK_PROPULSION_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_SPARK_PROPULSION_PLUS.DESC" 
+msgid "" 
+msgstr "消耗1{SPARK_RESERVE}：这张牌花费为0." 
+
+#. ATTACK.PC_ALAN_SPARK_PROPULSION_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SPARK_PROPULSION_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘只要懂了原理，这其实很简单。’" 
+
+#. ATTACK.PC_ALAN_SPARK_PROPULSION_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_SPARK_PROPULSION_PLUS2.NAME" 
+msgid "" 
+msgstr "高火花动力"
+
+#. ATTACK.PC_ALAN_SPARK_PROPULSION_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_SPARK_PROPULSION_PLUS2.DESC" 
+msgid "" 
+msgstr "消耗1{SPARK_RESERVE}：这张牌花费为0." 
+
+#. ATTACK.PC_ALAN_SPARK_PROPULSION_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SPARK_PROPULSION_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘只要懂了原理，这其实很简单。’" 
+
+#. ATTACK.PC_ALAN_SPARK_BOMB.NAME 
+msgctxt "ATTACK.PC_ALAN_SPARK_BOMB.NAME" 
+msgid "" 
+msgstr "火花弹"
+
+#. ATTACK.PC_ALAN_SPARK_BOMB.DESC 
+msgctxt "ATTACK.PC_ALAN_SPARK_BOMB.DESC" 
+msgid "" 
+msgstr "施加{1}{SPARK_RESERVE}." 
+
+#. ATTACK.PC_ALAN_SPARK_BOMB.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SPARK_BOMB.FLAVOUR" 
+msgid "" 
+msgstr "‘火花虽小，爆炸刚好。’" 
+
+#. ATTACK.PC_ALAN_SPARK_BOMB_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_SPARK_BOMB_PLUS.NAME" 
+msgid "" 
+msgstr "强力火花弹"
+
+#. ATTACK.PC_ALAN_SPARK_BOMB_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_SPARK_BOMB_PLUS.DESC" 
+msgid "" 
+msgstr "施加{1}{SPARK_RESERVE}." 
+
+#. ATTACK.PC_ALAN_SPARK_BOMB_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SPARK_BOMB_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘火花虽小，爆炸刚好。’" 
+
+#. ATTACK.PC_ALAN_SPARK_BOMB_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_SPARK_BOMB_PLUS2.NAME" 
+msgid "" 
+msgstr "无谋火花弹"
+
+#. ATTACK.PC_ALAN_SPARK_BOMB_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_SPARK_BOMB_PLUS2.DESC" 
+msgid "" 
+msgstr "施加{1}{SPARK_RESERVE}.\n<#DOWNGRADE>获得{2}{SPARK_RESERVE}</>." 
+
+#. ATTACK.PC_ALAN_SPARK_BOMB_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SPARK_BOMB_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘火花虽小，爆炸刚好。’" 
+
+#. ATTACK.PC_ALAN_LUMIN_BOMB.NAME 
+msgctxt "ATTACK.PC_ALAN_LUMIN_BOMB.NAME" 
+msgid "" 
+msgstr "蓝明弹"
+
+#. ATTACK.PC_ALAN_LUMIN_BOMB.DESC 
+msgctxt "ATTACK.PC_ALAN_LUMIN_BOMB.DESC" 
+msgid "" 
+msgstr "施加{1}{lumin_burnt}." 
+
+#. ATTACK.PC_ALAN_LUMIN_BOMB.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_LUMIN_BOMB.FLAVOUR" 
+msgid "" 
+msgstr "‘老实说里面都是品质比较次的蓝明。’" 
+
+#. ATTACK.PC_ALAN_LUMIN_BOMB_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_LUMIN_BOMB_PLUS.NAME" 
+msgid "" 
+msgstr "增强蓝明弹"
+
+#. ATTACK.PC_ALAN_LUMIN_BOMB_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_LUMIN_BOMB_PLUS.DESC" 
+msgid "" 
+msgstr "施加{1}{lumin_burnt}." 
+
+#. ATTACK.PC_ALAN_LUMIN_BOMB_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_LUMIN_BOMB_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘老实说里面都是品质比较次的蓝明。’" 
+
+#. ATTACK.PC_ALAN_LUMIN_BOMB_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_LUMIN_BOMB_PLUS2.NAME" 
+msgid "" 
+msgstr "强化蓝明弹"
+
+#. ATTACK.PC_ALAN_LUMIN_BOMB_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_LUMIN_BOMB_PLUS2.DESC" 
+msgid "" 
+msgstr "施加<#UPGRADE>{1}</>{lumin_burnt}." 
+
+#. ATTACK.PC_ALAN_LUMIN_BOMB_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_LUMIN_BOMB_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘老实说里面都是品质比较次的蓝明。’" 
+
+#. ATTACK.PC_ALAN_BLINDSIDE_TOSS.NAME 
+msgctxt "ATTACK.PC_ALAN_BLINDSIDE_TOSS.NAME" 
+msgid "" 
+msgstr "往后脑勺丢"
+
+#. ATTACK.PC_ALAN_BLINDSIDE_TOSS.DESC 
+msgctxt "ATTACK.PC_ALAN_BLINDSIDE_TOSS.DESC" 
+msgid "" 
+msgstr "消耗2{SPARK_RESERVE}：这张牌造成最大伤害." 
+
+#. ATTACK.PC_ALAN_BLINDSIDE_TOSS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_BLINDSIDE_TOSS.FLAVOUR" 
+msgid "" 
+msgstr "‘简单明了的解决办法，就是注意一下不要把人砸死。’" 
+
+#. ATTACK.PC_ALAN_BLINDSIDE_TOSS_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_BLINDSIDE_TOSS_PLUS.NAME" 
+msgid "" 
+msgstr "偷偷往后脑勺丢"
+
+#. ATTACK.PC_ALAN_BLINDSIDE_TOSS_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_BLINDSIDE_TOSS_PLUS.DESC" 
+msgid "" 
+msgstr "消耗2{SPARK_RESERVE}：这张牌造成最大伤害." 
+
+#. ATTACK.PC_ALAN_BLINDSIDE_TOSS_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_BLINDSIDE_TOSS_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘简单明了的解决办法，就是注意一下不要把人砸死。’" 
+
+#. ATTACK.PC_ALAN_BLINDSIDE_TOSS_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_BLINDSIDE_TOSS_PLUS2.NAME" 
+msgid "" 
+msgstr "往后脑勺用力丢"
+
+#. ATTACK.PC_ALAN_BLINDSIDE_TOSS_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_BLINDSIDE_TOSS_PLUS2.DESC" 
+msgid "" 
+msgstr "消耗2{SPARK_RESERVE}：这张牌造成最大伤害." 
+
+#. ATTACK.PC_ALAN_BLINDSIDE_TOSS_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_BLINDSIDE_TOSS_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘简单明了的解决办法，就是注意一下不要把人砸死。’" 
+
+#. ATTACK.PC_ALAN_SPLASH_LUMIN.NAME 
+msgctxt "ATTACK.PC_ALAN_SPLASH_LUMIN.NAME" 
+msgid "" 
+msgstr "泼洒蓝明"
+
+#. ATTACK.PC_ALAN_SPLASH_LUMIN.DESC 
+msgctxt "ATTACK.PC_ALAN_SPLASH_LUMIN.DESC" 
+msgid "" 
+msgstr "这张牌造成多少伤害，就施加多少{lumin_burnt}." 
+
+#. ATTACK.PC_ALAN_SPLASH_LUMIN.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SPLASH_LUMIN.FLAVOUR" 
+msgid "" 
+msgstr "‘撒完后赶紧逃，那地方暂时不能用了。’" 
+
+#. ATTACK.PC_ALAN_SPLASH_LUMIN_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_SPLASH_LUMIN_PLUS.NAME" 
+msgid "" 
+msgstr "强力泼洒蓝明"
+
+#. ATTACK.PC_ALAN_SPLASH_LUMIN_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_SPLASH_LUMIN_PLUS.DESC" 
+msgid "" 
+msgstr "这张牌造成多少伤害，就施加多少{lumin_burnt}." 
+
+#. ATTACK.PC_ALAN_SPLASH_LUMIN_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SPLASH_LUMIN_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘撒完后赶紧逃，那地方暂时不能用了。’" 
+
+#. ATTACK.PC_ALAN_SPLASH_LUMIN_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_SPLASH_LUMIN_PLUS2.NAME" 
+msgid "" 
+msgstr "从高处泼洒蓝明"
+
+#. ATTACK.PC_ALAN_SPLASH_LUMIN_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_SPLASH_LUMIN_PLUS2.DESC" 
+msgid "" 
+msgstr "这张牌造成多少伤害，就施加多少{lumin_burnt}." 
+
+#. ATTACK.PC_ALAN_SPLASH_LUMIN_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SPLASH_LUMIN_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘撒完后赶紧逃，那地方暂时不能用了。’" 
+
+#. ATTACK.PC_ALAN_TRIP.NAME 
+msgctxt "ATTACK.PC_ALAN_TRIP.NAME" 
+msgid "" 
+msgstr "绊倒"
+
+#. ATTACK.PC_ALAN_TRIP.DESC 
+msgctxt "ATTACK.PC_ALAN_TRIP.DESC" 
+msgid "" 
+msgstr "施加1{WOUND}." 
+
+#. ATTACK.PC_ALAN_TRIP.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_TRIP.FLAVOUR" 
+msgid "" 
+msgstr "‘看招！’" 
+
+#. ATTACK.PC_ALAN_TRIP_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_TRIP_PLUS.NAME" 
+msgid "" 
+msgstr "轻量绊倒"
+
+#. ATTACK.PC_ALAN_TRIP_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_TRIP_PLUS.DESC" 
+msgid "" 
+msgstr "<#DOWNGRADE>{PC_ALAN_LIGHTWEIGHT}{1}</>：施加<#UPGRADE>{2}</>{WOUND}." 
+
+#. ATTACK.PC_ALAN_TRIP_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_TRIP_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘看招！’" 
+
+#. ATTACK.PC_ALAN_TRIP_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_TRIP_PLUS2.NAME" 
+msgid "" 
+msgstr "远见绊倒"
+
+#. ATTACK.PC_ALAN_TRIP_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_TRIP_PLUS2.DESC" 
+msgid "" 
+msgstr "施加1{WOUND}.\n<#UPGRADE>抽1张牌</>." 
+
+#. ATTACK.PC_ALAN_TRIP_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_TRIP_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘看招！’" 
+
+#. ATTACK.PC_ALAN_CASUAL_TOSS.NAME 
+msgctxt "ATTACK.PC_ALAN_CASUAL_TOSS.NAME" 
+msgid "" 
+msgstr "随手一扔"
+
+#. ATTACK.PC_ALAN_CASUAL_TOSS.DESC 
+msgctxt "ATTACK.PC_ALAN_CASUAL_TOSS.DESC" 
+msgid "" 
+msgstr "随机丢弃{1}张牌.\n攻击1个随机敌人." 
+
+#. ATTACK.PC_ALAN_CASUAL_TOSS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_CASUAL_TOSS.FLAVOUR" 
+msgid "" 
+msgstr "‘把能扔的先扔了！’" 
+
+#. ATTACK.PC_ALAN_CASUAL_TOSS_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_CASUAL_TOSS_PLUS.NAME" 
+msgid "" 
+msgstr "专注随手一扔"
+
+#. ATTACK.PC_ALAN_CASUAL_TOSS_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_CASUAL_TOSS_PLUS.DESC" 
+msgid "" 
+msgstr "弃1张牌." 
+
+#. ATTACK.PC_ALAN_CASUAL_TOSS_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_CASUAL_TOSS_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘把能扔的先扔了！’" 
+
+#. ATTACK.PC_ALAN_CASUAL_TOSS_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_CASUAL_TOSS_PLUS2.NAME" 
+msgid "" 
+msgstr "无谋随手一扔"
+
+#. ATTACK.PC_ALAN_CASUAL_TOSS_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_CASUAL_TOSS_PLUS2.DESC" 
+msgid "" 
+msgstr "随机丢弃<#DOWNGRADE>{1}</>张牌.\n攻击1个随机敌人." 
+
+#. ATTACK.PC_ALAN_CASUAL_TOSS_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_CASUAL_TOSS_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘把能扔的先扔了！’" 
+
+#. ATTACK.PC_ALAN_HEAVY_SUPPRESSION.NAME 
+msgctxt "ATTACK.PC_ALAN_HEAVY_SUPPRESSION.NAME" 
+msgid "" 
+msgstr "沉重压制"
+
+#. ATTACK.PC_ALAN_HEAVY_SUPPRESSION.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_HEAVY_SUPPRESSION.FLAVOUR" 
+msgid "" 
+msgstr "‘重一点没关系，关键是能压得住场子。’" 
+
+#. ATTACK.PC_ALAN_HEAVY_SUPPRESSION_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_HEAVY_SUPPRESSION_PLUS.NAME" 
+msgid "" 
+msgstr "远见沉重压制"
+
+#. ATTACK.PC_ALAN_HEAVY_SUPPRESSION_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_HEAVY_SUPPRESSION_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘重一点没关系，关键是能压得住场子。’" 
+
+#. ATTACK.PC_ALAN_HEAVY_SUPPRESSION_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_HEAVY_SUPPRESSION_PLUS2.NAME" 
+msgid "" 
+msgstr "重量沉重压制"
+
+#. ATTACK.PC_ALAN_HEAVY_SUPPRESSION_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_HEAVY_SUPPRESSION_PLUS2.DESC" 
+msgid "" 
+msgstr "<#UPGRADE>{PC_ALAN_WEIGHTED}{1}：造成3额外伤害并获得2点行动点</>." 
+
+#. ATTACK.PC_ALAN_HEAVY_SUPPRESSION_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_HEAVY_SUPPRESSION_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘重一点没关系，关键是能压得住场子。’" 
+
+#. ATTACK.PC_ALAN_TWO_THROWING_KNIVES.NAME 
+msgctxt "ATTACK.PC_ALAN_TWO_THROWING_KNIVES.NAME" 
+msgid "" 
+msgstr "两把飞刀"
+
+#. ATTACK.PC_ALAN_TWO_THROWING_KNIVES.DESC 
+msgctxt "ATTACK.PC_ALAN_TWO_THROWING_KNIVES.DESC" 
+msgid "" 
+msgstr "攻击2个随机敌人." 
+
+#. ATTACK.PC_ALAN_TWO_THROWING_KNIVES.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_TWO_THROWING_KNIVES.FLAVOUR" 
+msgid "" 
+msgstr "‘战后记得回收。’" 
+
+#. ATTACK.PC_ALAN_TWO_THROWING_KNIVES_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_TWO_THROWING_KNIVES_PLUS.NAME" 
+msgid "" 
+msgstr "三把飞刀"
+
+#. ATTACK.PC_ALAN_TWO_THROWING_KNIVES_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_TWO_THROWING_KNIVES_PLUS.DESC" 
+msgid "" 
+msgstr "攻击<#UPGRADE>3</>个随机敌人." 
+
+#. ATTACK.PC_ALAN_TWO_THROWING_KNIVES_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_TWO_THROWING_KNIVES_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘战后记得回收。’" 
+
+#. ATTACK.PC_ALAN_TWO_THROWING_KNIVES_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_TWO_THROWING_KNIVES_PLUS2.NAME" 
+msgid "" 
+msgstr "一把飞刀"
+
+#. ATTACK.PC_ALAN_TWO_THROWING_KNIVES_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_TWO_THROWING_KNIVES_PLUS2.DESC" 
+msgid "" 
+msgstr "攻击<#DOWNGRADE>1</>个随机敌人." 
+
+#. ATTACK.PC_ALAN_TWO_THROWING_KNIVES_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_TWO_THROWING_KNIVES_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘战后记得回收。’" 
+
+#. ATTACK.PC_ALAN_DISRUPTIVE_ATTACK.NAME 
+msgctxt "ATTACK.PC_ALAN_DISRUPTIVE_ATTACK.NAME" 
+msgid "" 
+msgstr "干扰攻击"
+
+#. ATTACK.PC_ALAN_DISRUPTIVE_ATTACK.DESC 
+msgctxt "ATTACK.PC_ALAN_DISRUPTIVE_ATTACK.DESC" 
+msgid "" 
+msgstr "{PC_ALAN_LIGHTWEIGHT}{1}：造成3额外伤害并失去1点行动点." 
+
+#. ATTACK.PC_ALAN_DISRUPTIVE_ATTACK.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_DISRUPTIVE_ATTACK.FLAVOUR" 
+msgid "" 
+msgstr "‘你在看哪边？’" 
+
+#. ATTACK.PC_ALAN_DISRUPTIVE_ATTACK_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_DISRUPTIVE_ATTACK_PLUS.NAME" 
+msgid "" 
+msgstr "增强干扰攻击"
+
+#. ATTACK.PC_ALAN_DISRUPTIVE_ATTACK_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_DISRUPTIVE_ATTACK_PLUS.DESC" 
+msgid "" 
+msgstr "{PC_ALAN_LIGHTWEIGHT}{1}：造成<#UPGRADE>5</>额外伤害并失去1点行动点." 
+
+#. ATTACK.PC_ALAN_DISRUPTIVE_ATTACK_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_DISRUPTIVE_ATTACK_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘你在看哪边？’" 
+
+#. ATTACK.PC_ALAN_DISRUPTIVE_ATTACK_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_DISRUPTIVE_ATTACK_PLUS2.NAME" 
+msgid "" 
+msgstr "扭曲干扰攻击"
+
+#. ATTACK.PC_ALAN_DISRUPTIVE_ATTACK_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_DISRUPTIVE_ATTACK_PLUS2.DESC" 
+msgid "" 
+msgstr "<#DOWNGRADE>{PC_ALAN_WEIGHTED}{1}</>：造成<#UPGRADE>5</>额外伤害." 
+
+#. ATTACK.PC_ALAN_DISRUPTIVE_ATTACK_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_DISRUPTIVE_ATTACK_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘你在看哪边？’" 
+
+#. ATTACK.PC_ALAN_AIM.NAME 
+msgctxt "ATTACK.PC_ALAN_AIM.NAME" 
+msgid "" 
+msgstr "瞄准"
+
+#. ATTACK.PC_ALAN_AIM.DESC 
+msgctxt "ATTACK.PC_ALAN_AIM.DESC" 
+msgid "" 
+msgstr "若目标拥有{SPARK_RESERVE}则施加{1}{SPARK_RESERVE}." 
+
+#. ATTACK.PC_ALAN_AIM.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_AIM.FLAVOUR" 
+msgid "" 
+msgstr "‘尽量瞄准挂着火花的地方，说不定就爆了。’" 
+
+#. ATTACK.PC_ALAN_AIM_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_AIM_PLUS.NAME" 
+msgid "" 
+msgstr "增强瞄准"
+
+#. ATTACK.PC_ALAN_AIM_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_AIM_PLUS.DESC" 
+msgid "" 
+msgstr "若目标拥有{SPARK_RESERVE}则施加{1}{SPARK_RESERVE}." 
+
+#. ATTACK.PC_ALAN_AIM_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_AIM_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘尽量瞄准挂着火花的地方，说不定就爆了。’" 
+
+#. ATTACK.PC_ALAN_AIM_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_AIM_PLUS2.NAME" 
+msgid "" 
+msgstr "强化瞄准"
+
+#. ATTACK.PC_ALAN_AIM_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_AIM_PLUS2.DESC" 
+msgid "" 
+msgstr "若目标拥有{SPARK_RESERVE}则施加<#UPGRADE>{1}</>{SPARK_RESERVE}." 
+
+#. ATTACK.PC_ALAN_AIM_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_AIM_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘尽量瞄准挂着火花的地方，说不定就爆了。’" 
+
+#. ATTACK.PC_ALAN_CATALYST.NAME 
+msgctxt "ATTACK.PC_ALAN_CATALYST.NAME" 
+msgid "" 
+msgstr "催化剂"
+
+#. ATTACK.PC_ALAN_CATALYST.DESC 
+msgctxt "ATTACK.PC_ALAN_CATALYST.DESC" 
+msgid "" 
+msgstr "如果目标拥有{lumin_burnt}则对目标施加{1}{WOUND}和{1}{EXPOSED}." 
+
+#. ATTACK.PC_ALAN_CATALYST.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_CATALYST.FLAVOUR" 
+msgid "" 
+msgstr "‘蓝明，黑石之水，在加上一点罗洛可的东西，过后的下场可以参考这位。’" 
+
+#. ATTACK.PC_ALAN_CATALYST_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_CATALYST_PLUS.NAME" 
+msgid "" 
+msgstr "增强催化剂"
+
+#. ATTACK.PC_ALAN_CATALYST_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_CATALYST_PLUS.DESC" 
+msgid "" 
+msgstr "如果目标拥有{lumin_burnt}则对目标施加{1}{WOUND}和{1}{EXPOSED}." 
+
+#. ATTACK.PC_ALAN_CATALYST_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_CATALYST_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘蓝明，黑石之水，在加上一点罗洛可的东西，过后的下场可以参考这位。’" 
+
+#. ATTACK.PC_ALAN_CATALYST_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_CATALYST_PLUS2.NAME" 
+msgid "" 
+msgstr "强化催化剂"
+
+#. ATTACK.PC_ALAN_CATALYST_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_CATALYST_PLUS2.DESC" 
+msgid "" 
+msgstr "如果目标拥有{lumin_burnt}则对目标施加<#UPGRADE>{1}</>{WOUND}和<#UPGRADE>{1}</>{EXPOSED}." 
+
+#. ATTACK.PC_ALAN_CATALYST_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_CATALYST_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘蓝明，黑石之水，在加上一点罗洛可的东西，过后的下场可以参考这位。’" 
+
+#. ATTACK.PC_ALAN_STINGER.NAME 
+msgctxt "ATTACK.PC_ALAN_STINGER.NAME" 
+msgid "" 
+msgstr "叮人虫"
+
+#. ATTACK.PC_ALAN_STINGER.DESC 
+msgctxt "ATTACK.PC_ALAN_STINGER.DESC" 
+msgid "" 
+msgstr "移除目标身上所有所有{DEFEND}." 
+
+#. ATTACK.PC_ALAN_STINGER.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_STINGER.FLAVOUR" 
+msgid "" 
+msgstr "‘我特别养的，可惜不亲人，只叮人。’" 
+
+#. ATTACK.PC_ALAN_STINGER_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_STINGER_PLUS.NAME" 
+msgid "" 
+msgstr "粘性叮人虫"
+
+#. ATTACK.PC_ALAN_STINGER_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_STINGER_PLUS.DESC" 
+msgid "" 
+msgstr "移除目标身上所有所有{DEFEND}." 
+
+#. ATTACK.PC_ALAN_STINGER_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_STINGER_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘我特别养的，可惜不亲人，只叮人。’" 
+
+#. ATTACK.PC_ALAN_STINGER_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_STINGER_PLUS2.NAME" 
+msgid "" 
+msgstr "小叮人虫"
+
+#. ATTACK.PC_ALAN_STINGER_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_STINGER_PLUS2.DESC" 
+msgid "" 
+msgstr "移除目标身上所有所有{DEFEND}." 
+
+#. ATTACK.PC_ALAN_STINGER_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_STINGER_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘我特别养的，可惜不亲人，只叮人。’" 
+
+#. ATTACK.PC_ALAN_LUMIN_INFUSION.NAME 
+msgctxt "ATTACK.PC_ALAN_LUMIN_INFUSION.NAME" 
+msgid "" 
+msgstr "蓝明补充"
+
+#. ATTACK.PC_ALAN_LUMIN_INFUSION.DESC 
+msgctxt "ATTACK.PC_ALAN_LUMIN_INFUSION.DESC" 
+msgid "" 
+msgstr "获得{1}{LUMIN_RESERVE}." 
+
+#. ATTACK.PC_ALAN_LUMIN_INFUSION.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_LUMIN_INFUSION.FLAVOUR" 
+msgid "" 
+msgstr "‘看到这个凸出来的东西了没有？刀里的蓝明就可以通过注入这里来补充。’" 
+
+#. ATTACK.PC_ALAN_LUMIN_INFUSION_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_LUMIN_INFUSION_PLUS.NAME" 
+msgid "" 
+msgstr "远见蓝明补充"
+
+#. ATTACK.PC_ALAN_LUMIN_INFUSION_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_LUMIN_INFUSION_PLUS.DESC" 
+msgid "" 
+msgstr "获得{1}{LUMIN_RESERVE}\n<#UPGRADE>抽1张牌</>." 
+
+#. ATTACK.PC_ALAN_LUMIN_INFUSION_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_LUMIN_INFUSION_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘看到这个凸出来的东西了没有？刀里的蓝明就可以通过注入这里来补充。’" 
+
+#. ATTACK.PC_ALAN_LUMIN_INFUSION_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_LUMIN_INFUSION_PLUS2.NAME" 
+msgid "" 
+msgstr "火花补充"
+
+#. ATTACK.PC_ALAN_LUMIN_INFUSION_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_LUMIN_INFUSION_PLUS2.DESC" 
+msgid "" 
+msgstr "<#UPGRADE>施加{1}{SPARK_RESERVE}</>.\n<#DOWNGRADE>获得{1}{SPARK_RESERVE}</>." 
+
+#. ATTACK.PC_ALAN_LUMIN_INFUSION_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_LUMIN_INFUSION_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘看到这个凸出来的东西了没有？刀里的蓝明就可以通过注入这里来补充。’" 
+
+#. ATTACK.PC_ALAN_PLAN.NAME 
+msgctxt "ATTACK.PC_ALAN_PLAN.NAME" 
+msgid "" 
+msgstr "规划"
+
+#. ATTACK.PC_ALAN_PLAN.DESC 
+msgctxt "ATTACK.PC_ALAN_PLAN.DESC" 
+msgid "" 
+msgstr "从抽牌堆中{IMPROVISE}1张牌." 
+
+#. ATTACK.PC_ALAN_PLAN.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_PLAN.FLAVOUR" 
+msgid "" 
+msgstr "‘不管是进攻路线还是逃跑路线，最好都先规划好。’" 
+
+#. ATTACK.PC_ALAN_PLAN_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_PLAN_PLUS.NAME" 
+msgid "" 
+msgstr "增强规划"
+
+#. ATTACK.PC_ALAN_PLAN_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_PLAN_PLUS.DESC" 
+msgid "" 
+msgstr "从抽牌堆中<#UPGRADE>{IMPROVISE_PLUS}</>1张牌." 
+
+#. ATTACK.PC_ALAN_PLAN_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_PLAN_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘不管是进攻路线还是逃跑路线，最好都先规划好。’" 
+
+#. ATTACK.PC_ALAN_PLAN_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_PLAN_PLUS2.NAME" 
+msgid "" 
+msgstr "远见规划"
+
+#. ATTACK.PC_ALAN_PLAN_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_PLAN_PLUS2.DESC" 
+msgid "" 
+msgstr "从抽牌堆中{IMPROVISE}1张牌." 
+
+#. ATTACK.PC_ALAN_PLAN_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_PLAN_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘不管是进攻路线还是逃跑路线，最好都先规划好。’" 
+
+#. ATTACK.PC_ALAN_WARM_UP.NAME 
+msgctxt "ATTACK.PC_ALAN_WARM_UP.NAME" 
+msgid "" 
+msgstr "预热"
+
+#. ATTACK.PC_ALAN_WARM_UP.DESC 
+msgctxt "ATTACK.PC_ALAN_WARM_UP.DESC" 
+msgid "" 
+msgstr "下个回合开始时获得2{ADRENALINE}." 
+
+#. ATTACK.PC_ALAN_WARM_UP.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_WARM_UP.FLAVOUR" 
+msgid "" 
+msgstr "‘没办法，老旧款就这样，爱要不要吧。’" 
+
+#. ATTACK.PC_ALAN_WARM_UP_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_WARM_UP_PLUS.NAME" 
+msgid "" 
+msgstr "重量预热"
+
+#. ATTACK.PC_ALAN_WARM_UP_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_WARM_UP_PLUS.DESC" 
+msgid "" 
+msgstr "下个回合开始时获得2{ADRENALINE}.\n<#UPGRADE>{PC_ALAN_WEIGHTED}{1}：额外获得1层</>." 
+
+#. ATTACK.PC_ALAN_WARM_UP_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_WARM_UP_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘没办法，老旧款就这样，爱要不要吧。’" 
+
+#. ATTACK.PC_ALAN_WARM_UP_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_WARM_UP_PLUS2.NAME" 
+msgid "" 
+msgstr "轻量预热"
+
+#. ATTACK.PC_ALAN_WARM_UP_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_WARM_UP_PLUS2.DESC" 
+msgid "" 
+msgstr "<#UPGRADE>{PC_ALAN_LIGHTWEIGHT}{1}：本回合获得1{ADRENALINE}</>.\n下个回合开始时获得2{ADRENALINE}." 
+
+#. ATTACK.PC_ALAN_WARM_UP_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_WARM_UP_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘没办法，老旧款就这样，爱要不要吧。’" 
+
+#. ATTACK.PC_ALAN_PLATE_ARMOR.NAME 
+msgctxt "ATTACK.PC_ALAN_PLATE_ARMOR.NAME" 
+msgid "" 
+msgstr "板甲"
+
+#. ATTACK.PC_ALAN_PLATE_ARMOR.DESC 
+msgctxt "ATTACK.PC_ALAN_PLATE_ARMOR.DESC" 
+msgid "" 
+msgstr "每有1张手牌便获得{1}{DEFEND}.\n(获得{2}{DEFEND})." 
+
+#. ATTACK.PC_ALAN_PLATE_ARMOR.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_PLATE_ARMOR.FLAVOUR" 
+msgid "" 
+msgstr "‘新进货的板甲，由我亲自展示效果！’" 
+
+#. ATTACK.PC_ALAN_PLATE_ARMOR_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_PLATE_ARMOR_PLUS.NAME" 
+msgid "" 
+msgstr "增强板甲"
+
+#. ATTACK.PC_ALAN_PLATE_ARMOR_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_PLATE_ARMOR_PLUS.DESC" 
+msgid "" 
+msgstr "每有1张手牌便获得<#UPGRADE>{1}</>{DEFEND}.\n(获得{2}{DEFEND})." 
+
+#. ATTACK.PC_ALAN_PLATE_ARMOR_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_PLATE_ARMOR_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘新进货的板甲，由我亲自展示效果！’" 
+
+#. ATTACK.PC_ALAN_PLATE_ARMOR_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_PLATE_ARMOR_PLUS2.NAME" 
+msgid "" 
+msgstr "远见板甲"
+
+#. ATTACK.PC_ALAN_PLATE_ARMOR_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_PLATE_ARMOR_PLUS2.DESC" 
+msgid "" 
+msgstr "每有1张手牌便获得{1}{DEFEND}.\n(获得{2}{DEFEND})." 
+
+#. ATTACK.PC_ALAN_PLATE_ARMOR_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_PLATE_ARMOR_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘新进货的板甲，由我亲自展示效果！’" 
+
+#. ATTACK.PC_ALAN_GOODS.NAME 
+msgctxt "ATTACK.PC_ALAN_GOODS.NAME" 
+msgid "" 
+msgstr "货物"
+
+#. ATTACK.PC_ALAN_GOODS.DESC 
+msgctxt "ATTACK.PC_ALAN_GOODS.DESC" 
+msgid "" 
+msgstr "施加{1}{DEFEND}.\n该牌会额外增加与手牌中花费最高的牌的花费." 
+
+#. ATTACK.PC_ALAN_GOODS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_GOODS.FLAVOUR" 
+msgid "" 
+msgstr "‘摔了不赔，自己心疼去吧。’" 
+
+#. ATTACK.PC_ALAN_GOODS_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_GOODS_PLUS.NAME" 
+msgid "" 
+msgstr "填装货物"
+
+#. ATTACK.PC_ALAN_GOODS_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_GOODS_PLUS.DESC" 
+msgid "" 
+msgstr "施加{1}{DEFEND}.\n该牌会额外增加与手牌中花费最高的牌的花费." 
+
+#. ATTACK.PC_ALAN_GOODS_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_GOODS_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘摔了不赔，自己心疼去吧。’" 
+
+#. ATTACK.PC_ALAN_GOODS_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_GOODS_PLUS2.NAME" 
+msgid "" 
+msgstr "沉重货物"
+
+#. ATTACK.PC_ALAN_GOODS_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_GOODS_PLUS2.DESC" 
+msgid "" 
+msgstr "施加<#UPGRADE>{1}</>{DEFEND}.\n该牌会额外增加与手牌中花费最高的牌的花费." 
+
+#. ATTACK.PC_ALAN_GOODS_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_GOODS_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘摔了不赔，自己心疼去吧。’" 
+
+#. ATTACK.PC_ALAN_SHODDY_SHIELD.NAME 
+msgctxt "ATTACK.PC_ALAN_SHODDY_SHIELD.NAME" 
+msgid "" 
+msgstr "劣质盾牌"
+
+#. ATTACK.PC_ALAN_SHODDY_SHIELD.DESC 
+msgctxt "ATTACK.PC_ALAN_SHODDY_SHIELD.DESC" 
+msgid "" 
+msgstr "获得{1}{DEFEND}.本回合每打出一张牌，增加{2}.\n（已打出{3}张牌）." 
+
+#. ATTACK.PC_ALAN_SHODDY_SHIELD.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SHODDY_SHIELD.FLAVOUR" 
+msgid "" 
+msgstr "‘比起正版的弱上许多，但架不住它成本便宜。’" 
+
+#. ATTACK.PC_ALAN_SHODDY_SHIELD_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_SHODDY_SHIELD_PLUS.NAME" 
+msgid "" 
+msgstr "劣质石制盾牌"
+
+#. ATTACK.PC_ALAN_SHODDY_SHIELD_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_SHODDY_SHIELD_PLUS.DESC" 
+msgid "" 
+msgstr "获得<#UPGRADE>{1}</>{DEFEND}.本回合每打出一张牌，增加{2}.\n（已打出{3}张牌）." 
+
+#. ATTACK.PC_ALAN_SHODDY_SHIELD_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SHODDY_SHIELD_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘比起正版的弱上许多，但架不住它成本便宜。’" 
+
+#. ATTACK.PC_ALAN_SHODDY_SHIELD_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_SHODDY_SHIELD_PLUS2.NAME" 
+msgid "" 
+msgstr "劣质尖刺盾牌"
+
+#. ATTACK.PC_ALAN_SHODDY_SHIELD_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_SHODDY_SHIELD_PLUS2.DESC" 
+msgid "" 
+msgstr "获得{1}{DEFEND}和<#UPGRADE>{1}{RIPOSTE}</>.本回合每打出一张牌，增加{2}.\n（已打出{3}张牌）." 
+
+#. ATTACK.PC_ALAN_SHODDY_SHIELD_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SHODDY_SHIELD_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘比起正版的弱上许多，但架不住它成本便宜。’" 
+
+#. ATTACK.PC_ALAN_COUNTER.NAME 
+msgctxt "ATTACK.PC_ALAN_COUNTER.NAME" 
+msgid "" 
+msgstr "反击"
+
+#. ATTACK.PC_ALAN_COUNTER.DESC 
+msgctxt "ATTACK.PC_ALAN_COUNTER.DESC" 
+msgid "" 
+msgstr "获得{1}{DEFEND}和{2}{RIPOSTE}." 
+
+#. ATTACK.PC_ALAN_COUNTER.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_COUNTER.FLAVOUR" 
+msgid "" 
+msgstr "‘我可不会傻站着让你打。’" 
+
+#. ATTACK.PC_ALAN_COUNTER_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_COUNTER_PLUS.NAME" 
+msgid "" 
+msgstr "岩石反击"
+
+#. ATTACK.PC_ALAN_COUNTER_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_COUNTER_PLUS.DESC" 
+msgid "" 
+msgstr "获得<#UPGRADE>{1}</>{DEFEND}和{2}{RIPOSTE}." 
+
+#. ATTACK.PC_ALAN_COUNTER_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_COUNTER_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘我可不会傻站着让你打。’" 
+
+#. ATTACK.PC_ALAN_COUNTER_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_COUNTER_PLUS2.NAME" 
+msgid "" 
+msgstr "尖锐反击"
+
+#. ATTACK.PC_ALAN_COUNTER_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_COUNTER_PLUS2.DESC" 
+msgid "" 
+msgstr "获得{1}{DEFEND}和<#UPGRADE>{2}</>{RIPOSTE}." 
+
+#. ATTACK.PC_ALAN_COUNTER_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_COUNTER_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘我可不会傻站着让你打。’" 
+
+#. ATTACK.PC_ALAN_INSPIRE.NAME 
+msgctxt "ATTACK.PC_ALAN_INSPIRE.NAME" 
+msgid "" 
+msgstr "鼓舞"
+
+#. ATTACK.PC_ALAN_INSPIRE.DESC 
+msgctxt "ATTACK.PC_ALAN_INSPIRE.DESC" 
+msgid "" 
+msgstr "使自身和所有友方角色获得{1}{ADRENALINE}." 
+
+#. ATTACK.PC_ALAN_INSPIRE.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_INSPIRE.FLAVOUR" 
+msgid "" 
+msgstr "‘敌人就快倒下了！’" 
+
+#. ATTACK.PC_ALAN_INSPIRE_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_INSPIRE_PLUS.NAME" 
+msgid "" 
+msgstr "持久鼓舞"
+
+#. ATTACK.PC_ALAN_INSPIRE_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_INSPIRE_PLUS.DESC" 
+msgid "" 
+msgstr "使自身和所有友方角色获得{1}<#UPGRADE>{POWER}</>." 
+
+#. ATTACK.PC_ALAN_INSPIRE_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_INSPIRE_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘敌人就快倒下了！’" 
+
+#. ATTACK.PC_ALAN_INSPIRE_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_INSPIRE_PLUS2.NAME" 
+msgid "" 
+msgstr "增强鼓舞"
+
+#. ATTACK.PC_ALAN_INSPIRE_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_INSPIRE_PLUS2.DESC" 
+msgid "" 
+msgstr "使自身和所有友方角色获得<#UPGRADE>{1}</>{ADRENALINE}." 
+
+#. ATTACK.PC_ALAN_INSPIRE_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_INSPIRE_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘敌人就快倒下了！’" 
+
+#. ATTACK.PC_ALAN_BE_PREPARED.NAME 
+msgctxt "ATTACK.PC_ALAN_BE_PREPARED.NAME" 
+msgid "" 
+msgstr "有所准备"
+
+#. ATTACK.PC_ALAN_BE_PREPARED.DESC 
+msgctxt "ATTACK.PC_ALAN_BE_PREPARED.DESC" 
+msgid "" 
+msgstr "施加{1}{fixed}." 
+
+#. ATTACK.PC_ALAN_BE_PREPARED.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_BE_PREPARED.FLAVOUR" 
+msgid "" 
+msgstr "‘不要只专注于攻。给自己点退路。’" 
+
+#. ATTACK.PC_ALAN_BE_PREPARED_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_BE_PREPARED_PLUS.NAME" 
+msgid "" 
+msgstr "增强有所准备"
+
+#. ATTACK.PC_ALAN_BE_PREPARED_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_BE_PREPARED_PLUS.DESC" 
+msgid "" 
+msgstr "施加<#UPGRADE>{1}</>{fixed}." 
+
+#. ATTACK.PC_ALAN_BE_PREPARED_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_BE_PREPARED_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘不要只专注于攻。给自己点退路。’" 
+
+#. ATTACK.PC_ALAN_BE_PREPARED_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_BE_PREPARED_PLUS2.NAME" 
+msgid "" 
+msgstr "黯淡有所准备"
+
+#. ATTACK.PC_ALAN_BE_PREPARED_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_BE_PREPARED_PLUS2.DESC" 
+msgid "" 
+msgstr "施加{1}{fixed}." 
+
+#. ATTACK.PC_ALAN_BE_PREPARED_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_BE_PREPARED_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘不要只专注于攻。给自己点退路。’" 
+
+#. ATTACK.PC_ALAN_BACKUP_WEAPON.NAME 
+msgctxt "ATTACK.PC_ALAN_BACKUP_WEAPON.NAME" 
+msgid "" 
+msgstr "备用武器"
+
+#. ATTACK.PC_ALAN_BACKUP_WEAPON.DESC 
+msgctxt "ATTACK.PC_ALAN_BACKUP_WEAPON.DESC" 
+msgid "" 
+msgstr "抽2张牌." 
+
+#. ATTACK.PC_ALAN_BACKUP_WEAPON.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_BACKUP_WEAPON.FLAVOUR" 
+msgid "" 
+msgstr "‘有个后手总是好的。’" 
+
+#. ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS.NAME" 
+msgid "" 
+msgstr "备用轻武器"
+
+#. ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS.DESC" 
+msgid "" 
+msgstr "抽2张牌\n<#UPGRADE>{PC_ALAN_LIGHTWEIGHT}{1}：额外抽1张牌</>." 
+
+#. ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘有个后手总是好的。’" 
+
+#. ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS2.NAME" 
+msgid "" 
+msgstr "备用重武器"
+
+#. ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS2.DESC" 
+msgid "" 
+msgstr "抽2张牌\n<#UPGRADE>{PC_ALAN_WEIGHTED}{1}：获得1点行动点</>." 
+
+#. ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘有个后手总是好的。’" 
+
+#. ATTACK.PC_ALAN_CLEANUP.NAME 
+msgctxt "ATTACK.PC_ALAN_CLEANUP.NAME" 
+msgid "" 
+msgstr "清理"
+
+#. ATTACK.PC_ALAN_CLEANUP.DESC 
+msgctxt "ATTACK.PC_ALAN_CLEANUP.DESC" 
+msgid "" 
+msgstr "丢弃2张牌\n抽2张牌." 
+
+#. ATTACK.PC_ALAN_CLEANUP.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_CLEANUP.FLAVOUR" 
+msgid "" 
+msgstr "‘有些东西得尽快处理。’" 
+
+#. ATTACK.PC_ALAN_CLEANUP_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_CLEANUP_PLUS.NAME" 
+msgid "" 
+msgstr "清理石头"
+
+#. ATTACK.PC_ALAN_CLEANUP_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_CLEANUP_PLUS.DESC" 
+msgid "" 
+msgstr "<#UPGRADE>获得{1}{DEFEND}</>\n丢弃2张牌\n抽2张牌." 
+
+#. ATTACK.PC_ALAN_CLEANUP_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_CLEANUP_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘有些东西得尽快处理。’" 
+
+#. ATTACK.PC_ALAN_CLEANUP_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_CLEANUP_PLUS2.NAME" 
+msgid "" 
+msgstr "尽数清理"
+
+#. ATTACK.PC_ALAN_CLEANUP_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_CLEANUP_PLUS2.DESC" 
+msgid "" 
+msgstr "<#UPGRADE>丢弃所有手牌\n抽3张牌</>." 
+
+#. ATTACK.PC_ALAN_CLEANUP_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_CLEANUP_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘有些东西得尽快处理。’" 
+
+#. ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE.NAME 
+msgctxt "ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE.NAME" 
+msgid "" 
+msgstr "抢占先机"
+
+#. ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE.DESC 
+msgctxt "ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE.DESC" 
+msgid "" 
+msgstr "下一幕获得2点行动点." 
+
+#. ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE.FLAVOUR" 
+msgid "" 
+msgstr "‘你不抢，别人就会抢了。’" 
+
+#. ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE_PLUS.NAME" 
+msgid "" 
+msgstr "抢占重要先机"
+
+#. ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE_PLUS.DESC" 
+msgid "" 
+msgstr "下一幕获得2点行动点.\n<#UPGRADE>{PC_ALAN_WEIGHTED}{1}：下一幕额外获得1点行动点</>." 
+
+#. ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘你不抢，别人就会抢了。’" 
+
+#. ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE_PLUS2.NAME" 
+msgid "" 
+msgstr "抢占更多先机"
+
+#. ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE_PLUS2.DESC" 
+msgid "" 
+msgstr "下一幕获得2点行动点<#UPGRADE>并抽1张牌</>." 
+
+#. ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SEIZE_THE_INITIATIVE_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘你不抢，别人就会抢了。’" 
+
+#. ATTACK.PC_ALAN_EXPLOSIVE_CARGO.NAME 
+msgctxt "ATTACK.PC_ALAN_EXPLOSIVE_CARGO.NAME" 
+msgid "" 
+msgstr "易爆货物"
+
+#. ATTACK.PC_ALAN_EXPLOSIVE_CARGO.DESC 
+msgctxt "ATTACK.PC_ALAN_EXPLOSIVE_CARGO.DESC" 
+msgid "" 
+msgstr "施加{1}{DEFEND}和{2}{SPARK_RESERVE}." 
+
+#. ATTACK.PC_ALAN_EXPLOSIVE_CARGO.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_EXPLOSIVE_CARGO.FLAVOUR" 
+msgid "" 
+msgstr "‘里面有很多火花，小心点搬。’" 
+
+#. ATTACK.PC_ALAN_EXPLOSIVE_CARGO_PLUS.NAME 
+msgctxt "ATTACK.PC_ALAN_EXPLOSIVE_CARGO_PLUS.NAME" 
+msgid "" 
+msgstr "软化易爆货物"
+
+#. ATTACK.PC_ALAN_EXPLOSIVE_CARGO_PLUS.DESC 
+msgctxt "ATTACK.PC_ALAN_EXPLOSIVE_CARGO_PLUS.DESC" 
+msgid "" 
+msgstr "施加{1}{DEFEND}和<#UPGRADE>{2}</>{SPARK_RESERVE}." 
+
+#. ATTACK.PC_ALAN_EXPLOSIVE_CARGO_PLUS.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_EXPLOSIVE_CARGO_PLUS.FLAVOUR" 
+msgid "" 
+msgstr "‘里面有很多火花，小心点搬。’" 
+
+#. ATTACK.PC_ALAN_EXPLOSIVE_CARGO_PLUS2.NAME 
+msgctxt "ATTACK.PC_ALAN_EXPLOSIVE_CARGO_PLUS2.NAME" 
+msgid "" 
+msgstr "沉重易爆货物"
+
+#. ATTACK.PC_ALAN_EXPLOSIVE_CARGO_PLUS2.DESC 
+msgctxt "ATTACK.PC_ALAN_EXPLOSIVE_CARGO_PLUS2.DESC" 
+msgid "" 
+msgstr "施加<#UPGRADE>{1}</>{DEFEND}和{2}{SPARK_RESERVE}." 
+
+#. ATTACK.PC_ALAN_EXPLOSIVE_CARGO_PLUS2.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_EXPLOSIVE_CARGO_PLUS2.FLAVOUR" 
+msgid "" 
+msgstr "‘里面有很多火花，小心点搬。’" 
