@@ -43,7 +43,7 @@ local CONDITIONS =
     SPARK_RESERVE =
     {
         name = "Spark Reserve",
-        desc = "Up to 10 stacks. At 10 stacks, clear all stack and dealing 20% max HP damage to the bearer.",
+        desc = "Up to 10 stacks. At 10 stacks, clear all stack and dealing 25% max HP damage to the bearer.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.stacks)
         end,
@@ -65,7 +65,7 @@ local CONDITIONS =
                 if owner == self.owner and condition.id == "SPARK_RESERVE" then
                     if condition.stacks >= condition.max_stacks then
                         local max_health = owner:GetMaxHealth()
-                        local damage = math.floor(max_health * 0.2)
+                        local damage = math.floor(max_health * 0.25)
                         owner:ApplyDamage(damage)
                         owner:RemoveCondition("SPARK_RESERVE", condition.stacks, self)
                     end
