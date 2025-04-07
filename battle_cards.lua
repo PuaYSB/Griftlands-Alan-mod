@@ -23,7 +23,6 @@ local function CalculateTotalAndMaxCost(engine, self)
 end
 
 local function CalculateConditionText( source, condition_id, stacks, target )
-    stacks = stacks or 0 
     if source.engine then
         local modified_stacks = source.engine:CalculateModifiedStacks( condition_id, stacks, target or source.target, source )
 
@@ -44,9 +43,6 @@ local CONDITIONS =
     {
         name = "Spark Reserve",
         desc = "Up to 10 stacks. At 10 stacks, clear all stack and dealing 25% max HP damage to the bearer.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.stacks)
-        end,
         icon = "battle/conditions/hardknocks.tex",
         ctype = CTYPE.DEBUFF,
         apply_sound = "event:/sfx/battle/status/system/Status_Buff_Attack",
@@ -81,13 +77,11 @@ local CONDITIONS =
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.stacks, math.ceil(self.stacks / 5))
         end,
-
         icon = "battle/conditions/sharpened_blade.tex",
         ctype = CTYPE.BUFF,
         apply_sound = "event:/sfx/battle/status/system/Status_Buff_Attack",
         target_type = TARGET_TYPE.SELF,
         max_stacks = 99,
-
         event_handlers =
         {
             [ BATTLE_EVENT.ON_HIT ] = function(self, battle, attack, hit)
@@ -177,7 +171,7 @@ local CONDITIONS =
     {
         name = "Throwing Knife Replicator",
         icon = "battle/conditions/active_shield_generator.tex",        
-        desc = "At turn start, insert <#HILITE>{1}</> {PC_ALAN_QUICK_THROW} into your hand",
+        desc = "At turn start, insert <#HILITE>{1}</> {PC_ALAN_QUICK_THROW} into your hand.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.stacks )
         end,
@@ -212,18 +206,19 @@ local CONDITIONS =
         }
     },
 
-    PA_BACKUP_LUMIN_FUEL =
+    PA_LUMIN_SHIELD_GENERATOR =
     {
-        name = "Backup Lumin Fuel",
-        icon = "battle/conditions/duplication_potion.tex",        
-        desc = "At the end of your turn, gain <#HILITE>{1}</> {LUMIN_RESERVE}.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.stacks * 2 )
-        end,
-        event_handlers =
+        name = "Lumin Shield Generator",
+        icon = "battle/conditions/protective_procedure.tex",        
+        desc = "At turn end, Gain the {DEFEND} equal to the {LUMIN_RESERVE}.",
+        max_stacks = 1,
+        event_handlers = 
         {
-            [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
-            self.owner:AddCondition("LUMIN_RESERVE", (self.stacks * 2), self)
+            [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle, condition )
+            self.lumin_reserve = self.owner:GetConditionStacks( "LUMIN_RESERVE" ) or 0
+            if self.lumin_reserve > 0 then
+                self.owner:AddCondition("DEFEND", self.lumin_reserve, self)
+            end
             end
         }
     },
@@ -231,15 +226,15 @@ local CONDITIONS =
     PA_DEEP_POCKETS =
     {
         name = "Deep Pockets",
-        icon = "battle/conditions/duplication_potion.tex",        
+        icon = "battle/conditions/combat_analysis.tex",        
         desc = "At turn start, draw <#HILITE>{1}</> card.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.stacks )
         end,
         event_handlers =
         {
-            [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
-            self.owner:AddCondition("NEXT_TURN_CARD_ALAN", self.stacks, self)
+            [ BATTLE_EVENT.BEGIN_PLAYER_TURN ] = function( self, battle )
+            battle:DrawCards(self.stacks or 1)
             end
         }
     },
@@ -270,6 +265,150 @@ local CONDITIONS =
                 end
             end
             end
+        }
+    },
+
+    PA_RHYTHM =
+    {
+        name = "Rhythm",
+        icon = "battle/conditions/drive.tex",        
+        desc = "Whenever you play a card that costs 0, gain <#HILITE>{1}</> {ADRENALINE}.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.stacks)
+        end,
+        event_handlers = 
+        {
+            [ BATTLE_EVENT.START_RESOLVE ] = function(self, battle, card, cost)
+            if card.owner == self.owner and battle:CalculateActionCost(card) == 0 then
+                self.owner:AddCondition("ADRENALINE", self.stacks or 1, self)
+            end
+            end,
+        },
+    },
+
+    PA_CHARGE_UP =
+    {
+        name = "Charge Up",
+        icon = "battle/conditions/concentration.tex",        
+        desc = "At turn start, choose a card, double the damage of that card on this turn.",
+        max_stacks = 1,
+        deck_handlers = { DECK_TYPE.IN_HAND },
+        event_handlers = 
+        {
+            [ BATTLE_EVENT.BEGIN_PLAYER_TURN ] = function( self, battle )
+            local hand = battle:GetHandDeck()
+
+            local card = battle:ChooseCard( function(x) return x:IsDamageCard() end)
+            if card and card:IsDamageCard() then
+                local con = self.owner:GetCondition("cynotrainer") or self.owner:AddCondition("cynotrainer", 1, self)
+                if con then
+                    if con.buffed_cards then
+                        table.insert(con.buffed_cards, card)
+                    else
+                        con.buffed_cards = {card}
+                    end
+                end
+            end
+            end,
+        }
+    },
+
+    PA_BACKUP_LUMIN_FUEL =
+    {
+        name = "Backup Lumin Fuel",
+        icon = "battle/conditions/duplication_potion.tex",        
+        desc = "At the end of your turn, gain <#HILITE>{1}</> {LUMIN_RESERVE}.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self.stacks * 2 )
+        end,
+        event_handlers =
+        {
+            [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
+            self.owner:AddCondition("LUMIN_RESERVE", (self.stacks * 2), self)
+            end
+        }
+    },
+
+    PA_OVERLOADED_CORE =
+    {
+        name = "Overloaded Core",
+        icon = "battle/conditions/charged_strikes.tex",        
+        desc = "Gain {POWER} equal to your {SPARK_RESERVE}. When the amount of {SPARK_RESERVE} changes, the amount of {POWER} will also change.",
+        max_stacks = 1,
+        event_handlers =
+        {
+            [ BATTLE_EVENT.CONDITION_ADDED ] = function(self, owner, condition, stacks, source)
+            if owner == self.owner and condition.id == "SPARK_RESERVE" then
+                local new_spark_reserve = self.owner:GetConditionStacks("SPARK_RESERVE") or 0
+                local diff = new_spark_reserve - (self.spark_reserve or 0)
+                if diff > 0 then
+                    self.owner:AddCondition("POWER", diff, self)
+                end
+                self.spark_reserve = new_spark_reserve
+            end
+            end,
+
+            [ BATTLE_EVENT.CONDITION_REMOVED ] = function(self, owner, condition, stacks, source)
+            if owner == self.owner and condition.id == "SPARK_RESERVE" then
+                local new_spark_reserve = self.owner:GetConditionStacks("SPARK_RESERVE") or 0
+                local diff = new_spark_reserve - (self.spark_reserve or 0)
+                if diff < 0 then
+                    self.owner:AddCondition("POWER", diff, self)  
+                end
+                self.spark_reserve = new_spark_reserve
+            end
+            end
+        }
+    },
+
+    PA_PERFECT_ACCURACY =
+    {
+        name = "Perfect Accuracy",
+        icon = "battle/conditions/combo.tex",        
+        desc = "Your attacks deal max damage.",
+        max_stacks = 1,
+        event_handlers =
+        {
+            [ BATTLE_EVENT.BEGIN_PLAYER_TURN ] = function( self, battle )
+            self.owner:AddCondition("improve_accuracy", self.stacks, self)
+            end
+        }
+    },
+
+    PA_POWER_SURGE =
+    {
+        name = "Power Surge",
+        icon = "battle/conditions/furor.tex",        
+        desc = "Whenever you play a card that have cost at least 2, Play it again.",
+        max_stacks = 1,
+        event_handlers =
+        {
+            [ BATTLE_EVENT.START_RESOLVE ] = function(self, battle, card, attack)
+            if card and card.owner == self.owner and card.cost and card.cost >= 2 then
+                if not card.surge_played then
+                    card.surge_played = true  
+                    battle:PlayCard(card) 
+                end
+            end
+            end,
+        }
+    },
+
+    PA_LUMIN_BOOST =
+    {
+        name = "Lumin Boost",
+        icon = "battle/conditions/lumin_daze.tex",        
+        desc = "Each time you gain {LUMIN_RESERVE}, gain <#HILITE>{1}</> {POWER}",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self.stacks)
+        end,
+        event_handlers =
+        {
+            [ BATTLE_EVENT.CONDITION_ADDED ] = function(self, owner, condition, stacks, source)
+            if owner == self.owner and condition.id == "LUMIN_RESERVE" then
+                    self.owner:AddCondition("POWER", self.stacks, self)
+                end
+            end,
         }
     },
 }
@@ -750,7 +889,7 @@ local CARDS =
         min_damage = 3,
         max_damage = 3,
         self_spark_amt = 2,
-        target_spark_amt = 3,
+        target_spark_amt = 4,
         OnPostResolve = function(self, battle, attack)
             self.owner:AddCondition("SPARK_RESERVE", self.self_spark_amt, self)
             if attack and attack.target then
@@ -1322,7 +1461,7 @@ local CARDS =
         max_xp = 9,
         min_damage = 2,
         max_damage = 4,
-        spark_amt = 4,
+        spark_amt = 2,
         OnPostResolve = function(self, battle, attack)
             if attack and attack.target then
                 attack.target:AddCondition("SPARK_RESERVE", self.spark_amt, self)
@@ -1339,9 +1478,7 @@ local CARDS =
     PC_ALAN_SPARK_BULLET_plus2 =
     {
         name = "Tactless Spark Bullet",
-        min_damage = 5,
-        max_damage = 7,
-        desc = "Apply {1} {SPARK_RESERVE}.\n<#DOWNGRADE>Gain {2} {SPARK_RESERVE}</>.",
+        desc = "Apply <#UPGRADE>{1}</> {SPARK_RESERVE}.\n<#DOWNGRADE>Gain {2} {SPARK_RESERVE}</>.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, 
                 CalculateConditionText(self, "SPARK_RESERVE", self.target_spark_amt), 
@@ -1710,14 +1847,14 @@ local CARDS =
     PC_ALAN_DISRUPTIVE_ATTACK_plus2 =
     {
         name = "Twisted Disruptive Attack",
-        desc = "<#DOWNGRADE>{PC_ALAN_WEIGHTED}{1}</>: <#UPGRADE>Gain 3 {ADRENALINE}</>.",
+        desc = "<#DOWNGRADE>{PC_ALAN_WEIGHTED}{1}</>: <#UPGRADE>Gain 2 {ADRENALINE}</>.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.weight_thresh)
         end,
-        weight_thresh = 6,
+        weight_thresh = 7,
         action_bonus = 0,
         OnPostResolve = function(self, battle, attack)
-            self.owner:AddCondition("ADRENALINE", 3, self)
+            self.owner:AddCondition("ADRENALINE", 2, self)
         end,
 
     },
@@ -1859,8 +1996,8 @@ local CARDS =
         flags = CARD_FLAGS.MELEE,
         cost = 2,
         max_xp = 7,
-        min_damage = 4,
-        max_damage = 8,
+        min_damage = 3,
+        max_damage = 6,
         hit_count = 2, 
     },
 
@@ -1869,14 +2006,14 @@ local CARDS =
         name = "Triple Fists",
         desc = "Attack <#UPGRADE>Three Times</>.",
         min_damage = 2,
-        max_damage = 6,
+        max_damage = 5,
         hit_count = 3,
     },
 
     PC_ALAN_DOUBLE_FISTS_plus2 =
     {
         name = "Rooted Double Fists",
-        min_damage = 7,
+        min_damage = 6,
     },
 
     PC_ALAN_LUMIN_INFUSION =
@@ -2146,8 +2283,8 @@ local CARDS =
     PC_ALAN_SHODDY_SHIELD_plus =
     {
         name = "Shoddy Stone Shield",
-        desc = "Gain <#UPGRADE>{1}</> {DEFEND}. Increase by {2} for each card played this turn.\n({3} cards played).",
-        defend_amount = 4,
+        desc = "Gain {1} {DEFEND}. Increase by <#UPGRADE>{2}</> for each card played this turn.\n({3} cards played).",
+        defend_bonus = 2,
     },
 
     PC_ALAN_SHODDY_SHIELD_plus2 =
@@ -2376,7 +2513,7 @@ local CARDS =
         end,
         weight_thresh = 6,
         action_bonus = 1,
-        OnPostResolve = function( self, battle, attack)
+        OnPreResolve = function( self, battle, attack)
             battle:DrawCards(3)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost >= self.weight_thresh then
@@ -2535,7 +2672,7 @@ local CARDS =
         max_xp = 10,
         min_damage = 4,
         max_damage = 4,   
-        light_thresh = 0,
+        light_thresh = 2,
         event_handlers =
         {
             [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
@@ -2783,7 +2920,7 @@ local CARDS =
         rarity = CARD_RARITY.UNCOMMON,
         min_damage = 4,
         max_damage = 4,
-        weight_thresh = 9,
+        weight_thresh = 8,
         action_bonus = 2,
         OnPreResolve = function(self, battle)
         local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
@@ -2816,7 +2953,7 @@ local CARDS =
         min_damage = 6,
         max_damage = 6,
         action_bonus = 1,
-        weight_thresh = 8,
+        weight_thresh = 7,
         OnPreResolve = function(self, battle)
         local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
         if total_cost >= self.weight_thresh then
@@ -2858,7 +2995,7 @@ local CARDS =
         rarity = CARD_RARITY.UNIQUE,
         min_damage = 8,
         max_damage = 8,
-        weight_thresh = 7,
+        weight_thresh = 6,
         OnPostResolve = function( self, battle, attack )
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost >= self.weight_thresh then
@@ -2899,7 +3036,7 @@ local CARDS =
         rarity = CARD_RARITY.UNIQUE,
         min_damage = 10,
         max_damage = 10,
-        weight_thresh = 6,
+        weight_thresh = 5,
         deck_handlers = { DECK_TYPE.DISCARDS },
         event_handlers =
         {
@@ -2944,8 +3081,10 @@ local CARDS =
         event_handlers = 
         {
             [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
+            if card == self then
             local total_damage = self.bonus_damage * self.engine:CountCardsPlayed()
             dmgt:AddDamage(total_damage, total_damage, self)
+            end
             end
         },
     },
@@ -3037,8 +3176,8 @@ local CARDS =
     PC_ALAN_LUMIN_DARTS_plus =
     {
         name = "Boosted Lumin Darts",
-        min_damage = 6,
-        max_damage = 8,
+        min_damage = 7,
+        max_damage = 9,
     },
 
     PC_ALAN_LUMIN_DARTS_plus2 = 
@@ -3159,7 +3298,7 @@ local CARDS =
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str,self:CalculateDefendText( self.defend_amount ), self.weight_thresh)
         end, 
-        weight_thresh = 7,
+        weight_thresh = 5,
         action_bonus = 1,
         OnPreResolve = function(self, battle)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
@@ -3338,8 +3477,7 @@ local CARDS =
         }, 
         CanPlayCard = function(self, battle, card)
             for _, hand_card in battle:GetHandDeck():Cards() do
-                if hand_card ~= self and 
-                    (CheckBits(hand_card.flags, CARD_FLAGS.MELEE) or CheckBits(hand_card.flags, CARD_FLAGS.RANGED)) then
+                if hand_card ~= self and (CheckBits(hand_card.flags, CARD_FLAGS.MELEE) or CheckBits(hand_card.flags, CARD_FLAGS.RANGED)) then
                         return false, self.def:GetLocalizedString("NO_INJURIES")
                     end
                 end
@@ -3586,7 +3724,7 @@ local CARDS =
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str,self.weight_thresh)
         end,
-        weight_thresh = 6,
+        weight_thresh = 5,
         action_bonus = 1, 
         OnPreResolve = function(self, battle)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
@@ -3662,7 +3800,7 @@ local CARDS =
         max_xp = 3,
         min_damage = 6,
         max_damage = 9,
-        weight_thresh = 9,
+        weight_thresh = 8,
         action_bonus = 3,
         OnPreResolve = function(self, battle)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
@@ -3707,8 +3845,8 @@ local CARDS =
         target_mod = TARGET_MOD.TEAM,
         cost = 1,
         max_xp = 9,
-        min_damage = 4,
-        max_damage = 7,
+        min_damage = 3,
+        max_damage = 6,
         lumin_burnt_amt = 5,
         OnPostResolve = function( self, battle, attack )
             attack:AddCondition("lumin_burnt", self.lumin_burnt_amt, self)
@@ -3718,7 +3856,7 @@ local CARDS =
     PC_ALAN_LUMIN_DISC_plus =
     {
         name = "Rooted Lumin Disc",
-        min_damage = 7,
+        min_damage = 6,
     },
 
     PC_ALAN_LUMIN_DISC_plus2 =
@@ -3740,14 +3878,14 @@ local CARDS =
         name = "Cargo Spill",
         icon = "battle/entire_supply.tex",
         anims = "punch",
-        desc = "At the end of your turn, increase the damage of this card in this combat by 3 if still on hand.",
+        desc = "At the end of your turn, if this card is still in your hand, increase its damage by 3 until played.",
         flavour = "'You must always be ready for the enemy’s moves.'",
         rarity = CARD_RARITY.UNCOMMON,
         flags = CARD_FLAGS.RANGED | CARD_FLAGS.STICKY,
         cost = 1,
         max_xp = 9,
-        min_damage = 5,
-        max_damage = 8,
+        min_damage = 3,
+        max_damage = 6,
         strength_gain = 3,
         event_handlers = 
         {
@@ -3755,15 +3893,20 @@ local CARDS =
                 if self.deck == battle:GetHandDeck() and battle:GetBattleResult() == nil then
                     self:NotifyTriggered()
                     self.min_damage = self.min_damage + self.strength_gain
+                    self.max_damage = self.max_damage + self.strength_gain
                 end
             end
         },
+        OnPostResolve = function( self, battle, attack)
+            self.min_damage = self.def.min_damage
+            self.max_damage = self.def.max_damage
+        end, 
     },
 
     PC_ALAN_CARGO_SPILL_plus =
     {
         name = "Heavy Cargo Spill",
-        desc = "At the end of your turn, increase the damage of this card in this combat by <#UPGRADE>6</> if still on hand.",        
+        desc = "At the end of your turn, if this card is still in your hand, increase its damage by <#UPGRADE>6</> until played.",        
         cost = 2,
         strength_gain = 6,
     },
@@ -3771,8 +3914,8 @@ local CARDS =
     PC_ALAN_CARGO_SPILL_plus2 =
     {
         name = "Boosted Cargo Spill",
-        min_damage = 8,
-        max_damage = 11,
+        min_damage = 6,
+        max_damage = 9,
     },
 
     PC_ALAN_TOSS_IT_OVER =
@@ -4088,33 +4231,41 @@ local CARDS =
         cost = 0,
     },
 
-    PC_ALAN_BACKUP_LUMIN_FUEL =
+    PC_ALAN_LUMIN_SHIELD_GENERATOR =
     {
-        name = "Backup Lumin Fuel",
-        icon = "battle/secret_collection.tex",
+        name = "Lumin Shield Generator",
+        icon = "battle/emergency_shield_generator.tex",
         anim = "taunt",
-        desc = "{ABILITY}: At the end of your turn, gain 2 {LUMIN_RESERVE}.",
-        flavour = "'The amount is a bit low, but it’ll do.'",
-        cost = 2,
-        max_xp = 7,
+        desc = "{ABILITY}: At turn end, Gain the {DEFEND} equal to the {LUMIN_RESERVE}.",
+        flavour = "'I tweaked the internal circuits—now it can stay active for longer.'",
+        cost = 1,
+        max_xp = 9,
         rarity = CARD_RARITY.UNCOMMON,
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
         target_type = TARGET_TYPE.SELF,
         OnPostResolve = function( self, battle, attack )
-            self.owner:AddCondition("PA_BACKUP_LUMIN_FUEL", 1, self)
+            self.owner:AddCondition("PA_LUMIN_SHIELD_GENERATOR", 1, self)
         end
     },
 
-    PC_ALAN_BACKUP_LUMIN_FUEL_plus =
+    PC_ALAN_LUMIN_SHIELD_GENERATOR_plus =
     {
-        name = "Initial Backup Lumin Fuel", 
+        name = "Initial Lumin Shield Generator",
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
     },
 
-    PC_ALAN_BACKUP_LUMIN_FUEL_plus2 =
+    PC_ALAN_LUMIN_SHIELD_GENERATOR_plus2 =
     {
-        name = "Pale Backup Lumin Fuel",
-        cost = 1,       
+        name = "Boosted Lumin Shield Generator",
+        desc = "<#UPGRADE>Gain {1} {LUMIN_RESERVE}</>.\n{ABILITY}: At turn end, Gain the {DEFEND} equal to the {LUMIN_RESERVE}.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, CalculateConditionText( self, "LUMIN_RESERVE", self.lumin_res_amt ))
+        end,
+        lumin_res_amt = 5,
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("PA_LUMIN_SHIELD_GENERATOR", 1, self)
+            self.owner:AddCondition("LUMIN_RESERVE", self.lumin_res_amt, self)
+        end
     },
 
     PC_ALAN_CONFIRM_TARGET =
@@ -4318,7 +4469,7 @@ local CARDS =
         OnPostResolve = function( self, battle, attack )
             attack.target:AddCondition("DEFEND", self.defend_amount, self)
             battle:DrawCards(1)
-            local card = Battle.Card("PC_ALAN_HAMMER_SWING_II", self.owner)
+            local card = Battle.Card("PC_ALAN_RAISE_SHIELD_II", self.owner)
             card.base_card = self
             card.auto_deal = true
             battle:DealCard(card, battle:GetDrawDeck())
@@ -4326,7 +4477,7 @@ local CARDS =
         end,
     },
 
-        PC_ALAN_RAISE_SHIELD_II =
+    PC_ALAN_RAISE_SHIELD_II =
     {
         name = "Raise Shield II",
         icon = "battle/breather.tex",
@@ -4363,7 +4514,7 @@ local CARDS =
         }
     },
 
-        PC_ALAN_RAISE_SHIELD_III =
+    PC_ALAN_RAISE_SHIELD_III =
     {
         name = "Raise Shield III",
         icon = "battle/breather.tex",
@@ -4400,7 +4551,7 @@ local CARDS =
         }
     },
 
-        PC_ALAN_RAISE_SHIELD_IV =
+    PC_ALAN_RAISE_SHIELD_IV =
     {
         name = "Raise Shield IV",
         icon = "battle/breather.tex",
@@ -4442,7 +4593,7 @@ local CARDS =
         name = "Stay Alert",
         icon = "battle/thieves_instinct.tex",
         anim = "taunt",
-        desc = "Apply {1} {DEFEND}\nAt the end of your turn, increase the Defense applied by this card in this combat by {2} if still on hand.",
+        desc = "Apply {1} {DEFEND}\nAt the end of your turn, if this card is still in your hand, increase the Defense applied by this card by {2} until played.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self:CalculateDefendText( self.defend_amount ), self.defend_bonus)
         end,
@@ -4453,7 +4604,7 @@ local CARDS =
         cost = 1,
         max_xp = 9,
         defend_amount = 4,
-        defend_bonus = 2,
+        defend_bonus = 3,
         event_handlers = 
         {
             [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
@@ -4471,16 +4622,16 @@ local CARDS =
     PC_ALAN_STAY_ALERT_plus =
     {
         name = "More Stay Alert",
-        desc = "Apply {1} {DEFEND}\nAt the end of your turn, increase the Defense applied by this card in this combat by <#UPGRADE>{2}</> if still on hand.",        
+        desc = "Apply {1} {DEFEND}\nAt the end of your turn, if this card is still in your hand, increase the Defense applied by this card by <#UPGRADE>{2}</> until played.",        
         cost = 2,
-        defend_bonus = 4,
+        defend_bonus = 5,
     },
 
     PC_ALAN_STAY_ALERT_plus2 =
     {
         name = "Boosted Stay Alert",
-        desc = "Apply <#UPGRADE>{1}</> {DEFEND}\nAt the end of your turn, increase the Defense applied by this card in this combat by {2} if still on hand.",
-        defend_amount = 6,
+        desc = "Apply <#UPGRADE>{1}</> {DEFEND}\nAt the end of your turn, if this card is still in your hand, increase the Defense applied by this card by {2} until played.",
+        defend_amount = 7,
     },
 
     PC_ALAN_READY =
@@ -4529,7 +4680,7 @@ local CARDS =
         name = "Deep Pockets",
         icon = "battle/rummage.tex",
         anim = "taunt",
-        desc = "Draw a card at next turn.\n{ABILITY}: At turn start, draw a card.",
+        desc = "{ABILITY}: At turn start, draw a card.",
         flavour = "'I keep a few things in here—just in case.'",
         cost = 2,
         max_xp = 7,
@@ -4537,7 +4688,6 @@ local CARDS =
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
         target_type = TARGET_TYPE.SELF,
         OnPostResolve = function( self, battle, attack )
-            self.owner:AddCondition("NEXT_TURN_CARD_ALAN", 1, self)
             self.owner:AddCondition("PA_DEEP_POCKETS", 1, self)
         end
     },
@@ -4640,6 +4790,238 @@ local CARDS =
         pwr_amt = 2,
     },
 
+    PC_ALAN_ALL_FOR_ONE =
+    {
+        name = "All for One",
+        icon = "battle/bio_strike.tex",
+        anim = "punch",
+        desc = "Put all 0-cost card into your hand.",
+        flavour = "'Took me a while to find this—rumor has it, it came from an ancient tower.'",
+        cost = 0,
+        max_xp = 9,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND,
+        min_damage = 5,
+        max_damage = 6,
+        deck_handlers = { DECK_TYPE.DRAW, DECK_TYPE.DISCARDS },
+        OnPostResolve = function( self, card, source_deck, source_idx, target_deck, target_idx )
+            local battle = self.engine
+            local hand_deck = battle:GetHandDeck()
+            local valid_cards = {}
+
+            for _, draw_card in battle:GetDrawDeck():Cards() do
+                local cost = draw_card.GetCost and draw_card:GetCost() or draw_card.cost 
+                if cost and cost == 0 then
+                    table.insert(valid_cards, draw_card)
+                end
+            end
+
+            for _, discard_card in battle:GetDiscardDeck():Cards() do
+                local cost = discard_card.GetCost and discard_card:GetCost() or discard_card.cost
+                if cost and cost == 0 then
+                    table.insert(valid_cards, discard_card)
+                end
+            end
+
+            if #valid_cards > 0 then
+                for _, move_card in ipairs(valid_cards) do
+                    move_card:TransferCard(hand_deck)
+                end
+            end
+        end
+    },
+
+    PC_ALAN_ALL_FOR_ONE_plus = 
+    {
+        name = "Boosted All for One",
+        min_damage = 7,
+        max_damage = 8,
+    },
+
+    PC_ALAN_ALL_FOR_ONE_plus2 =
+    {
+        name = "Enduring All for One",
+        flags = CARD_FLAGS.MELEE,
+        cost = 2,
+    },
+
+    PC_ALAN_SUPREME_STRIKE =
+    {
+        name = "Supreme Strike",
+        icon = "battle/crushing_blow.tex",
+        anim = "punch",
+        desc = "At the end of your turn, if this card is still in your hand, decrease the cost by 1 until played.",
+        flavour = "'Meet the Hesh!'",
+        cost = 3,
+        max_xp = 3,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.MELEE | CARD_FLAGS.STICKY,
+        min_damage = 8,
+        max_damage = 14,
+        event_handlers = 
+        {
+            [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
+            if self.deck == battle:GetHandDeck() and battle:GetBattleResult() == nil then
+                self:NotifyTriggered()
+                self.cost = self.cost - 1
+            end
+            end
+        },
+        OnPostResolve = function( self, battle, attack )
+            self.cost = self.def.cost
+        end, 
+    },
+
+    PC_ALAN_SUPREME_STRIKE_plus =
+    {
+        name = "Pale Supreme Strike",
+        cost = 2,
+        min_damage = 5,
+        max_damage = 9
+    },
+
+    PC_ALAN_SUPREME_STRIKE_plus2 =
+    {
+        name = "Heavy Supreme Strike",
+        cost = 4,
+        min_damage = 11,
+        max_damage = 17,
+    },
+
+    PC_ALAN_WARNING_SHOT =
+    {
+        name = "Warning Shot",
+        icon = "battle/cataclysm.tex",
+        anim = "throw",
+        desc = "If either you or the target has {SPARK_RESERVE}, Double the damage.\nIf both have {SPARK_RESERVE}, Double damage again.",
+        flavour = "'You dare step closer? Huh?!'",
+        cost = 1,
+        max_xp = 9,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.RANGED,
+        min_damage = 3,
+        max_damage = 6,
+        event_handlers =
+        {
+            [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
+                if self == card and self.owner:HasCondition("SPARK_RESERVE") then
+                    dmgt:AddDamage( dmgt.min_damage, dmgt.max_damage, self )
+                end
+
+                if self == card and target and self.target:HasCondition("SPARK_RESERVE") then
+                    dmgt:AddDamage( dmgt.min_damage, dmgt.max_damage, self )
+                end
+            end,
+        },
+    },
+
+    PC_ALAN_WARNING_SHOT_plus =
+    {
+        name = "Rooted Warning Shot",
+        min_damage = 6,
+    },
+
+    PC_ALAN_WARNING_SHOT_plus2 =
+    {
+        name = "Tall Warning Shot",
+        max_damage = 9,
+    },
+
+    PC_ALAN_LUMIN_EXPLOSIVE = 
+    {
+        name = "Lumin Explosive",
+        icon = "battle/high_yield_lumin_bomb.tex",
+        anim = "throw",
+        desc = "Attack all enemies.\nApply {1} {lumin_burnt}.\nOnce per turn, whenever you get hit, play this card for free.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.lumin_burnt_amt)
+        end,
+        flavour = "'Stay back! One step closer, and I’m throwing it!'",
+        cost = 1,
+        max_xp = 9,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.RANGED,
+        target_mod = TARGET_MOD.TEAM,
+        min_damage = 6,
+        max_damage = 6,
+        lumin_burnt_amt = 5,
+        deck_handlers = { DECK_TYPE.DRAW, DECK_TYPE.DISCARDS },
+        triggered_this_turn = false,
+        event_handlers =
+        {
+            [ BATTLE_EVENT.ON_HIT ] = function(self, battle, attack, hit)
+            if hit.target == self.owner and attack.card:IsAttackCard() and not attack.is_counter and self.triggered_this_turn == false then
+                self.engine:PushPostHandler(function()
+                    battle:PlayCard(self, self.owner)
+                    self.triggered_this_turn = true
+                end)
+            end
+            end,
+
+            [ BATTLE_EVENT.BEGIN_PLAYER_TURN ] = function(self, battle, fighter)
+            self.triggered_this_turn = false
+            end,
+        },
+        OnPostResolve = function( self, battle, attack )
+            attack:AddCondition("lumin_burnt", self.lumin_burnt_amt, self)
+        end
+    },
+
+    PC_ALAN_LUMIN_EXPLOSIVE_plus =
+    {
+        name = "Rooted Lumin Explosive",
+        min_damage = 8,
+        max_damage = 8,
+    },
+
+    PC_ALAN_LUMIN_EXPLOSIVE_plus2 =
+    {
+        name = "Tall Lumin Explosive",
+        max_damage = 10,
+    },
+
+    PC_ALAN_DISHONORABLE =
+    {
+        name = "Dishonorable",
+        icon = "battle/wretched_strike.tex",
+        anim = "punch",
+        desc = "Apply 1 {STUN}",
+        flavour = "'Relax, it’s just a few days of bed rest.'",
+        cost = 1,
+        max_xp = 9,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND,
+        min_damage = 2,
+        max_damage = 4,
+        OnPostResolve = function( self, battle, attack )
+            attack.target:AddCondition("STUN", 1, self)
+        end
+    },
+
+    PC_ALAN_DISHONORABLE_plus =
+    {
+        name = "Boosted Dishonorable",
+        min_damage = 3,
+        max_damage = 6,
+    },
+
+    PC_ALAN_DISHONORABLE_plus2 =
+    {
+        name = "Enduring Dishonorable",
+        desc = "<#DOWNGRADE>{PC_ALAN_LIGHTWEIGHT}{1}</>: Apply 1 {STUN}",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.light_thresh)
+        end,
+        flags = CARD_FLAGS.MELEE,
+        light_thresh = 1,
+        OnPostResolve = function( self, battle, attack )
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
+            if total_cost <= self.light_thresh then
+                attack.target:AddCondition("STUN", 1, self)
+            end
+        end
+    },
+
     PC_ALAN_SECOND_HAND_SCANNER =
     {
         name = "Second-Hand Scanner",
@@ -4674,9 +5056,361 @@ local CARDS =
         target_mod = TARGET_MOD.SINGLE,
     },
 
+    PC_ALAN_RHYTHM =
+    {
+        name = "Rhythm",
+        icon = "battle/slam.tex",
+        anim = "taunt",
+        desc = "{ABILITY}: Whenever you play a card that costs 0, gain 1 {ADRENALINE}.",
+        flavour = "'Come on, feel the beat with me.'",
+        cost = 2,
+        max_xp = 7,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        target_type = TARGET_TYPE.SELF,
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("PA_RHYTHM", 1, self)
+        end
+    },
 
+    PC_ALAN_RHYTHM_plus =
+    {
+        name = "Initial Rhythm", 
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    },
 
+    PC_ALAN_RHYTHM_plus2 =
+    {
+        name = "Boosted Rhythm",
+        desc = "{ABILITY}: Whenever you play a card that costs 0, gain <#UPGRADE>2</> {ADRENALINE}.",
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("PA_RHYTHM", 2, self)
+        end
+    },
 
+    PC_ALAN_CHARGE_UP =
+    {
+        name = "Charge Up",
+        icon = "battle/cynotrainer.tex",
+        anim = "taunt",
+        desc = "{ABILITY}: At turn start, choose a card, double the damage of that card.",
+        flavour = "'Are you ready?!'",
+        cost = 3,
+        max_xp = 3,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        target_type = TARGET_TYPE.SELF,
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("PA_CHARGE_UP", 1, self)
+        end
+    },
+
+    PC_ALAN_CHARGE_UP_plus =
+    {
+        name = "Initial Charge Up", 
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    },
+
+    PC_ALAN_CHARGE_UP_plus2 =
+    {
+        name = "Pale Charge Up",
+        cost = 2,
+    },
+
+    PC_ALAN_BACKUP_LUMIN_FUEL =
+    {
+        name = "Backup Lumin Fuel",
+        icon = "battle/secret_collection.tex",
+        anim = "taunt",
+        desc = "{ABILITY}: At the end of your turn, gain 2 {LUMIN_RESERVE}.",
+        flavour = "'The amount is a bit low, but it’ll do.'",
+        cost = 2,
+        max_xp = 7,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        target_type = TARGET_TYPE.SELF,
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("PA_BACKUP_LUMIN_FUEL", 1, self)
+        end
+    },
+
+    PC_ALAN_BACKUP_LUMIN_FUEL_plus =
+    {
+        name = "Initial Backup Lumin Fuel", 
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    },
+
+    PC_ALAN_BACKUP_LUMIN_FUEL_plus2 =
+    {
+        name = "Pale Backup Lumin Fuel",
+        cost = 1,       
+    },
+
+    PC_ALAN_CONVERT =
+    {
+        name = "Convert",
+        icon = "battle/mettle.tex",
+        anim = "taunt",
+        desc = "At the end of your turn, if this card is on hand, play it.\nConvert all {ADRENALINE} into {POWER}.",
+        flavour = "'The amount is a bit low, but it’ll do.'",
+        cost = 0,
+        max_xp = 9,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.UNPLAYABLE,
+        target_type = TARGET_TYPE.SELF,
+        event_handlers =
+        {
+            [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle, card )
+                if self.deck == battle:GetHandDeck() then
+                    self:ClearFlags(CARD_FLAGS.UNPLAYABLE)
+                    battle:PlayCard(self, self.owner)
+                    self:SetFlags(CARD_FLAGS.UNPLAYABLE)
+                end
+            end,
+        },
+        OnPostResolve = function( self, battle, attack )
+            local count = self.owner:GetConditionStacks("ADRENALINE")
+            if count > 0 then
+                self.owner:RemoveCondition("ADRENALINE", count, self)
+                self.owner:AddCondition("POWER", count, self)
+            end
+        end
+    },
+
+    PC_ALAN_CONVERT_plus =
+    {
+        name = "Visionary Convert",
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.UNPLAYABLE | CARD_FLAGS.REPLENISH,
+    },
+
+    PC_ALAN_CONVERT_plus2 =
+    {
+        name = "Twisted Visionary Convert",
+        desc = "Convert all {ADRENALINE} into {POWER}.",
+        cost = 1,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.STICKY,
+        event_handlers =
+        {
+
+        },
+        OnPostResolve = function( self, battle, attack )
+            local count = self.owner:GetConditionStacks("ADRENALINE")
+            if count > 0 then
+                self.owner:RemoveCondition("ADRENALINE", count, self)
+                self.owner:AddCondition("POWER", count, self)
+            end
+        end
+    },
+
+    PC_ALAN_FIRST_AID =
+    {
+        name = "First Aid",
+        icon = "battle/triage.tex",
+        anim = "taunt",
+        desc = "{1} {HEAL}.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.heal_amt)
+        end,
+        flavour = "'I know a bit of first aid—need a hand?'",
+        cost = 1,
+        max_xp = 9,
+        heal_amt = 5,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
+        OnPostResolve = function( self, battle, attack)
+            self.target:HealHealth( self.heal_amount, self )
+        end,
+    },
+
+    PC_ALAN_FIRST_AID_plus =
+    {
+        name = "Boosted First Aid",
+        desc = "<#UPGRADE>{1}</> {HEAL}",
+        heal_amt = 8,
+    },
+
+    PC_ALAN_FIRST_AID_plus2 =
+    {
+        name = "Visionary First Aid",
+        desc = "<#UPGRADE>Draw a card</>\n{1} {HEAL}",
+        OnPostResolve = function( self, battle, attack)
+            self.target:HealHealth( self.heal_amount, self )
+            battle:DrawCards(1)
+        end,
+    },
+
+    PC_ALAN_OVERLOADED_CORE =
+    {
+        name = "Overloaded Core",
+        icon = "battle/overloaded_core.tex",
+        anim = "taunt",
+        desc = "{ABILITY}: Gain {POWER} equal to your {SPARK_RESERVE}. When the amount of {SPARK_RESERVE} changes, the amount of {POWER} will also change.",
+        flavour = "'Handle with care—don’t let it blow up again.'",
+        cost = 2,
+        max_xp = 7,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        target_type = TARGET_TYPE.SELF,
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("PA_OVERLOADED_CORE", 1, self)
+        end
+    },
+
+    PC_ALAN_OVERLOADED_CORE_plus =
+    {
+        name = "Initial Overloaded Core", 
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    },
+
+    PC_ALAN_OVERLOADED_CORE_plus2 =
+    {
+        name = "Pale Overloaded Core",
+        cost = 1,       
+    },
+
+    PC_ALAN_PERFECT_ACCURACY =
+    {
+        name = "Perfect Accuracy",
+        icon = "battle/improve_accuracy.tex",
+        anim = "taunt",
+        desc = "{ABILITY}: Your attacks deal max damage for the rest of the turns.",
+        flavour = "'Every strike is lethal!'",
+        cost = 2,
+        max_xp = 7,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        target_type = TARGET_TYPE.SELF,
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("PA_PERFECT_ACCURACY", 1, self)
+        end
+    },
+
+    PC_ALAN_PERFECT_ACCURACY_plus =
+    {
+        name = "Initial Perfect Accuracy", 
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    },
+
+    PC_ALAN_PERFECT_ACCURACY_plus2 =
+    {
+        name = "Visionary Perfect Accuracy",      
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.REPLENISH,
+    },
+
+    PC_ALAN_POWER_SURGE =
+    {
+        name = "Power Surge",
+        icon = "battle/raw_power.tex",
+        anim = "taunt",
+        desc = "{PC_ALAN_WEIGHTED}{1}: Play this card automatically.\n{ABILITY}: Whenever you play a card that have cost at least 2, Play it again.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self.weight_thresh)
+        end,
+        flavour = "'WAAAGH!'",
+        cost = 0,
+        max_xp = 3,
+        weight_thresh = 9,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.UNPLAYABLE,
+        target_type = TARGET_TYPE.SELF,
+        event_handlers = 
+        {
+            [ BATTLE_EVENT.DRAW_CARD ] = function(self, battle, card)
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self) 
+            if card.owner == self.owner then
+                if total_cost >= self.weight_thresh then
+                    self:ClearFlags(CARD_FLAGS.UNPLAYABLE)
+                    battle:PlayCard(self, self.owner)
+                    self:SetFlags(CARD_FLAGS.UNPLAYABLE)
+                end
+            end
+            end
+        },
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("PA_POWER_SURGE", 1, self)
+        end
+    },
+
+    PC_ALAN_POWER_SURGE_plus =
+    {
+        name = "Visionary Power Surge",
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.UNPLAYABLE | CARD_FLAGS.REPLENISH,
+    },
+
+    PC_ALAN_POWER_SURGE_plus2 =
+    {
+        name = "Initial Power Surge",
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.UNPLAYABLE | CARD_FLAGS.AMBUSH,
+    },
+
+    PC_ALAN_LUMIN_BOOST =
+    {
+        name = "Lumin Boost",
+        icon = "battle/lumin_jolt.tex",
+        anim = "taunt",
+        desc = "{ABILITY}: Each time you gain {LUMIN_RESERVE}, gain 1 {POWER}.",
+        flavour = "'Careful—don’t let the Cult of Hesh see this.'",
+        cost = 2,
+        max_xp = 7,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        target_type = TARGET_TYPE.SELF,
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("PA_LUMIN_BOOST", 1, self)
+        end
+    },
+
+    PC_ALAN_LUMIN_BOOST_plus =
+    {
+        name = "Initial Lumin Boost", 
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    },
+
+    PC_ALAN_LUMIN_BOOST_plus2 =
+    {
+        name = "Pale Lumin Boost",
+        cost = 1,       
+    },
+
+    PC_ALAN_THREATEN =
+    {
+        name = "Threaten",
+        icon = "battle/doomed.tex",
+        anim = "taunt",
+        desc = "Increases the target's {SURRENDER} meter by {1}.",
+        flavour = "'I'll give you a chance to beg for mercy!'",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self.sur_amt)
+        end,
+        cost = 2,
+        max_xp = 7,
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.SKILL,
+        target_type = TARGET_TYPE.ENEMY,
+        sur_amt = 10,
+        OnPostResolve = function( self, battle, attack )
+            for i, hit in attack:Hits() do
+                if hit.target:HasMorale() then
+                    local health = hit.target:GetMaxHealth()
+                    hit.target:DeltaMorale( (self.sur_amt)/health )
+                end
+            end
+        end,
+    },
+
+    PC_ALAN_THREATEN_plus =
+    {
+        name = "Pale Threaten",
+        cost = 1,
+    },
+
+    PC_ALAN_THREATEN_plus2 =
+    {
+        name = "Boosted Threaten",
+        desc = "Increases the target's {SURRENDER} meter by <#UPGRADE>{1}</>.",        
+        sur_amt = 20,
+    },
 
 
     --------------------------------------------------------------------------------------

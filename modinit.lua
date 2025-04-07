@@ -69,7 +69,7 @@ local function OnLoad( mod )
     require "LOSTPASSAGE:negotiation_grafts"
     require "LOSTPASSAGE:battle_cards"
     require "LOSTPASSAGE:battle_grafts"
-
+    require "LOSTPASSAGE:Flourishes"
     require "LOSTPASSAGE:shel_shops"
 
     ------------------------------------------------------------------------------------------
