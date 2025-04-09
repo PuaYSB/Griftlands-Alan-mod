@@ -427,6 +427,7 @@ local CARDS =
         flavour = "'No one said I can't use my fists.'",
         rarity = CARD_RARITY.BASIC,
         flags = CARD_FLAGS.MELEE,
+        wild = true,
         cost = 1,
         max_xp = 7,
         min_damage = 2,
@@ -517,6 +518,7 @@ local CARDS =
         flavour = "'I'd better prepare more bottles, whether for storing or throwing.'",
         rarity = CARD_RARITY.BASIC,
         flags = CARD_FLAGS.RANGED,
+        wild = true,
         cost = 0,
         max_xp = 8,
         min_damage = 3,
@@ -623,6 +625,7 @@ local CARDS =
         rarity = CARD_RARITY.BASIC,
         flags = CARD_FLAGS.SKILL,
         target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
+        wild = true,
         cost = 1,
         max_xp = 8,
         OnPostResolve = function( self, battle, attack )
@@ -731,6 +734,7 @@ local CARDS =
         rarity = CARD_RARITY.BASIC,
         flags = CARD_FLAGS.SKILL,
         target_type = TARGET_TYPE.SELF,
+        wild = true,
         cost = 1,
         max_xp = 8,
 
@@ -946,6 +950,7 @@ local CARDS =
         target_type = TARGET_TYPE.SELF,
         rarity = CARD_RARITY.BASIC,
         flags = CARD_FLAGS.SKILL,
+        wild = true,
         cost = 1,
         has_checked = false,
         pool_size = 3,
@@ -3438,7 +3443,7 @@ local CARDS =
         max_damage = 10, 
         spark_amt = 4,
         OnPostResolve = function( self, battle, attack)
-            self.owner:AddCondition("SPARK_RESERVE", spark_amt, self)
+            self.owner:AddCondition("SPARK_RESERVE", self.spark_amt, self)
         end,
     },
 
@@ -3546,19 +3551,8 @@ local CARDS =
 
     PC_ALAN_COMBO_STRIKE_plus =
     {
-        name = "Lightweight Combo Strike",
-        desc = "Insert {PC_ALAN_QUICK_THROW} equal to damage dealt by this card.\n<#UPGRADE>{PC_ALAN_LIGHTWEIGHT}{1}: Gain 1 action</>.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str,self.light_thresh)
-        end, 
-        light_thresh = 2,
-        action_bonus = 1,
-        OnPreResolve = function(self, battle)
-            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
-            if total_cost <= self.light_thresh then
-                self.engine:ModifyActionCount(self.action_bonus)
-            end
-        end,
+        name = "Combo Strike on Clarity",
+        flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND,
     },
 
     PC_ALAN_COMBO_STRIKE_plus2 =
@@ -4489,7 +4483,7 @@ local CARDS =
         hide_in_cardex = true,
         cost = 1,
         flags = CARD_FLAGS.SKILL,
-        rarity = CARD_RARITY.UNCOMMON,
+        rarity = CARD_RARITY.UNIQUE,
         target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
         defend_amount = 6,
         OnPostResolve = function( self, battle, attack )
@@ -4526,7 +4520,7 @@ local CARDS =
         hide_in_cardex = true,
         cost = 2,
         flags = CARD_FLAGS.SKILL,
-        rarity = CARD_RARITY.UNCOMMON,
+        rarity = CARD_RARITY.UNIQUE,
         target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
         defend_amount = 9,
         OnPostResolve = function( self, battle, attack )
@@ -4563,7 +4557,7 @@ local CARDS =
         hide_in_cardex = true,
         cost = 3,
         flags = CARD_FLAGS.SKILL,
-        rarity = CARD_RARITY.UNCOMMON,
+        rarity = CARD_RARITY.UNIQUE,
         target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
         defend_amount = 12,
         deck_handlers = { DECK_TYPE.DISCARDS },
@@ -5471,13 +5465,13 @@ local FEATURES =
     PC_ALAN_WEIGHTED =
     {
     name = "Weighted ",
-    desc = "If the total cost of all cards in hand is <b>at least</b> a certain amount before this card is played, an additional effect is triggered.",
+    desc = "If the total cost of all cards in hand is <HILITE>at least</> a certain amount before this card is played, an additional effect will be triggered.",
     },
 
     PC_ALAN_LIGHTWEIGHT =
     {
     name = "Lightweight ",
-    desc = "If the total cost of all cards in hand is <b>at most</b> a certain amount before this card is played, an additional effect is triggered.",
+    desc = "If the total cost of all cards in hand is <HILITE>at most</> a certain amount before this card is played, an additional effect will be triggered.",
     }
 }
 
