@@ -2219,6 +2219,7 @@ local CARDS =
         cost = 0,
         max_xp = 7, 
         defend_amount = 4,
+        fixed_cost = 0,
         event_handlers =
         {
             [ BATTLE_EVENT.BEGIN_PLAYER_TURN ] = function(self, battle)
