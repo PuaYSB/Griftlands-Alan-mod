@@ -2233,9 +2233,10 @@ local CARDS =
             end
             self.fixed_cost = max_cost > 0 and max_cost or 0
             end,
+
             [ BATTLE_EVENT.CALC_ACTION_COST ] = function(self, cost_acc, card, target)
             if card == self then
-            cost_acc:AddValue(self.fixed_cost, self)
+                cost_acc:AddValue(self.fixed_cost, self)
             end
             end,
         },
@@ -4327,7 +4328,7 @@ local CARDS =
         target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
         flags = CARD_FLAGS.SKILL,
         rarity = CARD_RARITY.UNCOMMON,
-        defend_amount = 8,
+        defend_amount = 7,
         OnPostResolve = function( self, battle, attack )
             attack.target:AddCondition("DEFEND", self.defend_amount, self)
         end,
@@ -4336,8 +4337,7 @@ local CARDS =
         {
             [ BATTLE_EVENT.CALC_ACTION_COST ] = function( self, cost_acc, card, target )
                 if card == self then
-                    local cost_reduction = math.floor((self.engine:GetHandDeck():CountCards() - 1) / 2) 
-                    cost_acc:AddValue(cost_reduction)
+                    cost_acc:AddValue(math.floor((self.engine:GetHandDeck():CountCards() - 1) / 2))
                 end
             end
         },
@@ -4346,14 +4346,14 @@ local CARDS =
     PC_ALAN_ANCHOR_plus =
     {
         name = "Visionary Anchor",
-        desc = "Apply <#UPGRADE>{1}</> {DEFEND}.\nThis card costs 1 more per two other cards in your hand.",
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.REPLENISH,
     },
 
     PC_ALAN_ANCHOR_plus2 =
     {
         name = "Stone Anchor",
-        defend_amount = 12,
+        desc = "Apply <#UPGRADE>{1}</> {DEFEND}.\nAt the start of your turn, this card's cost increases by 1 for each other card in your hand that costs at least 2.",
+        defend_amount = 10,
     },
 
     PC_ALAN_PERFORMANCE =

@@ -72,10 +72,11 @@ local decks =
 {
     NegotiationDeck("negotiation_basic", "PC_SHEL")
         :AddCards{ 
-            fast_talk = 3,
-            threaten = 3,
-            deflection = 3,
-            bravery = 1,
+            PC_ALAN_DISCUSS = 3,
+            PC_ALAN_BLUFF = 2,
+            PC_ALAN_GUIDANCE = 3,
+            PC_ALAN_NEGOTIATION_SKILLS = 1,
+            PC_ALAN_BRAINSTORM = 1,
         },
     
     BattleDeck("battle_basic", "PC_SHEL")
