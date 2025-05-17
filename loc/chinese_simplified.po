@@ -1524,7 +1524,7 @@ msgstr "双拳"
 #. ATTACK.PC_ALAN_DOUBLE_FISTS.DESC 
 msgctxt "ATTACK.PC_ALAN_DOUBLE_FISTS.DESC" 
 msgid "" 
-msgstr "攻击两次。" 
+msgstr "攻击2次。" 
 
 #. ATTACK.PC_ALAN_DOUBLE_FISTS.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_DOUBLE_FISTS.FLAVOUR" 
@@ -1539,7 +1539,7 @@ msgstr "三拳"
 #. ATTACK.PC_ALAN_DOUBLE_FISTS_PLUS.DESC 
 msgctxt "ATTACK.PC_ALAN_DOUBLE_FISTS_PLUS.DESC" 
 msgid "" 
-msgstr "攻击<#UPGRADE>三</>次。" 
+msgstr "攻击<#UPGRADE>3</>次。" 
 
 #. ATTACK.PC_ALAN_DOUBLE_FISTS_PLUS.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_DOUBLE_FISTS_PLUS.FLAVOUR" 
@@ -1554,7 +1554,7 @@ msgstr "猛烈双拳"
 #. ATTACK.PC_ALAN_DOUBLE_FISTS_PLUS2.DESC 
 msgctxt "ATTACK.PC_ALAN_DOUBLE_FISTS_PLUS2.DESC" 
 msgid "" 
-msgstr "攻击两次。" 
+msgstr "攻击2次。" 
 
 #. ATTACK.PC_ALAN_DOUBLE_FISTS_PLUS2.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_DOUBLE_FISTS_PLUS2.FLAVOUR" 
@@ -2454,7 +2454,7 @@ msgstr "增强收尾"
 #. ATTACK.PC_ALAN_FINALE_PLUS.DESC 
 msgctxt "ATTACK.PC_ALAN_FINALE_PLUS.DESC" 
 msgid "" 
-msgstr "本回合每打出1张牌就使该牌伤害增加{1}。" 
+msgstr "本回合每打出1张牌就使该牌伤害增加<#UPGRADE>{1}</>。" 
 
 #. ATTACK.PC_ALAN_FINALE_PLUS.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_FINALE_PLUS.FLAVOUR" 
@@ -5584,7 +5584,7 @@ msgstr "道理"
 #. NEGOTIATION_FEATURE.PA_REASON.DESC
 msgctxt "NEGOTIATION_FEATURE.PA_REASON.DESC"
 msgid ""
-msgstr "在该牌使用时如果拥有的论点数<#HILITE>大于等于</>一定数则会获得额外效果（核心论点不计入）。"
+msgstr "在该牌使用时如果拥有的论点数<#HILITE>大于等于</>一定数则会获得额外效果（核心论点和植入物不计入）。"
 
 #. NEGOTIATION_FEATURE.PA_UNREASON.NAME
 msgctxt "NEGOTIATION_FEATURE.PA_UNREASON.NAME"
@@ -5594,7 +5594,7 @@ msgstr "无理"
 #. NEGOTIATION_FEATURE.PA_UNREASON.DESC
 msgctxt "NEGOTIATION_FEATURE.PA_UNREASON.DESC"
 msgid ""
-msgstr "在该牌使用时如果未拥有任何论点则会获得额外效果（核心论点除外）。"
+msgstr "在该牌使用时如果未拥有任何论点则会获得额外效果（核心论点和植入物除外）。"
 
 #. NEGOTIATION_FEATURE.PA_FRIENDLY.NAME
 msgctxt "NEGOTIATION_FEATURE.PA_FRIENDLY.NAME"
@@ -5644,7 +5644,7 @@ msgstr "蛮横"
 #. NEGOTIATION_FEATURE.PC_ALAN_RUDE.DESC
 msgctxt "NEGOTIATION_FEATURE.PC_ALAN_RUDE.DESC"
 msgid ""
-msgstr "所有意志损失增加3。你的回合开始时减少1层。协商结束时仍然拥有该植入物则使对方对你的好感度下降一个等级。"
+msgstr "所有意志损失增加2。你的回合开始时减少1层。协商结束时仍然拥有该植入物则使对方对你的好感度下降一个等级。"
 
 #. NEGOTIATION_FEATURE.PC_ALAN_FALLACY.NAME
 msgctxt "NEGOTIATION_FEATURE.PC_ALAN_FALLACY.NAME"
@@ -5654,7 +5654,67 @@ msgstr "歪理"
 #. NEGOTIATION_FEATURE.PC_ALAN_FALLACY.DESC
 msgctxt "NEGOTIATION_FEATURE.PC_ALAN_FALLACY.DESC"
 msgid ""
-msgstr "每拥有1层便造成1次2点伤害，回合开始时失去所有层数。"
+msgstr "每拥有1层便在回合结束时造成1次3点伤害，回合开始时失去所有层数。"
+
+#. NEGOTIATION_FEATURE.PA_BREEZY.NAME
+msgctxt "NEGOTIATION_FEATURE.PA_BREEZY.NAME"
+msgid ""
+msgstr "风轻云淡"
+
+#. NEGOTIATION_FEATURE.PA_BREEZY.DESC
+msgctxt "NEGOTIATION_FEATURE.PA_BREEZY.DESC"
+msgid ""
+msgstr "回合开始时对随机1个论点施加<#HILITE>{1}</>淡定。"
+
+#. NEGOTIATION_FEATURE.PA_NONSTOP_DEBATE.NAME
+msgctxt "NEGOTIATION_FEATURE.PA_NONSTOP_DEBATE.NAME"
+msgid ""
+msgstr "无间断讨论"
+
+#. NEGOTIATION_FEATURE.PA_NONSTOP_DEBATE.DESC
+msgctxt "NEGOTIATION_FEATURE.PA_NONSTOP_DEBATE.DESC"
+msgid ""
+msgstr "你的回合开始时若论点数未达到上限则创建<#HILITE>{1}</>{PC_ALAN_TRUTH}。"
+
+#. NEGOTIATION_FEATURE.PA_TURN_THE_TABLES.NAME
+msgctxt "NEGOTIATION_FEATURE.PA_TURN_THE_TABLES.NAME"
+msgid ""
+msgstr "倒打一耙"
+
+#. NEGOTIATION_FEATURE.PA_TURN_THE_TABLES.DESC
+msgctxt "NEGOTIATION_FEATURE.PA_TURN_THE_TABLES.DESC"
+msgid ""
+msgstr "每当你打出任意牌时，获得1{PC_ALAN_FALLACY}。"
+
+#. NEGOTIATION_FEATURE.PA_INTERROGATE.NAME
+msgctxt "NEGOTIATION_FEATURE.PA_INTERROGATE.NAME"
+msgid ""
+msgstr "审问"
+
+#. NEGOTIATION_FEATURE.PA_INTERROGATE.DESC
+msgctxt "NEGOTIATION_FEATURE.PA_INTERROGATE.DESC"
+msgid ""
+msgstr "这个论点摧毁另外一个论点时，恢复{1}核心论点意志。"
+
+#. NEGOTIATION_FEATURE.PA_GOSSIP.NAME
+msgctxt "NEGOTIATION_FEATURE.PA_GOSSIP.NAME"
+msgid ""
+msgstr "八卦"
+
+#. NEGOTIATION_FEATURE.PA_GOSSIP.DESC
+msgctxt "NEGOTIATION_FEATURE.PA_GOSSIP.DESC"
+msgid ""
+msgstr "所有友方论点造成<#HILITE>{1}</>额外伤害。"
+
+#. NEGOTIATION_FEATURE.PA_CAUSE_AND_EFFECT.NAME
+msgctxt "NEGOTIATION_FEATURE.PA_CAUSE_AND_EFFECT.NAME"
+msgid ""
+msgstr "有因有果"
+
+#. NEGOTIATION_FEATURE.PA_CAUSE_AND_EFFECT.DESC
+msgctxt "NEGOTIATION_FEATURE.PA_CAUSE_AND_EFFECT.DESC"
+msgid ""
+msgstr "每打出1张牌便抽1张牌并使层数减少1。"
 
 #. MODIFIER.PC_ALAN_CORE.NAME
 msgctxt "MODIFIER.PC_ALAN_CORE.NAME"
@@ -5694,7 +5754,7 @@ msgstr "蛮横"
 #. MODIFIER.PC_ALAN_RUDE.DESC
 msgctxt "MODIFIER.PC_ALAN_RUDE.DESC"
 msgid ""
-msgstr "所有意志损失增加3。你的回合开始时减少1层。协商结束时仍然拥有该植入物则使对方对你的好感度下降一个等级。"
+msgstr "所有意志损失增加2。你的回合开始时减少1层。协商结束时仍然拥有该植入物则使对方对你的好感度下降一个等级。"
 
 #. MODIFIER.PC_ALAN_FALLACY.NAME
 msgctxt "MODIFIER.PC_ALAN_FALLACY.NAME"
@@ -5704,7 +5764,67 @@ msgstr "歪理"
 #. MODIFIER.PC_ALAN_FALLACY.DESC
 msgctxt "MODIFIER.PC_ALAN_FALLACY.DESC"
 msgid ""
-msgstr "每拥有1层便造成1次2点伤害，回合开始时失去所有层数。"
+msgstr "每拥有1层便在回合结束时造成1次3点伤害，回合开始时失去所有层数。"
+
+#. MODIFIER.PA_BREEZY.NAME
+msgctxt "MODIFIER.PA_BREEZY.NAME"
+msgid ""
+msgstr "风轻云淡"
+
+#. MODIFIER.PA_BREEZY.DESC
+msgctxt "MODIFIER.PA_BREEZY.DESC"
+msgid ""
+msgstr "回合开始时对随机1个论点施加<#HILITE>{1}</>淡定。"
+
+#. MODIFIER.PA_NONSTOP_DEBATE.NAME
+msgctxt "MODIFIER.PA_NONSTOP_DEBATE.NAME"
+msgid ""
+msgstr "无间断讨论"
+
+#. MODIFIER.PA_NONSTOP_DEBATE.DESC
+msgctxt "MODIFIER.PA_NONSTOP_DEBATE.DESC"
+msgid ""
+msgstr "你的回合开始时若论点数未达到上限则创建<#HILITE>{1}</>{PC_ALAN_TRUTH}。"
+
+#. MODIFIER.PA_TURN_THE_TABLES.NAME
+msgctxt "MODIFIER.PA_TURN_THE_TABLES.NAME"
+msgid ""
+msgstr "倒打一耙"
+
+#. MODIFIER.PA_TURN_THE_TABLES.DESC
+msgctxt "MODIFIER.PA_TURN_THE_TABLES.DESC"
+msgid ""
+msgstr "每当你打出任意牌时，获得1{PC_ALAN_FALLACY}。"
+
+#. MODIFIER.PA_INTERROGATE.NAME
+msgctxt "MODIFIER.PA_INTERROGATE.NAME"
+msgid ""
+msgstr "审问"
+
+#. MODIFIER.PA_INTERROGATE.DESC
+msgctxt "MODIFIER.PA_INTERROGATE.DESC"
+msgid ""
+msgstr "这个论点摧毁另外一个论点时，恢复{1}核心论点意志。"
+
+#. MODIFIER.PA_GOSSIP.NAME
+msgctxt "MODIFIER.PA_GOSSIP.NAME"
+msgid ""
+msgstr "八卦"
+
+#. MODIFIER.PA_GOSSIP.DESC
+msgctxt "MODIFIER.PA_GOSSIP.DESC"
+msgid ""
+msgstr "所有友方论点造成<#HILITE>{1}</>额外伤害。"
+
+#. MODIFIER.PA_CAUSE_AND_EFFECT.NAME
+msgctxt "MODIFIER.PA_CAUSE_AND_EFFECT.NAME"
+msgid ""
+msgstr "有因有果"
+
+#. MODIFIER.PA_CAUSE_AND_EFFECT.DESC
+msgctxt "MODIFIER.PA_CAUSE_AND_EFFECT.DESC"
+msgid ""
+msgstr "每打出1张牌便抽1张牌并使层数减少1。"
 
 #. CARD.PC_ALAN_DISCUSS.NAME
 msgctxt "CARD.PC_ALAN_DISCUSS.NAME"
@@ -6089,12 +6209,12 @@ msgstr "友善谈判"
 #. CARD.PC_ALAN_DIPLOMACY.DESC
 msgctxt "CARD.PC_ALAN_DIPLOMACY.DESC"
 msgid ""
-msgstr "获得{1}{PC_ALAN_GENUINE}\n创造{2}{PC_ALAN_TRUTH}。"
+msgstr "获得{1}{PC_ALAN_GENUINE}\n创建{2}{PC_ALAN_TRUTH}。"
 
 #. CARD.PC_ALAN_DIPLOMACY.FLAVOUR
 msgctxt "CARD.PC_ALAN_DIPLOMACY.FLAVOUR"
 msgid ""
-msgstr "'一些很简单的小技巧，总的来说就是语气好的、点，记住一些通用的道理，以及最重要的——耐心。'"
+msgstr "'一些很简单的小技巧，总的来说就是语气好一点，记住一些通用的道理，以及最重要的——耐心。'"
 
 #. CARD.PC_ALAN_HOSTILE.NAME
 msgctxt "CARD.PC_ALAN_HOSTILE.NAME"
@@ -6291,18 +6411,18 @@ msgctxt "CARD.PC_ALAN_GENUINE_CARD.FLAVOUR"
 msgid ""
 msgstr "'相信我，我不会害你的。'"
 
-#. CARD.PC_ALAN_GENUINE_CARD_upgraded.NAME
-msgctxt "CARD.PC_ALAN_GENUINE_CARD_upgraded.NAME"
+#. CARD.PC_ALAN_GENUINE_CARD_UPGRADED.NAME
+msgctxt "CARD.PC_ALAN_GENUINE_CARD_UPGRADED.NAME"
 msgid ""
 msgstr "增强解释"
 
-#. CARD.PC_ALAN_GENUINE_CARD_upgraded.DESC
-msgctxt "CARD.PC_ALAN_GENUINE_CARD_upgraded.DESC"
+#. CARD.PC_ALAN_GENUINE_CARD_UPGRADED.DESC
+msgctxt "CARD.PC_ALAN_GENUINE_CARD_UPGRADED.DESC"
 msgid ""
 msgstr "获得{1}{PC_ALAN_GENUINE}。"
 
-#. CARD.PC_ALAN_GENUINE_CARD_upgraded.FLAVOUR
-msgctxt "CARD.PC_ALAN_GENUINE_CARD_upgraded.FLAVOUR"
+#. CARD.PC_ALAN_GENUINE_CARD_UPGRADED.FLAVOUR
+msgctxt "CARD.PC_ALAN_GENUINE_CARD_UPGRADED.FLAVOUR"
 msgid ""
 msgstr "'相信我，我不会害你的。'"
 
@@ -6314,24 +6434,2379 @@ msgstr "质疑"
 #. CARD.PC_ALAN_FALLACY_CARD.DESC
 msgctxt "CARD.PC_ALAN_FALLACY_CARD.DESC"
 msgid ""
-msgstr "获得{1}{PC_ALAN_FALLACY}。"
+msgstr "获得1{PC_ALAN_FALLACY}。"
 
 #. CARD.PC_ALAN_FALLACY_CARD.FLAVOUR
 msgctxt "CARD.PC_ALAN_FALLACY_CARD.FLAVOUR"
 msgid ""
 msgstr "'你确定吗？'"
 
-#. CARD.PC_ALAN_FALLACY_CARD_upgraded.NAME
-msgctxt "CARD.PC_ALAN_FALLACY_CARD_upgraded.NAME"
+#. CARD.PC_ALAN_FALLACY_CARD_UPGRADED.NAME
+msgctxt "CARD.PC_ALAN_FALLACY_CARD_UPGRADED.NAME"
 msgid ""
 msgstr "黯淡质疑"
 
-#. CARD.PC_ALAN_FALLACY_CARD_upgraded.DESC
-msgctxt "CARD.PC_ALAN_FALLACY_CARD_upgraded.DESC"
+#. CARD.PC_ALAN_FALLACY_CARD_UPGRADED.DESC
+msgctxt "CARD.PC_ALAN_FALLACY_CARD_UPGRADED.DESC"
 msgid ""
-msgstr "获得{1}{PC_ALAN_FALLACY}。"
+msgstr "获得1{PC_ALAN_FALLACY}。"
 
-#. CARD.PC_ALAN_FALLACY_CARD_upgraded.FLAVOUR
-msgctxt "CARD.PC_ALAN_FALLACY_CARD_upgraded.FLAVOUR"
+#. CARD.PC_ALAN_FALLACY_CARD_UPGRADED.FLAVOUR
+msgctxt "CARD.PC_ALAN_FALLACY_CARD_UPGRADED.FLAVOUR"
 msgid ""
 msgstr "'你确定吗？'"
+
+#. CARD.PC_ALAN_CONFIDENCE.NAME
+msgctxt "CARD.PC_ALAN_CONFIDENCE.NAME"
+msgid ""
+msgstr "自信"
+
+#. CARD.PC_ALAN_CONFIDENCE.DESC
+msgctxt "CARD.PC_ALAN_CONFIDENCE.DESC"
+msgid ""
+msgstr "{PA_REASON} {1}：造成最大伤害。"
+
+#. CARD.PC_ALAN_CONFIDENCE.FLAVOUR
+msgctxt "CARD.PC_ALAN_CONFIDENCE.FLAVOUR"
+msgid ""
+msgstr "'让我们开始吧。'"
+
+#. CARD.PC_ALAN_CONFIDENCE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_CONFIDENCE_PLUS.NAME"
+msgid ""
+msgstr "猛烈自信"
+
+#. CARD.PC_ALAN_CONFIDENCE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_CONFIDENCE_PLUS.DESC"
+msgid ""
+msgstr "{PA_REASON} {1}：造成最大伤害。"
+
+#. CARD.PC_ALAN_CONFIDENCE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_CONFIDENCE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'让我们开始吧。'"
+
+#. CARD.PC_ALAN_CONFIDENCE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_CONFIDENCE_PLUS2.NAME"
+msgid ""
+msgstr "黯淡自信"
+
+#. CARD.PC_ALAN_CONFIDENCE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_CONFIDENCE_PLUS2.DESC"
+msgid ""
+msgstr "{PA_REASON} <#UPGRADE>{1}</>：造成最大伤害。"
+
+#. CARD.PC_ALAN_CONFIDENCE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_CONFIDENCE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'让我们开始吧。'"
+
+#. CARD.PC_ALAN_PERSENTATION.NAME
+msgctxt "CARD.PC_ALAN_PERSENTATION.NAME"
+msgid ""
+msgstr "出示"
+
+#. CARD.PC_ALAN_PERSENTATION.DESC
+msgctxt "CARD.PC_ALAN_PERSENTATION.DESC"
+msgid ""
+msgstr "{PA_REASON} X：本牌的费用减少X。"
+
+#. CARD.PC_ALAN_PERSENTATION.FLAVOUR
+msgctxt "CARD.PC_ALAN_PERSENTATION.FLAVOUR"
+msgid ""
+msgstr "'看看这个吧，先生。'"
+
+#. CARD.PC_ALAN_PERSENTATION_PLUS.NAME
+msgctxt "CARD.PC_ALAN_PERSENTATION_PLUS.NAME"
+msgid ""
+msgstr "猛烈出示"
+
+#. CARD.PC_ALAN_PERSENTATION_PLUS.DESC
+msgctxt "CARD.PC_ALAN_PERSENTATION_PLUS.DESC"
+msgid ""
+msgstr "{PA_REASON} X：本牌的费用减少X。"
+
+#. CARD.PC_ALAN_PERSENTATION_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_PERSENTATION_PLUS.FLAVOUR"
+msgid ""
+msgstr "'看看这个吧，先生。'"
+
+#. CARD.PC_ALAN_PERSENTATION_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_PERSENTATION_PLUS2.NAME"
+msgid ""
+msgstr "强力出示"
+
+#. CARD.PC_ALAN_PERSENTATION_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_PERSENTATION_PLUS2.DESC"
+msgid ""
+msgstr "{PA_REASON} X：本牌的费用减少X。"
+
+#. CARD.PC_ALAN_PERSENTATION_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_PERSENTATION_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'看看这个吧，先生。'"
+
+#. CARD.PC_ALAN_REBUTTAL.NAME
+msgctxt "CARD.PC_ALAN_REBUTTAL.NAME"
+msgid ""
+msgstr "反驳"
+
+#. CARD.PC_ALAN_REBUTTAL.DESC
+msgctxt "CARD.PC_ALAN_REBUTTAL.DESC"
+msgid ""
+msgstr "瞄准1个随机对手论点。\n{EVOKE}：创建1个友方论点。"
+
+#. CARD.PC_ALAN_REBUTTAL.FLAVOUR
+msgctxt "CARD.PC_ALAN_REBUTTAL.FLAVOUR"
+msgid ""
+msgstr "'等等！'"
+
+#. CARD.PC_ALAN_REBUTTAL_PLUS.NAME
+msgctxt "CARD.PC_ALAN_REBUTTAL_PLUS.NAME"
+msgid ""
+msgstr "增强反驳"
+
+#. CARD.PC_ALAN_REBUTTAL_PLUS.DESC
+msgctxt "CARD.PC_ALAN_REBUTTAL_PLUS.DESC"
+msgid ""
+msgstr "瞄准1个随机对手论点。\n{EVOKE}：创建1个友方论点。"
+
+#. CARD.PC_ALAN_REBUTTAL_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_REBUTTAL_PLUS.FLAVOUR"
+msgid ""
+msgstr "'等等！'"
+
+#. CARD.PC_ALAN_REBUTTAL_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_REBUTTAL_PLUS2.NAME"
+msgid ""
+msgstr "真诚反驳"
+
+#. CARD.PC_ALAN_REBUTTAL_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_REBUTTAL_PLUS2.DESC"
+msgid ""
+msgstr "瞄准1个随机对手论点。\n<#UPGRADE>获得1{PC_ALAN_GENUINE}</>。\n{EVOKE}：创建1个友方论点。"
+
+#. CARD.PC_ALAN_REBUTTAL_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_REBUTTAL_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'等等！'"
+
+#. CARD.PC_ALAN_AGREEMENT.NAME
+msgctxt "CARD.PC_ALAN_AGREEMENT.NAME"
+msgid ""
+msgstr "附和"
+
+#. CARD.PC_ALAN_AGREEMENT.DESC
+msgctxt "CARD.PC_ALAN_AGREEMENT.DESC"
+msgid ""
+msgstr "获得{1}{INFLUENCE}。"
+
+#. CARD.PC_ALAN_AGREEMENT.FLAVOUR
+msgctxt "CARD.PC_ALAN_AGREEMENT.FLAVOUR"
+msgid ""
+msgstr "'不愧是阁下，讲解得如此深入。'"
+
+#. CARD.PC_ALAN_AGREEMENT_PLUS.NAME
+msgctxt "CARD.PC_ALAN_AGREEMENT_PLUS.NAME"
+msgid ""
+msgstr "远见附和"
+
+#. CARD.PC_ALAN_AGREEMENT_PLUS.DESC
+msgctxt "CARD.PC_ALAN_AGREEMENT_PLUS.DESC"
+msgid ""
+msgstr "获得{1}{INFLUENCE}。\n<#UPGRADE>抽1张牌</>。"
+
+#. CARD.PC_ALAN_AGREEMENT_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_AGREEMENT_PLUS.FLAVOUR"
+msgid ""
+msgstr "'不愧是阁下，讲解得如此深入。'"
+
+#. CARD.PC_ALAN_AGREEMENT_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_AGREEMENT_PLUS2.NAME"
+msgid ""
+msgstr "岩石附和"
+
+#. CARD.PC_ALAN_AGREEMENT_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_AGREEMENT_PLUS2.DESC"
+msgid ""
+msgstr "获得{1}{INFLUENCE}。\n<#UPGRADE>获得{2}{COMPOSURE}</>。"
+
+#. CARD.PC_ALAN_AGREEMENT_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_AGREEMENT_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'不愧是阁下，讲解得如此深入。'"
+
+#. CARD.PC_ALAN_FACT.NAME
+msgctxt "CARD.PC_ALAN_FACT.NAME"
+msgid ""
+msgstr "事实"
+
+#. CARD.PC_ALAN_FACT.DESC
+msgctxt "CARD.PC_ALAN_FACT.DESC"
+msgid ""
+msgstr "{PC_ALAN_TRUTH|}创建{1}{PC_ALAN_TRUTH}。"
+
+#. CARD.PC_ALAN_FACT.FLAVOUR
+msgctxt "CARD.PC_ALAN_FACT.FLAVOUR"
+msgid ""
+msgstr "'事实就是如此。'"
+
+#. CARD.PC_ALAN_FACT_PLUS.NAME
+msgctxt "CARD.PC_ALAN_FACT_PLUS.NAME"
+msgid ""
+msgstr "黯淡事实"
+
+#. CARD.PC_ALAN_FACT_PLUS.DESC
+msgctxt "CARD.PC_ALAN_FACT_PLUS.DESC"
+msgid ""
+msgstr "{PC_ALAN_TRUTH|}创建{1}{PC_ALAN_TRUTH}。"
+
+#. CARD.PC_ALAN_FACT_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_FACT_PLUS.FLAVOUR"
+msgid ""
+msgstr "'事实就是如此。'"
+
+#. CARD.PC_ALAN_FACT_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_FACT_PLUS2.NAME"
+msgid ""
+msgstr "镜像事实"
+
+#. CARD.PC_ALAN_FACT_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_FACT_PLUS2.DESC"
+msgid ""
+msgstr "{PC_ALAN_TRUTH|}创建<#UPGRADE>{1}</>{PC_ALAN_TRUTH}。"
+
+#. CARD.PC_ALAN_FACT_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_FACT_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'事实就是如此。'"
+
+#. CARD.PC_ALAN_PLEA.NAME
+msgctxt "CARD.PC_ALAN_PLEA.NAME"
+msgid ""
+msgstr "恳求"
+
+#. CARD.PC_ALAN_PLEA.DESC
+msgctxt "CARD.PC_ALAN_PLEA.DESC"
+msgid ""
+msgstr "获得{1}{PC_ALAN_GENUINE}。\n抽1张牌。"
+
+#. CARD.PC_ALAN_PLEA.FLAVOUR
+msgctxt "CARD.PC_ALAN_PLEA.FLAVOUR"
+msgid ""
+msgstr "'求你啦，老兄。'"
+
+#. CARD.PC_ALAN_PLEA_PLUS.NAME
+msgctxt "CARD.PC_ALAN_PLEA_PLUS.NAME"
+msgid ""
+msgstr "增强恳求"
+
+#. CARD.PC_ALAN_PLEA_PLUS.DESC
+msgctxt "CARD.PC_ALAN_PLEA_PLUS.DESC"
+msgid ""
+msgstr "获得<#UPGRADE>{1}</>{PC_ALAN_GENUINE}。\n抽1张牌。"
+
+#. CARD.PC_ALAN_PLEA_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_PLEA_PLUS.FLAVOUR"
+msgid ""
+msgstr "'求你啦，老兄。'"
+
+#. CARD.PC_ALAN_PLEA_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_PLEA_PLUS2.NAME"
+msgid ""
+msgstr "岩石恳求"
+
+#. CARD.PC_ALAN_PLEA_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_PLEA_PLUS2.DESC"
+msgid ""
+msgstr "获得{1}{PC_ALAN_GENUINE}。\n<#UPGRADE>施加{2}{COMPOSURE}</>。"
+
+#. CARD.PC_ALAN_PLEA_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_PLEA_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'求你啦，老兄。'"
+
+#. CARD.PC_ALAN_GOOD_IMPRESSION.NAME
+msgctxt "CARD.PC_ALAN_GOOD_IMPRESSION.NAME"
+msgid ""
+msgstr "好印象"
+
+#. CARD.PC_ALAN_GOOD_IMPRESSION.DESC
+msgctxt "CARD.PC_ALAN_GOOD_IMPRESSION.DESC"
+msgid ""
+msgstr "{PA_FRIENDLY} {1}：造成{2}额外伤害。"
+
+#. CARD.PC_ALAN_GOOD_IMPRESSION.FLAVOUR
+msgctxt "CARD.PC_ALAN_GOOD_IMPRESSION.FLAVOUR"
+msgid ""
+msgstr "*wink*"
+
+#. CARD.PC_ALAN_GOOD_IMPRESSION_PLUS.NAME
+msgctxt "CARD.PC_ALAN_GOOD_IMPRESSION_PLUS.NAME"
+msgid ""
+msgstr "增强好印象"
+
+#. CARD.PC_ALAN_GOOD_IMPRESSION_PLUS.DESC
+msgctxt "CARD.PC_ALAN_GOOD_IMPRESSION_PLUS.DESC"
+msgid ""
+msgstr "{PA_FRIENDLY} {1}：造成<#UPGRADE>{2}</>额外伤害。"
+
+#. CARD.PC_ALAN_GOOD_IMPRESSION_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_GOOD_IMPRESSION_PLUS.FLAVOUR"
+msgid ""
+msgstr "*wink*"
+
+#. CARD.PC_ALAN_GOOD_IMPRESSION_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_GOOD_IMPRESSION_PLUS2.NAME"
+msgid ""
+msgstr "黯淡好印象"
+
+#. CARD.PC_ALAN_GOOD_IMPRESSION_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_GOOD_IMPRESSION_PLUS2.DESC"
+msgid ""
+msgstr "{PA_FRIENDLY} {1}：造成<#DOWNGRADE>{2}</>额外伤害并<#UPGRADE>获得1行动点</>。"
+
+#. CARD.PC_ALAN_GOOD_IMPRESSION_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_GOOD_IMPRESSION_PLUS2.FLAVOUR"
+msgid ""
+msgstr "*wink*"
+
+#. CARD.PC_ALAN_UNREASONABLE_RAGE.NAME
+msgctxt "CARD.PC_ALAN_UNREASONABLE_RAGE.NAME"
+msgid ""
+msgstr "无理取闹"
+
+#. CARD.PC_ALAN_UNREASONABLE_RAGE.DESC
+msgctxt "CARD.PC_ALAN_UNREASONABLE_RAGE.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：获得1{PC_ALAN_FALLACY}。"
+
+#. CARD.PC_ALAN_UNREASONABLE_RAGE.FLAVOUR
+msgctxt "CARD.PC_ALAN_UNREASONABLE_RAGE.FLAVOUR"
+msgid ""
+msgstr "'我告诉你，今天这事没完！'"
+
+#. CARD.PC_ALAN_UNREASONABLE_RAGE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_UNREASONABLE_RAGE_PLUS.NAME"
+msgid ""
+msgstr "增强无理取闹"
+
+#. CARD.PC_ALAN_UNREASONABLE_RAGE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_UNREASONABLE_RAGE_PLUS.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：获得1{PC_ALAN_FALLACY}。"
+
+#. CARD.PC_ALAN_UNREASONABLE_RAGE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_UNREASONABLE_RAGE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'我告诉你，今天这事没完！'"
+
+#. CARD.PC_ALAN_UNREASONABLE_RAGE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_UNREASONABLE_RAGE_PLUS2.NAME"
+msgid ""
+msgstr "蛮横无理取闹"
+
+#. CARD.PC_ALAN_UNREASONABLE_RAGE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_UNREASONABLE_RAGE_PLUS2.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：<#UPGRADE>{INCEPT}1{PC_ALAN_RUDE}</>。"
+
+#. CARD.PC_ALAN_UNREASONABLE_RAGE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_UNREASONABLE_RAGE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'我告诉你，今天这事没完！'"
+
+#. CARD.PC_ALAN_BREAK_PACT.NAME
+msgctxt "CARD.PC_ALAN_BREAK_PACT.NAME"
+msgid ""
+msgstr "撕毁协议"
+
+#. CARD.PC_ALAN_BREAK_PACT.DESC
+msgctxt "CARD.PC_ALAN_BREAK_PACT.DESC"
+msgid ""
+msgstr "若拥有任意层数的{PC_ALAN_FALLACY}则获得{1}{PC_ALAN_FALLACY}。"
+
+#. CARD.PC_ALAN_BREAK_PACT.FLAVOUR
+msgctxt "CARD.PC_ALAN_BREAK_PACT.FLAVOUR"
+msgid ""
+msgstr "'没人规定我必须遵守这该死的条约。'"
+
+#. CARD.PC_ALAN_BREAK_PACT_PLUS.NAME
+msgctxt "CARD.PC_ALAN_BREAK_PACT_PLUS.NAME"
+msgid ""
+msgstr "黯淡撕毁协议"
+
+#. CARD.PC_ALAN_BREAK_PACT_PLUS.DESC
+msgctxt "CARD.PC_ALAN_BREAK_PACT_PLUS.DESC"
+msgid ""
+msgstr "若拥有任意层数的{PC_ALAN_FALLACY}则获得{1}{PC_ALAN_FALLACY}。"
+
+#. CARD.PC_ALAN_BREAK_PACT_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_BREAK_PACT_PLUS.FLAVOUR"
+msgid ""
+msgstr "'没人规定我必须遵守这该死的条约。'"
+
+#. CARD.PC_ALAN_BREAK_PACT_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_BREAK_PACT_PLUS2.NAME"
+msgid ""
+msgstr "增强撕毁协议"
+
+#. CARD.PC_ALAN_BREAK_PACT_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_BREAK_PACT_PLUS2.DESC"
+msgid ""
+msgstr "若拥有任意层数的{PC_ALAN_FALLACY}则获得<#UPGRADE>{1}</>{PC_ALAN_FALLACY}。"
+
+#. CARD.PC_ALAN_BREAK_PACT_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_BREAK_PACT_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'没人规定我必须遵守这该死的条约。'"
+
+#. CARD.PC_ALAN_URGE.NAME
+msgctxt "CARD.PC_ALAN_URGE.NAME"
+msgid ""
+msgstr "催促"
+
+#. CARD.PC_ALAN_URGE.DESC
+msgctxt "CARD.PC_ALAN_URGE.DESC"
+msgid ""
+msgstr "{PA_VIOLENT} {1}：{INCEPT}2{VULNERABILITY}。"
+
+#. CARD.PC_ALAN_URGE.FLAVOUR
+msgctxt "CARD.PC_ALAN_URGE.FLAVOUR"
+msgid ""
+msgstr "'给我快点！'"
+
+#. CARD.PC_ALAN_URGE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_URGE_PLUS.NAME"
+msgid ""
+msgstr "增强催促"
+
+#. CARD.PC_ALAN_URGE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_URGE_PLUS.DESC"
+msgid ""
+msgstr "{PA_VIOLENT} {1}：{INCEPT}2{VULNERABILITY}。"
+
+#. CARD.PC_ALAN_URGE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_URGE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'给我快点！'"
+
+#. CARD.PC_ALAN_URGE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_URGE_PLUS2.NAME"
+msgid ""
+msgstr "扭曲催促"
+
+#. CARD.PC_ALAN_URGE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_URGE_PLUS2.DESC"
+msgid ""
+msgstr "<#UPGRADE>{PA_FRIENDLY} {1}</>：{INCEPT}2{VULNERABILITY}。"
+
+#. CARD.PC_ALAN_URGE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_URGE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'给我快点！'"
+
+#. CARD.PC_ALAN_ABANDON.NAME
+msgctxt "CARD.PC_ALAN_ABANDON.NAME"
+msgid ""
+msgstr "抛弃"
+
+#. CARD.PC_ALAN_ABANDON.DESC
+msgctxt "CARD.PC_ALAN_ABANDON.DESC"
+msgid ""
+msgstr "随机摧毁1个友方论点。"
+
+#. CARD.PC_ALAN_ABANDON.FLAVOUR
+msgctxt "CARD.PC_ALAN_ABANDON.FLAVOUR"
+msgid ""
+msgstr "'我没说需要你们帮忙。'"
+
+#. CARD.PC_ALAN_ABANDON_PLUS.NAME
+msgctxt "CARD.PC_ALAN_ABANDON_PLUS.NAME"
+msgid ""
+msgstr "远见抛弃"
+
+#. CARD.PC_ALAN_ABANDON_PLUS.DESC
+msgctxt "CARD.PC_ALAN_ABANDON_PLUS.DESC"
+msgid ""
+msgstr "随机摧毁1个友方论点。\n<#UPGRADE>抽1张牌</>。"
+
+#. CARD.PC_ALAN_ABANDON_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_ABANDON_PLUS.FLAVOUR"
+msgid ""
+msgstr "'我没说需要你们帮忙。'"
+
+#. CARD.PC_ALAN_ABANDON_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_ABANDON_PLUS2.NAME"
+msgid ""
+msgstr "强力抛弃"
+
+#. CARD.PC_ALAN_ABANDON_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_ABANDON_PLUS2.DESC"
+msgid ""
+msgstr "随机摧毁1个友方论点。"
+
+#. CARD.PC_ALAN_ABANDON_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_ABANDON_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'我没说需要你们帮忙。'"
+
+#. CARD.PC_ALAN_INSULT.NAME
+msgctxt "CARD.PC_ALAN_INSULT.NAME"
+msgid ""
+msgstr "侮辱"
+
+#. CARD.PC_ALAN_INSULT.DESC
+msgctxt "CARD.PC_ALAN_INSULT.DESC"
+msgid ""
+msgstr "{INCEPT}1{PC_ALAN_RUDE}。"
+
+#. CARD.PC_ALAN_INSULT.FLAVOUR
+msgctxt "CARD.PC_ALAN_INSULT.FLAVOUR"
+msgid ""
+msgstr "'你那张脸丑得让黑石都得请先知来做心理建设后才敢看第二眼！'"
+
+#. CARD.PC_ALAN_INSULT_PLUS.NAME
+msgctxt "CARD.PC_ALAN_INSULT_PLUS.NAME"
+msgid ""
+msgstr "粗暴侮辱"
+
+#. CARD.PC_ALAN_INSULT_PLUS.DESC
+msgctxt "CARD.PC_ALAN_INSULT_PLUS.DESC"
+msgid ""
+msgstr "{INCEPT}1{PC_ALAN_RUDE}。\n<#UPGRADE>{PA_VIOLENT} {1}：获得1行动点</>。"
+
+#. CARD.PC_ALAN_INSULT_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_INSULT_PLUS.FLAVOUR"
+msgid ""
+msgstr "'你那张脸丑得让黑石都得请先知来做心理建设后才敢看第二眼！'"
+
+#. CARD.PC_ALAN_INSULT_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_INSULT_PLUS2.NAME"
+msgid ""
+msgstr "霸道侮辱"
+
+#. CARD.PC_ALAN_INSULT_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_INSULT_PLUS2.DESC"
+msgid ""
+msgstr "{INCEPT}1{PC_ALAN_RUDE}。\n<#UPGRADE>获得1{PC_ALAN_FALLACY}</>。"
+
+#. CARD.PC_ALAN_INSULT_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_INSULT_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'你那张脸丑得让黑石都得请先知来做心理建设后才敢看第二眼！'"
+
+#. CARD.PC_ALAN_MISFIRE.NAME
+msgctxt "CARD.PC_ALAN_MISFIRE.NAME"
+msgid ""
+msgstr "走火"
+
+#. CARD.PC_ALAN_MISFIRE.DESC
+msgctxt "CARD.PC_ALAN_MISFIRE.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：攻击所有对手论点。"
+
+#. CARD.PC_ALAN_MISFIRE.FLAVOUR
+msgctxt "CARD.PC_ALAN_MISFIRE.FLAVOUR"
+msgid ""
+msgstr "'抱歉，这把枪有时候就是这样。'"
+
+#. CARD.PC_ALAN_MISFIRE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_MISFIRE_PLUS.NAME"
+msgid ""
+msgstr "猛烈走火"
+
+#. CARD.PC_ALAN_MISFIRE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_MISFIRE_PLUS.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：攻击所有对手论点。"
+
+#. CARD.PC_ALAN_MISFIRE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_MISFIRE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'抱歉，这把枪有时候就是这样。'"
+
+#. CARD.PC_ALAN_MISFIRE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_MISFIRE_PLUS2.NAME"
+msgid ""
+msgstr "聚焦走火"
+
+#. CARD.PC_ALAN_MISFIRE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_MISFIRE_PLUS2.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：<#UPGRADE>攻击2次</>。"
+
+#. CARD.PC_ALAN_MISFIRE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_MISFIRE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'抱歉，这把枪有时候就是这样。'"
+
+#. CARD.PC_ALAN_PROHIBIT.NAME
+msgctxt "CARD.PC_ALAN_PROHIBIT.NAME"
+msgid ""
+msgstr "禁止"
+
+#. CARD.PC_ALAN_PROHIBIT.DESC
+msgctxt "CARD.PC_ALAN_PROHIBIT.DESC"
+msgid ""
+msgstr "{EVOKE}：1回合内抽出3张敌对牌。"
+
+#. CARD.PC_ALAN_PROHIBIT.FLAVOUR
+msgctxt "CARD.PC_ALAN_PROHIBIT.FLAVOUR"
+msgid ""
+msgstr "'土狼与你禁止入内！'"
+
+#. CARD.PC_ALAN_PROHIBIT_PLUS.NAME
+msgctxt "CARD.PC_ALAN_PROHIBIT_PLUS.NAME"
+msgid ""
+msgstr "增强禁止"
+
+#. CARD.PC_ALAN_PROHIBIT_PLUS.DESC
+msgctxt "CARD.PC_ALAN_PROHIBIT_PLUS.DESC"
+msgid ""
+msgstr "{EVOKE}：1回合内抽出3张敌对牌。"
+
+#. CARD.PC_ALAN_PROHIBIT_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_PROHIBIT_PLUS.FLAVOUR"
+msgid ""
+msgstr "'土狼与你禁止入内！'"
+
+#. CARD.PC_ALAN_PROHIBIT_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_PROHIBIT_PLUS2.NAME"
+msgid ""
+msgstr "霸道禁止"
+
+#. CARD.PC_ALAN_PROHIBIT_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_PROHIBIT_PLUS2.DESC"
+msgid ""
+msgstr "<#UPGRADE>获得1{PC_ALAN_FALLACY}</>。\n{EVOKE}：1回合内抽出3张敌对牌。"
+
+#. CARD.PC_ALAN_PROHIBIT_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_PROHIBIT_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'土狼与你禁止入内！'"
+
+#. CARD.PC_ALAN_SOCIAL_CIRCLE.NAME
+msgctxt "CARD.PC_ALAN_SOCIAL_CIRCLE.NAME"
+msgid ""
+msgstr "社交圈"
+
+#. CARD.PC_ALAN_SOCIAL_CIRCLE.DESC
+msgctxt "CARD.PC_ALAN_SOCIAL_CIRCLE.DESC"
+msgid ""
+msgstr "你每拥有2个爱戴或者喜欢你的人便该牌施加的淡定增加1。\n（施加{1}淡定）。"
+
+#. CARD.PC_ALAN_SOCIAL_CIRCLE.FLAVOUR
+msgctxt "CARD.PC_ALAN_SOCIAL_CIRCLE.FLAVOUR"
+msgid ""
+msgstr "'我还是有些人脉的。'"
+
+#. CARD.PC_ALAN_SOCIAL_CIRCLE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_SOCIAL_CIRCLE_PLUS.NAME"
+msgid ""
+msgstr "增强社交圈"
+
+#. CARD.PC_ALAN_SOCIAL_CIRCLE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_SOCIAL_CIRCLE_PLUS.DESC"
+msgid ""
+msgstr "你每拥有2个爱戴或者喜欢你的人<#UPGRADE>+3</>便该牌施加的淡定增加1。\n（施加{1}淡定）。"
+
+#. CARD.PC_ALAN_SOCIAL_CIRCLE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_SOCIAL_CIRCLE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'我还是有些人脉的。'"
+
+#. CARD.PC_ALAN_SOCIAL_CIRCLE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_SOCIAL_CIRCLE_PLUS2.NAME"
+msgid ""
+msgstr "扭曲社交圈"
+
+#. CARD.PC_ALAN_SOCIAL_CIRCLE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_SOCIAL_CIRCLE_PLUS2.DESC"
+msgid ""
+msgstr "你每拥有2个<#UPGRADE>讨厌</>或者<#UPGRADE>不喜欢</>你的人<#UPGRADE>+3</>便该牌施加的淡定增加1。\n（施加{1}淡定）。"
+
+#. CARD.PC_ALAN_SOCIAL_CIRCLE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_SOCIAL_CIRCLE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'我还是有些人脉的。'"
+
+#. CARD.PC_ALAN_BREEZY.NAME
+msgctxt "CARD.PC_ALAN_BREEZY.NAME"
+msgid ""
+msgstr "风轻云淡"
+
+#. CARD.PC_ALAN_BREEZY.DESC
+msgctxt "CARD.PC_ALAN_BREEZY.DESC"
+msgid ""
+msgstr "{PA_BREEZY|}创建：回合结束时对随机1个论点施加2淡定。"
+
+#. CARD.PC_ALAN_BREEZY.FLAVOUR
+msgctxt "CARD.PC_ALAN_BREEZY.FLAVOUR"
+msgid ""
+msgstr "'今天的风儿，甚是喧嚣啊。'"
+
+#. CARD.PC_ALAN_BREEZY_PLUS.NAME
+msgctxt "CARD.PC_ALAN_BREEZY_PLUS.NAME"
+msgid ""
+msgstr "黯淡风轻云淡"
+
+#. CARD.PC_ALAN_BREEZY_PLUS.DESC
+msgctxt "CARD.PC_ALAN_BREEZY_PLUS.DESC"
+msgid ""
+msgstr "{PA_BREEZY|}创建：回合结束时对随机1个论点施加2淡定。"
+
+#. CARD.PC_ALAN_BREEZY_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_BREEZY_PLUS.FLAVOUR"
+msgid ""
+msgstr "'今天的风儿，甚是喧嚣啊。'"
+
+#. CARD.PC_ALAN_BREEZY_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_BREEZY_PLUS2.NAME"
+msgid ""
+msgstr "镜像风轻云淡"
+
+#. CARD.PC_ALAN_BREEZY_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_BREEZY_PLUS2.DESC"
+msgid ""
+msgstr "{PA_BREEZY|}创建<#UPGRADE>2</>：回合结束时对随机1个论点施加2淡定。"
+
+#. CARD.PC_ALAN_BREEZY_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_BREEZY_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'今天的风儿，甚是喧嚣啊。'"
+
+#. CARD.PC_ALAN_TARGETED.NAME
+msgctxt "CARD.PC_ALAN_TARGETED.NAME"
+msgid ""
+msgstr "指定"
+
+#. CARD.PC_ALAN_TARGETED.DESC
+msgctxt "CARD.PC_ALAN_TARGETED.DESC"
+msgid ""
+msgstr "摧毁1个指定的论点。"
+
+#. CARD.PC_ALAN_TARGETED.FLAVOUR
+msgctxt "CARD.PC_ALAN_TARGETED.FLAVOUR"
+msgid ""
+msgstr "'对，没错，就是你，喝酒的那个。'"
+
+#. CARD.PC_ALAN_TARGETED_PLUS.NAME
+msgctxt "CARD.PC_ALAN_TARGETED_PLUS.NAME"
+msgid ""
+msgstr "黯淡指定"
+
+#. CARD.PC_ALAN_TARGETED_PLUS.DESC
+msgctxt "CARD.PC_ALAN_TARGETED_PLUS.DESC"
+msgid ""
+msgstr "摧毁1个指定的论点。"
+
+#. CARD.PC_ALAN_TARGETED_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_TARGETED_PLUS.FLAVOUR"
+msgid ""
+msgstr "'对，没错，就是你，喝酒的那个。'"
+
+#. CARD.PC_ALAN_TARGETED_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_TARGETED_PLUS2.NAME"
+msgid ""
+msgstr "远见指定"
+
+#. CARD.PC_ALAN_TARGETED_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_TARGETED_PLUS2.DESC"
+msgid ""
+msgstr "摧毁1个指定的论点并<#UPGRADE>抽1张牌</>。"
+
+#. CARD.PC_ALAN_TARGETED_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_TARGETED_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'对，没错，就是你，喝酒的那个。'"
+
+#. CARD.PC_ALAN_SHOWTIME.NAME
+msgctxt "CARD.PC_ALAN_SHOWTIME.NAME"
+msgid ""
+msgstr "表演时刻"
+
+#. CARD.PC_ALAN_SHOWTIME.DESC
+msgctxt "CARD.PC_ALAN_SHOWTIME.DESC"
+msgid ""
+msgstr "抽1张牌。\n从抽牌堆{IMPROVISE}1张牌。"
+
+#. CARD.PC_ALAN_SHOWTIME.FLAVOUR
+msgctxt "CARD.PC_ALAN_SHOWTIME.FLAVOUR"
+msgid ""
+msgstr "'且看我如何表演。'"
+
+#. CARD.PC_ALAN_SHOWTIME_PLUS.NAME
+msgctxt "CARD.PC_ALAN_SHOWTIME_PLUS.NAME"
+msgid ""
+msgstr "增强表演时刻"
+
+#. CARD.PC_ALAN_SHOWTIME_PLUS.DESC
+msgctxt "CARD.PC_ALAN_SHOWTIME_PLUS.DESC"
+msgid ""
+msgstr "抽<#UPGRADE>2</>张牌。\n从抽牌堆{IMPROVISE}1张牌。"
+
+#. CARD.PC_ALAN_SHOWTIME_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_SHOWTIME_PLUS.FLAVOUR"
+msgid ""
+msgstr "'且看我如何表演。'"
+
+#. CARD.PC_ALAN_SHOWTIME_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_SHOWTIME_PLUS2.NAME"
+msgid ""
+msgstr "广泛表演时刻"
+
+#. CARD.PC_ALAN_SHOWTIME_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_SHOWTIME_PLUS2.DESC"
+msgid ""
+msgstr "抽1张牌。\n从抽牌堆<#UPGRADE>{IMPROVISE_PLUS}</>1张牌。"
+
+#. CARD.PC_ALAN_SHOWTIME_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_SHOWTIME_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'且看我如何表演。'"
+
+#. CARD.PC_ALAN_ARGUMENT.NAME
+msgctxt "CARD.PC_ALAN_ARGUMENT.NAME"
+msgid ""
+msgstr "论述"
+
+#. CARD.PC_ALAN_ARGUMENT.DESC
+msgctxt "CARD.PC_ALAN_ARGUMENT.DESC"
+msgid ""
+msgstr "{PA_REASON} X：额外攻击X次。\n（至多额外攻击{1}次）。"
+
+#. CARD.PC_ALAN_ARGUMENT.FLAVOUR
+msgctxt "CARD.PC_ALAN_ARGUMENT.FLAVOUR"
+msgid ""
+msgstr "'你听我说。'"
+
+#. CARD.PC_ALAN_ARGUMENT_PLUS.NAME
+msgctxt "CARD.PC_ALAN_ARGUMENT_PLUS.NAME"
+msgid ""
+msgstr "增强论述"
+
+#. CARD.PC_ALAN_ARGUMENT_PLUS.DESC
+msgctxt "CARD.PC_ALAN_ARGUMENT_PLUS.DESC"
+msgid ""
+msgstr "{PA_REASON} X：额外攻击X次。\n（至多额外攻击<#UPGRADE>{1}</>次）。"
+
+#. CARD.PC_ALAN_ARGUMENT_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_ARGUMENT_PLUS.FLAVOUR"
+msgid ""
+msgstr "'你听我说。'"
+
+#. CARD.PC_ALAN_ARGUMENT_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_ARGUMENT_PLUS2.NAME"
+msgid ""
+msgstr "猛烈论述"
+
+#. CARD.PC_ALAN_ARGUMENT_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_ARGUMENT_PLUS2.DESC"
+msgid ""
+msgstr "{PA_REASON} X：额外攻击X次。\n（至多额外攻击{1}次）。"
+
+#. CARD.PC_ALAN_ARGUMENT_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_ARGUMENT_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'你听我说。'"
+
+#. CARD.PC_ALAN_SNAP_FINGERS.NAME
+msgctxt "CARD.PC_ALAN_SNAP_FINGERS.NAME"
+msgid ""
+msgstr "打响指"
+
+#. CARD.PC_ALAN_SNAP_FINGERS.DESC
+msgctxt "CARD.PC_ALAN_SNAP_FINGERS.DESC"
+msgid ""
+msgstr "手牌里有这张牌时，每当打出牌便失去1点行动点并对所有友方论点施加2{COMPOSURE}。"
+
+#. CARD.PC_ALAN_SNAP_FINGERS.FLAVOUR
+msgctxt "CARD.PC_ALAN_SNAP_FINGERS.FLAVOUR"
+msgid ""
+msgstr "'老兄，能不能不要走神，谢谢。'"
+
+#. CARD.PC_ALAN_SNAP_FINGERS_PLUS.NAME
+msgctxt "CARD.PC_ALAN_SNAP_FINGERS_PLUS.NAME"
+msgid ""
+msgstr "远见打响指"
+
+#. CARD.PC_ALAN_SNAP_FINGERS_PLUS.DESC
+msgctxt "CARD.PC_ALAN_SNAP_FINGERS_PLUS.DESC"
+msgid ""
+msgstr "手牌里有这张牌时，每当打出牌便失去1点行动点并对所有友方论点施加2{COMPOSURE}。"
+
+#. CARD.PC_ALAN_SNAP_FINGERS_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_SNAP_FINGERS_PLUS.FLAVOUR"
+msgid ""
+msgstr "'老兄，能不能不要走神，谢谢。'"
+
+#. CARD.PC_ALAN_SNAP_FINGERS_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_SNAP_FINGERS_PLUS2.NAME"
+msgid ""
+msgstr "扭曲打响指"
+
+#. CARD.PC_ALAN_SNAP_FINGERS_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_SNAP_FINGERS_PLUS2.DESC"
+msgid ""
+msgstr "<#UPGRADE>对所有友方论点施加3{COMPOSURE}</>。"
+
+#. CARD.PC_ALAN_SNAP_FINGERS_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_SNAP_FINGERS_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'老兄，能不能不要走神，谢谢。'"
+
+#. CARD.PC_ALAN_APPLAUSE.NAME
+msgctxt "CARD.PC_ALAN_APPLAUSE.NAME"
+msgid ""
+msgstr "鼓掌"
+
+#. CARD.PC_ALAN_APPLAUSE.DESC
+msgctxt "CARD.PC_ALAN_APPLAUSE.DESC"
+msgid ""
+msgstr "这张牌造成多少伤害，就获得多少{PC_ALAN_GENUINE}。"
+
+#. CARD.PC_ALAN_APPLAUSE.FLAVOUR
+msgctxt "CARD.PC_ALAN_APPLAUSE.FLAVOUR"
+msgid ""
+msgstr "'这计划妙呀。'"
+
+#. CARD.PC_ALAN_APPLAUSE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_APPLAUSE_PLUS.NAME"
+msgid ""
+msgstr "增强鼓掌"
+
+#. CARD.PC_ALAN_APPLAUSE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_APPLAUSE_PLUS.DESC"
+msgid ""
+msgstr "这张牌造成多少伤害，就获得多少{PC_ALAN_GENUINE}。"
+
+#. CARD.PC_ALAN_APPLAUSE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_APPLAUSE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'这计划妙呀。'"
+
+#. CARD.PC_ALAN_APPLAUSE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_APPLAUSE_PLUS2.NAME"
+msgid ""
+msgstr "黯淡鼓掌"
+
+#. CARD.PC_ALAN_APPLAUSE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_APPLAUSE_PLUS2.DESC"
+msgid ""
+msgstr "这张牌造成多少伤害，就获得多少{PC_ALAN_GENUINE}。"
+
+#. CARD.PC_ALAN_APPLAUSE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_APPLAUSE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'这计划妙呀。'"
+
+#. CARD.PC_ALAN_LIKE_WIND_AND_RAIN.NAME
+msgctxt "CARD.PC_ALAN_LIKE_WIND_AND_RAIN.NAME"
+msgid ""
+msgstr "如风沐雨"
+
+#. CARD.PC_ALAN_LIKE_WIND_AND_RAIN.DESC
+msgctxt "CARD.PC_ALAN_LIKE_WIND_AND_RAIN.DESC"
+msgid ""
+msgstr "为随机一个友方论点添加{1}点意志值。"
+
+#. CARD.PC_ALAN_LIKE_WIND_AND_RAIN.FLAVOUR
+msgctxt "CARD.PC_ALAN_LIKE_WIND_AND_RAIN.FLAVOUR"
+msgid ""
+msgstr "'闭上眼睛，享受享受片刻吧。'"
+
+#. CARD.PC_ALAN_LIKE_WIND_AND_RAIN_PLUS.NAME
+msgctxt "CARD.PC_ALAN_LIKE_WIND_AND_RAIN_PLUS.NAME"
+msgid ""
+msgstr "黯淡如风沐雨"
+
+#. CARD.PC_ALAN_LIKE_WIND_AND_RAIN_PLUS.DESC
+msgctxt "CARD.PC_ALAN_LIKE_WIND_AND_RAIN_PLUS.DESC"
+msgid ""
+msgstr "为随机一个友方论点添加{1}点意志值。"
+
+#. CARD.PC_ALAN_LIKE_WIND_AND_RAIN_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_LIKE_WIND_AND_RAIN_PLUS.FLAVOUR"
+msgid ""
+msgstr "'闭上眼睛，享受享受片刻吧。'"
+
+#. CARD.PC_ALAN_LIKE_WIND_AND_RAIN_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_LIKE_WIND_AND_RAIN_PLUS2.NAME"
+msgid ""
+msgstr "广泛如风沐雨"
+
+#. CARD.PC_ALAN_LIKE_WIND_AND_RAIN_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_LIKE_WIND_AND_RAIN_PLUS2.DESC"
+msgid ""
+msgstr "为<#UPGRADE>所有友方论点</>添加{1}点意志值。"
+
+#. CARD.PC_ALAN_LIKE_WIND_AND_RAIN_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_LIKE_WIND_AND_RAIN_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'闭上眼睛，享受享受片刻吧。'"
+
+#. CARD.PC_ALAN_PROMOTION.NAME
+msgctxt "CARD.PC_ALAN_PROMOTION.NAME"
+msgid ""
+msgstr "宣传"
+
+#. CARD.PC_ALAN_PROMOTION.DESC
+msgctxt "CARD.PC_ALAN_PROMOTION.DESC"
+msgid ""
+msgstr "你每拥有2个爱戴或者喜欢你的人便该牌的费用减少1。"
+
+#. CARD.PC_ALAN_PROMOTION.FLAVOUR
+msgctxt "CARD.PC_ALAN_PROMOTION.FLAVOUR"
+msgid ""
+msgstr "'这书真的很好看。'"
+
+#. CARD.PC_ALAN_PROMOTION_PLUS.NAME
+msgctxt "CARD.PC_ALAN_PROMOTION_PLUS.NAME"
+msgid ""
+msgstr "猛烈宣传"
+
+#. CARD.PC_ALAN_PROMOTION_PLUS.DESC
+msgctxt "CARD.PC_ALAN_PROMOTION_PLUS.DESC"
+msgid ""
+msgstr "你每拥有2个爱戴或者喜欢你的人便该牌的费用减少1。"
+
+#. CARD.PC_ALAN_PROMOTION_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_PROMOTION_PLUS.FLAVOUR"
+msgid ""
+msgstr "'这书真的很好看。'"
+
+#. CARD.PC_ALAN_PROMOTION_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_PROMOTION_PLUS2.NAME"
+msgid ""
+msgstr "强力宣传"
+
+#. CARD.PC_ALAN_PROMOTION_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_PROMOTION_PLUS2.DESC"
+msgid ""
+msgstr "你每拥有2个爱戴或者喜欢你的人便该牌的费用减少1。"
+
+#. CARD.PC_ALAN_PROMOTION_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_PROMOTION_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'这书真的很好看。'"
+
+#. CARD.PC_ALAN_NONSTOP_DEBATE.NAME
+msgctxt "CARD.PC_ALAN_NONSTOP_DEBATE.NAME"
+msgid ""
+msgstr "无间断讨论"
+
+#. CARD.PC_ALAN_NONSTOP_DEBATE.DESC
+msgctxt "CARD.PC_ALAN_NONSTOP_DEBATE.DESC"
+msgid ""
+msgstr "{PA_NONSTOP_DEBATE|}获得：你的回合开始时若论点数未达到上限则创建1{PC_ALAN_TRUTH}。"
+
+#. CARD.PC_ALAN_NONSTOP_DEBATE.FLAVOUR
+msgctxt "CARD.PC_ALAN_NONSTOP_DEBATE.FLAVOUR"
+msgid ""
+msgstr "'你是想告诉我你拿着那枪就是为了说声净TM扯淡？'"
+
+#. CARD.PC_ALAN_NONSTOP_DEBATE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_NONSTOP_DEBATE_PLUS.NAME"
+msgid ""
+msgstr "初始无间断讨论"
+
+#. CARD.PC_ALAN_NONSTOP_DEBATE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_NONSTOP_DEBATE_PLUS.DESC"
+msgid ""
+msgstr "{PA_NONSTOP_DEBATE|}获得：你的回合开始时若论点数未达到上限则创建1{PC_ALAN_TRUTH}。"
+
+#. CARD.PC_ALAN_NONSTOP_DEBATE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_NONSTOP_DEBATE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'你是想告诉我你拿着那枪就是为了说声净TM扯淡？'"
+
+#. CARD.PC_ALAN_NONSTOP_DEBATE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_NONSTOP_DEBATE_PLUS2.NAME"
+msgid ""
+msgstr "黯淡无间断讨论"
+
+#. CARD.PC_ALAN_NONSTOP_DEBATE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_NONSTOP_DEBATE_PLUS2.DESC"
+msgid ""
+msgstr "{PA_NONSTOP_DEBATE|}获得：你的回合开始时若论点数未达到上限则创建1{PC_ALAN_TRUTH}。"
+
+#. CARD.PC_ALAN_NONSTOP_DEBATE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_NONSTOP_DEBATE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'你是想告诉我你拿着那枪就是为了说声净TM扯淡？'"
+
+#. CARD.PC_ALAN_REPUTATION.NAME
+msgctxt "CARD.PC_ALAN_REPUTATION.NAME"
+msgid ""
+msgstr "名声"
+
+#. CARD.PC_ALAN_REPUTATION.DESC
+msgctxt "CARD.PC_ALAN_REPUTATION.DESC"
+msgid ""
+msgstr "{PA_VIOLENT} {1}：本牌将无法打出。\n抽1张牌。"
+
+#. CARD.PC_ALAN_REPUTATION.FLAVOUR
+msgctxt "CARD.PC_ALAN_REPUTATION.FLAVOUR"
+msgid ""
+msgstr "'人们都说我是个好人，不信你去问问？'"
+
+#. CARD.PC_ALAN_REPUTATION.ENEMY
+msgctxt "CARD.PC_ALAN_REPUTATION.ENEMY"
+msgid ""
+msgstr "你的敌人已经影响了你的名声"
+
+#. CARD.PC_ALAN_REPUTATION_PLUS.NAME
+msgctxt "CARD.PC_ALAN_REPUTATION_PLUS.NAME"
+msgid ""
+msgstr "猛烈名声"
+
+#. CARD.PC_ALAN_REPUTATION_PLUS.DESC
+msgctxt "CARD.PC_ALAN_REPUTATION_PLUS.DESC"
+msgid ""
+msgstr "{PA_VIOLENT} {1}：本牌将无法打出。\n抽1张牌。"
+
+#. CARD.PC_ALAN_REPUTATION_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_REPUTATION_PLUS.FLAVOUR"
+msgid ""
+msgstr "'人们都说我是个好人，不信你去问问？'"
+
+#. CARD.PC_ALAN_REPUTATION_PLUS.ENEMY
+msgctxt "CARD.PC_ALAN_REPUTATION_PLUS.ENEMY"
+msgid ""
+msgstr "你的敌人已经影响了你的名声"
+
+#. CARD.PC_ALAN_REPUTATION_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_REPUTATION_PLUS2.NAME"
+msgid ""
+msgstr "强力名声"
+
+#. CARD.PC_ALAN_REPUTATION_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_REPUTATION_PLUS2.DESC"
+msgid ""
+msgstr "{PA_VIOLENT} {1}：本牌将无法打出。\n抽1张牌。"
+
+#. CARD.PC_ALAN_REPUTATION_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_REPUTATION_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'人们都说我是个好人，不信你去问问？'"
+
+#. CARD.PC_ALAN_REPUTATION_PLUS2.ENEMY
+msgctxt "CARD.PC_ALAN_REPUTATION_PLUS2.ENEMY"
+msgid ""
+msgstr "你的敌人已经影响了你的名声"
+
+#. CARD.PC_ALAN_COIN_BRIDE.NAME
+msgctxt "CARD.PC_ALAN_COIN_BRIDE.NAME"
+msgid ""
+msgstr "硬币赠送"
+
+#. CARD.PC_ALAN_COIN_BRIDE.DESC
+msgctxt "CARD.PC_ALAN_COIN_BRIDE.DESC"
+msgid ""
+msgstr "抽{1}张牌。每抽1张外交牌获得2{PC_ALAN_GENUINE}。"
+
+#. CARD.PC_ALAN_COIN_BRIDE.FLAVOUR
+msgctxt "CARD.PC_ALAN_COIN_BRIDE.FLAVOUR"
+msgid ""
+msgstr "'我这里有些纪念币，就，放过我嘛。'"
+
+#. CARD.PC_ALAN_COIN_BRIDE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_COIN_BRIDE_PLUS.NAME"
+msgid ""
+msgstr "强化硬币赠送"
+
+#. CARD.PC_ALAN_COIN_BRIDE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_COIN_BRIDE_PLUS.DESC"
+msgid ""
+msgstr "抽<#UPGRADE>{1}</>张牌。每抽1张外交牌获得2{PC_ALAN_GENUINE}。"
+
+#. CARD.PC_ALAN_COIN_BRIDE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_COIN_BRIDE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'我这里有些纪念币，就，放过我嘛。'"
+
+#. CARD.PC_ALAN_COIN_BRIDE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_COIN_BRIDE_PLUS2.NAME"
+msgid ""
+msgstr "正当硬币赠送"
+
+#. CARD.PC_ALAN_COIN_BRIDE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_COIN_BRIDE_PLUS2.DESC"
+msgid ""
+msgstr "抽{1}张牌。每抽1张外交牌<#UPGRADE>{PC_ALAN_TRUTH|}创建1{PC_ALAN_TRUTH}</>。"
+
+#. CARD.PC_ALAN_COIN_BRIDE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_COIN_BRIDE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'我这里有些纪念币，就，放过我嘛。'"
+
+#. CARD.PC_ALAN_UNDERSTAND.NAME
+msgctxt "CARD.PC_ALAN_UNDERSTAND.NAME"
+msgid ""
+msgstr "了解"
+
+#. CARD.PC_ALAN_UNDERSTAND.DESC
+msgctxt "CARD.PC_ALAN_UNDERSTAND.DESC"
+msgid ""
+msgstr "获得{1}{PC_ALAN_GENUINE}。\n{PA_FRIENDLY} {2}：在弃牌堆中增加1张这张牌。"
+
+#. CARD.PC_ALAN_UNDERSTAND.FLAVOUR
+msgctxt "CARD.PC_ALAN_UNDERSTAND.FLAVOUR"
+msgid ""
+msgstr "'哦~~~.......'"
+
+#. CARD.PC_ALAN_UNDERSTAND_PLUS.NAME
+msgctxt "CARD.PC_ALAN_UNDERSTAND_PLUS.NAME"
+msgid ""
+msgstr "猛烈了解"
+
+#. CARD.PC_ALAN_UNDERSTAND_PLUS.DESC
+msgctxt "CARD.PC_ALAN_UNDERSTAND_PLUS.DESC"
+msgid ""
+msgstr "获得{1}{PC_ALAN_GENUINE}。\n{PA_FRIENDLY} {2}：在弃牌堆中增加1张这张牌。"
+
+#. CARD.PC_ALAN_UNDERSTAND_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_UNDERSTAND_PLUS.FLAVOUR"
+msgid ""
+msgstr "'哦~~~.......'"
+
+#. CARD.PC_ALAN_UNDERSTAND_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_UNDERSTAND_PLUS2.NAME"
+msgid ""
+msgstr "友善了解"
+
+#. CARD.PC_ALAN_UNDERSTAND_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_UNDERSTAND_PLUS2.DESC"
+msgid ""
+msgstr "获得<#UPGRADE>{1}</>{PC_ALAN_GENUINE}。\n{PA_FRIENDLY} {2}：在弃牌堆中增加1张这张牌。"
+
+#. CARD.PC_ALAN_UNDERSTAND_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_UNDERSTAND_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'哦~~~.......'"
+
+#. CARD.PC_ALAN_STAY_CALM.NAME
+msgctxt "CARD.PC_ALAN_STAY_CALM.NAME"
+msgid ""
+msgstr "冷静"
+
+#. CARD.PC_ALAN_STAY_CALM.DESC
+msgctxt "CARD.PC_ALAN_STAY_CALM.DESC"
+msgid ""
+msgstr "选择1个论点，获得两倍于该论点层数的{PC_ALAN_GENUINE}。"
+
+#. CARD.PC_ALAN_STAY_CALM.FLAVOUR
+msgctxt "CARD.PC_ALAN_STAY_CALM.FLAVOUR"
+msgid ""
+msgstr "'对，没错，就是这样！'"
+
+#. CARD.PC_ALAN_STAY_CALM_PLUS.NAME
+msgctxt "CARD.PC_ALAN_STAY_CALM_PLUS.NAME"
+msgid ""
+msgstr "岩石冷静"
+
+#. CARD.PC_ALAN_STAY_CALM_PLUS.DESC
+msgctxt "CARD.PC_ALAN_STAY_CALM_PLUS.DESC"
+msgid ""
+msgstr "选择1个论点，获得两倍于该论点层数的{PC_ALAN_GENUINE}和<#UPGRADE>{COMPOSURE}</>。"
+
+#. CARD.PC_ALAN_STAY_CALM_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_STAY_CALM_PLUS.FLAVOUR"
+msgid ""
+msgstr "'对，没错，就是这样！'"
+
+#. CARD.PC_ALAN_STAY_CALM_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_STAY_CALM_PLUS2.NAME"
+msgid ""
+msgstr "强力冷静"
+
+#. CARD.PC_ALAN_STAY_CALM_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_STAY_CALM_PLUS2.DESC"
+msgid ""
+msgstr "选择1个论点，获得两倍于该论点层数的{PC_ALAN_GENUINE}<#UPGRADE>+2</>。"
+
+#. CARD.PC_ALAN_STAY_CALM_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_STAY_CALM_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'对，没错，就是这样！'"
+
+#. CARD.PC_ALAN_SUPPORT.NAME
+msgctxt "CARD.PC_ALAN_SUPPORT.NAME"
+msgid ""
+msgstr "撑腰"
+
+#. CARD.PC_ALAN_SUPPORT.DESC
+msgctxt "CARD.PC_ALAN_SUPPORT.DESC"
+msgid ""
+msgstr "{PC_ALAN_TRUTH|}获得2{INFLUENCE}，随后每拥有2层{INFLUENCE}便创建1{PC_ALAN_TRUTH}。"
+
+#. CARD.PC_ALAN_SUPPORT.FLAVOUR
+msgctxt "CARD.PC_ALAN_SUPPORT.FLAVOUR"
+msgid ""
+msgstr "'我背后还是有些人的。'"
+
+#. CARD.PC_ALAN_SUPPORT_PLUS.NAME
+msgctxt "CARD.PC_ALAN_SUPPORT_PLUS.NAME"
+msgid ""
+msgstr "黯淡撑腰"
+
+#. CARD.PC_ALAN_SUPPORT_PLUS.DESC
+msgctxt "CARD.PC_ALAN_SUPPORT_PLUS.DESC"
+msgid ""
+msgstr "{PC_ALAN_TRUTH|}获得2{INFLUENCE}，随后每拥有2层{INFLUENCE}便创建1{PC_ALAN_TRUTH}。"
+
+#. CARD.PC_ALAN_SUPPORT_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_SUPPORT_PLUS.FLAVOUR"
+msgid ""
+msgstr "'我背后还是有些人的。'"
+
+#. CARD.PC_ALAN_SUPPORT_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_SUPPORT_PLUS2.NAME"
+msgid ""
+msgstr "霸道撑腰"
+
+#. CARD.PC_ALAN_SUPPORT_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_SUPPORT_PLUS2.DESC"
+msgid ""
+msgstr "{PC_ALAN_FALLACY|}获得2<#UPGRADE>{DOMINANCE}，随后每拥有2层{DOMINANCE}便获得1{PC_ALAN_FALLACY}</>。"
+
+#. CARD.PC_ALAN_SUPPORT_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_SUPPORT_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'我背后还是有些人的。'"
+
+#. CARD.PC_ALAN_RECKLESS.NAME
+msgctxt "CARD.PC_ALAN_RECKLESS.NAME"
+msgid ""
+msgstr "鲁莽"
+
+#. CARD.PC_ALAN_RECKLESS.DESC
+msgctxt "CARD.PC_ALAN_RECKLESS.DESC"
+msgid ""
+msgstr "每个己方论点让伤害值减少{1}。"
+
+#. CARD.PC_ALAN_RECKLESS.FLAVOUR
+msgctxt "CARD.PC_ALAN_RECKLESS.FLAVOUR"
+msgid ""
+msgstr "'来啊，我奉陪到底！'"
+
+#. CARD.PC_ALAN_RECKLESS_PLUS.NAME
+msgctxt "CARD.PC_ALAN_RECKLESS_PLUS.NAME"
+msgid ""
+msgstr "软化鲁莽"
+
+#. CARD.PC_ALAN_RECKLESS_PLUS.DESC
+msgctxt "CARD.PC_ALAN_RECKLESS_PLUS.DESC"
+msgid ""
+msgstr "每个己方论点让伤害值减少<#UPGRADE>{1}</>。"
+
+#. CARD.PC_ALAN_RECKLESS_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_RECKLESS_PLUS.FLAVOUR"
+msgid ""
+msgstr "'来啊，我奉陪到底！'"
+
+#. CARD.PC_ALAN_RECKLESS_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_RECKLESS_PLUS2.NAME"
+msgid ""
+msgstr "无谋鲁莽"
+
+#. CARD.PC_ALAN_RECKLESS_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_RECKLESS_PLUS2.DESC"
+msgid ""
+msgstr "<#DOWNGRADE>{PA_REASON} {1}：该卡不造成任何伤害</>。"
+
+#. CARD.PC_ALAN_RECKLESS_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_RECKLESS_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'来啊，我奉陪到底！'"
+
+#. CARD.PC_ALAN_APPLY_PRESSURE.NAME
+msgctxt "CARD.PC_ALAN_APPLY_PRESSURE.NAME"
+msgid ""
+msgstr "施压"
+
+#. CARD.PC_ALAN_APPLY_PRESSURE.DESC
+msgctxt "CARD.PC_ALAN_APPLY_PRESSURE.DESC"
+msgid ""
+msgstr "打出后，这张牌就在本次协商中获得{1}伤害。"
+
+#. CARD.PC_ALAN_APPLY_PRESSURE.FLAVOUR
+msgctxt "CARD.PC_ALAN_APPLY_PRESSURE.FLAVOUR"
+msgid ""
+msgstr "'没什么，我只是想提醒一下，时间快到了。'"
+
+#. CARD.PC_ALAN_APPLY_PRESSURE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_APPLY_PRESSURE_PLUS.NAME"
+msgid ""
+msgstr "增强施压"
+
+#. CARD.PC_ALAN_APPLY_PRESSURE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_APPLY_PRESSURE_PLUS.DESC"
+msgid ""
+msgstr "打出后，这张牌就在本次协商中获得{1}伤害。"
+
+#. CARD.PC_ALAN_APPLY_PRESSURE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_APPLY_PRESSURE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'没什么，我只是想提醒一下，时间快到了。'"
+
+#. CARD.PC_ALAN_APPLY_PRESSURE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_APPLY_PRESSURE_PLUS2.NAME"
+msgid ""
+msgstr "无理施压"
+
+#. CARD.PC_ALAN_APPLY_PRESSURE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_APPLY_PRESSURE_PLUS2.DESC"
+msgid ""
+msgstr "<#DOWNGRADE>{PA_UNREASON}：</>打出后，这张牌就在本次协商中获得<#UPGRADE>{1}</>伤害。"
+
+#. CARD.PC_ALAN_APPLY_PRESSURE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_APPLY_PRESSURE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'没什么，我只是想提醒一下，时间快到了。'"
+
+#. CARD.PC_ALAN_BULLY.NAME
+msgctxt "CARD.PC_ALAN_BULLY.NAME"
+msgid ""
+msgstr "恶霸"
+
+#. CARD.PC_ALAN_BULLY.DESC
+msgctxt "CARD.PC_ALAN_BULLY.DESC"
+msgid ""
+msgstr "每拥有1个讨厌你或者不喜欢你的人，这张牌造成{1}额外伤害。"
+
+#. CARD.PC_ALAN_BULLY.FLAVOUR
+msgctxt "CARD.PC_ALAN_BULLY.FLAVOUR"
+msgid ""
+msgstr "'我管你那么多？给我听就完事了！'"
+
+#. CARD.PC_ALAN_BULLY_PLUS.NAME
+msgctxt "CARD.PC_ALAN_BULLY_PLUS.NAME"
+msgid ""
+msgstr "黯淡恶霸"
+
+#. CARD.PC_ALAN_BULLY_PLUS.DESC
+msgctxt "CARD.PC_ALAN_BULLY_PLUS.DESC"
+msgid ""
+msgstr "每拥有1个讨厌你或者不喜欢你的人，这张牌造成<#DOWNGRADE>{1}</>额外伤害。"
+
+#. CARD.PC_ALAN_BULLY_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_BULLY_PLUS.FLAVOUR"
+msgid ""
+msgstr "'我管你那么多？给我听就完事了！'"
+
+#. CARD.PC_ALAN_BULLY_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_BULLY_PLUS2.NAME"
+msgid ""
+msgstr "蛮横恶霸"
+
+#. CARD.PC_ALAN_BULLY_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_BULLY_PLUS2.DESC"
+msgid ""
+msgstr "每拥有1个讨厌你或者不喜欢你的人，这张牌造成{1}额外伤害。\n<#UPGRADE>{INCEPT}1{PC_ALAN_RUDE}</>。"
+
+#. CARD.PC_ALAN_BULLY_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_BULLY_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'我管你那么多？给我听就完事了！'"
+
+#. CARD.PC_ALAN_YANK.NAME
+msgctxt "CARD.PC_ALAN_YANK.NAME"
+msgid ""
+msgstr "拉扯"
+
+#. CARD.PC_ALAN_YANK.DESC
+msgctxt "CARD.PC_ALAN_YANK.DESC"
+msgid ""
+msgstr "{PA_VIOLENT} {1}：抽{2}张牌。"
+
+#. CARD.PC_ALAN_YANK.FLAVOUR
+msgctxt "CARD.PC_ALAN_YANK.FLAVOUR"
+msgid ""
+msgstr "'你给我过来！'"
+
+#. CARD.PC_ALAN_YANK_PLUS.NAME
+msgctxt "CARD.PC_ALAN_YANK_PLUS.NAME"
+msgid ""
+msgstr "增强拉扯"
+
+#. CARD.PC_ALAN_YANK_PLUS.DESC
+msgctxt "CARD.PC_ALAN_YANK_PLUS.DESC"
+msgid ""
+msgstr "{PA_VIOLENT} {1}：抽<#UPGRADE>{2}</>张牌。"
+
+#. CARD.PC_ALAN_YANK_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_YANK_PLUS.FLAVOUR"
+msgid ""
+msgstr "'你给我过来！'"
+
+#. CARD.PC_ALAN_YANK_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_YANK_PLUS2.NAME"
+msgid ""
+msgstr "粗暴拉扯"
+
+#. CARD.PC_ALAN_YANK_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_YANK_PLUS2.DESC"
+msgid ""
+msgstr "{PA_VIOLENT} {1}：抽{2}张牌。\n<#UPGRADE>{PA_VIOLENT} {3}：在弃牌堆中增加1张这张牌</>。"
+
+#. CARD.PC_ALAN_YANK_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_YANK_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'你给我过来！'"
+
+#. CARD.PC_ALAN_FABRICATE.NAME
+msgctxt "CARD.PC_ALAN_FABRICATE.NAME"
+msgid ""
+msgstr "编撰"
+
+#. CARD.PC_ALAN_FABRICATE.DESC
+msgctxt "CARD.PC_ALAN_FABRICATE.DESC"
+msgid ""
+msgstr "每有1个可用行动点便获得1{PC_ALAN_FALLACY}。"
+
+#. CARD.PC_ALAN_FABRICATE.FLAVOUR
+msgctxt "CARD.PC_ALAN_FABRICATE.FLAVOUR"
+msgid ""
+msgstr "'总之就是这样啦，你爱信不信，不信就滚。'"
+
+#. CARD.PC_ALAN_FABRICATE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_FABRICATE_PLUS.NAME"
+msgid ""
+msgstr "增强编撰"
+
+#. CARD.PC_ALAN_FABRICATE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_FABRICATE_PLUS.DESC"
+msgid ""
+msgstr "每有1个可用行动点便获得1{PC_ALAN_FALLACY}<#UPGRADE>+1</>。"
+
+#. CARD.PC_ALAN_FABRICATE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_FABRICATE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'总之就是这样啦，你爱信不信，不信就滚。'"
+
+#. CARD.PC_ALAN_FABRICATE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_FABRICATE_PLUS2.NAME"
+msgid ""
+msgstr "岩石编撰"
+
+#. CARD.PC_ALAN_FABRICATE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_FABRICATE_PLUS2.DESC"
+msgid ""
+msgstr "每有1个可用行动点便获得1{PC_ALAN_FALLACY}和<#UPGRADE>2{COMPOSURE}</>。"
+
+#. CARD.PC_ALAN_FABRICATE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_FABRICATE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'总之就是这样啦，你爱信不信，不信就滚。'"
+
+#. CARD.PC_ALAN_HOT_COFFEE.NAME
+msgctxt "CARD.PC_ALAN_HOT_COFFEE.NAME"
+msgid ""
+msgstr "热咖啡"
+
+#. CARD.PC_ALAN_HOT_COFFEE.DESC
+msgctxt "CARD.PC_ALAN_HOT_COFFEE.DESC"
+msgid ""
+msgstr "手牌里有这张牌时，所有牌造成{1}额外伤害。"
+
+#. CARD.PC_ALAN_HOT_COFFEE.FLAVOUR
+msgctxt "CARD.PC_ALAN_HOT_COFFEE.FLAVOUR"
+msgid ""
+msgstr "'这咖啡正好还热，希望你的脸不会需要感受这温度。'"
+
+#. CARD.PC_ALAN_HOT_COFFEE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_HOT_COFFEE_PLUS.NAME"
+msgid ""
+msgstr "增强热咖啡"
+
+#. CARD.PC_ALAN_HOT_COFFEE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_HOT_COFFEE_PLUS.DESC"
+msgid ""
+msgstr "手牌里有这张牌时，所有牌造成<#UPGRADE>{1}</>额外伤害。"
+
+#. CARD.PC_ALAN_HOT_COFFEE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_HOT_COFFEE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'这咖啡正好还热，希望你的脸不会需要感受这温度。'"
+
+#. CARD.PC_ALAN_HOT_COFFEE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_HOT_COFFEE_PLUS2.NAME"
+msgid ""
+msgstr "远见热咖啡"
+
+#. CARD.PC_ALAN_HOT_COFFEE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_HOT_COFFEE_PLUS2.DESC"
+msgid ""
+msgstr "手牌里有这张牌时，所有牌造成{1}额外伤害。"
+
+#. CARD.PC_ALAN_HOT_COFFEE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_HOT_COFFEE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'这咖啡正好还热，希望你的脸不会需要感受这温度。'"
+
+#. CARD.PC_ALAN_TURN_THE_TABLES.NAME
+msgctxt "CARD.PC_ALAN_TURN_THE_TABLES.NAME"
+msgid ""
+msgstr "倒打一耙"
+
+#. CARD.PC_ALAN_TURN_THE_TABLES.DESC
+msgctxt "CARD.PC_ALAN_TURN_THE_TABLES.DESC"
+msgid ""
+msgstr "在本回合的剩余时间，每当你打出任意牌时，获得1{PC_ALAN_FALLACY}。"
+
+#. CARD.PC_ALAN_TURN_THE_TABLES.FLAVOUR
+msgctxt "CARD.PC_ALAN_TURN_THE_TABLES.FLAVOUR"
+msgid ""
+msgstr "'你先来事的！'"
+
+#. CARD.PC_ALAN_TURN_THE_TABLES_PLUS.NAME
+msgctxt "CARD.PC_ALAN_TURN_THE_TABLES_PLUS.NAME"
+msgid ""
+msgstr "黯淡倒打一耙"
+
+#. CARD.PC_ALAN_TURN_THE_TABLES_PLUS.DESC
+msgctxt "CARD.PC_ALAN_TURN_THE_TABLES_PLUS.DESC"
+msgid ""
+msgstr "在本回合的剩余时间，每当你打出任意牌时，获得1{PC_ALAN_FALLACY}。"
+
+#. CARD.PC_ALAN_TURN_THE_TABLES_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_TURN_THE_TABLES_PLUS.FLAVOUR"
+msgid ""
+msgstr "'你先来事的！'"
+
+#. CARD.PC_ALAN_TURN_THE_TABLES_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_TURN_THE_TABLES_PLUS2.NAME"
+msgid ""
+msgstr "持续倒打一耙"
+
+#. CARD.PC_ALAN_TURN_THE_TABLES_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_TURN_THE_TABLES_PLUS2.DESC"
+msgid ""
+msgstr "在本回合的剩余时间，每当你打出任意牌时，获得1{PC_ALAN_FALLACY}。"
+
+#. CARD.PC_ALAN_TURN_THE_TABLES_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_TURN_THE_TABLES_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'你先来事的！'"
+
+#. CARD.PC_ALAN_TRADE_DONE.NAME
+msgctxt "CARD.PC_ALAN_TRADE_DONE.NAME"
+msgid ""
+msgstr "交易达成"
+
+#. CARD.PC_ALAN_TRADE_DONE.DESC
+msgctxt "CARD.PC_ALAN_TRADE_DONE.DESC"
+msgid ""
+msgstr "对方每拥有1个论点，赏金或者植入物便获得1{PC_ALAN_FALLACY}。"
+
+#. CARD.PC_ALAN_TRADE_DONE.FLAVOUR
+msgctxt "CARD.PC_ALAN_TRADE_DONE.FLAVOUR"
+msgid ""
+msgstr "'希望你不会后悔。'"
+
+#. CARD.PC_ALAN_TRADE_DONE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_TRADE_DONE_PLUS.NAME"
+msgid ""
+msgstr "黯淡交易达成"
+
+#. CARD.PC_ALAN_TRADE_DONE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_TRADE_DONE_PLUS.DESC"
+msgid ""
+msgstr "对方每拥有1个论点，赏金或者植入物便获得1{PC_ALAN_FALLACY}。"
+
+#. CARD.PC_ALAN_TRADE_DONE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_TRADE_DONE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'希望你不会后悔。'"
+
+#. CARD.PC_ALAN_TRADE_DONE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_TRADE_DONE_PLUS2.NAME"
+msgid ""
+msgstr "增强交易达成"
+
+#. CARD.PC_ALAN_TRADE_DONE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_TRADE_DONE_PLUS2.DESC"
+msgid ""
+msgstr "对方每拥有1个论点，赏金或者植入物便获得1{PC_ALAN_FALLACY}<#UPGRADE>+1</>。"
+
+#. CARD.PC_ALAN_TRADE_DONE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_TRADE_DONE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'希望你不会后悔。'"
+
+#. CARD.PC_ALAN_FLIP_THE_TABLE.NAME
+msgctxt "CARD.PC_ALAN_FLIP_THE_TABLE.NAME"
+msgid ""
+msgstr "掀桌"
+
+#. CARD.PC_ALAN_FLIP_THE_TABLE.DESC
+msgctxt "CARD.PC_ALAN_FLIP_THE_TABLE.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：抽到该牌后立即对随机目标打出该牌。\n抽1张牌。"
+
+#. CARD.PC_ALAN_FLIP_THE_TABLE.FLAVOUR
+msgctxt "CARD.PC_ALAN_FLIP_THE_TABLE.FLAVOUR"
+msgid ""
+msgstr "'这事不谈也罢！'"
+
+#. CARD.PC_ALAN_FLIP_THE_TABLE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_FLIP_THE_TABLE_PLUS.NAME"
+msgid ""
+msgstr "强力掀桌"
+
+#. CARD.PC_ALAN_FLIP_THE_TABLE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_FLIP_THE_TABLE_PLUS.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：抽到该牌后立即对随机目标打出该牌。\n抽1张牌。"
+
+#. CARD.PC_ALAN_FLIP_THE_TABLE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_FLIP_THE_TABLE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'这事不谈也罢！'"
+
+#. CARD.PC_ALAN_FLIP_THE_TABLE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_FLIP_THE_TABLE_PLUS2.NAME"
+msgid ""
+msgstr "远见掀桌"
+
+#. CARD.PC_ALAN_FLIP_THE_TABLE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_FLIP_THE_TABLE_PLUS2.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：抽到该牌后立即对随机目标打出该牌。\n抽<#UPGRADE>2</>张牌。"
+
+#. CARD.PC_ALAN_FLIP_THE_TABLE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_FLIP_THE_TABLE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'这事不谈也罢！'"
+
+#. CARD.PC_ALAN_ACCURE.NAME
+msgctxt "CARD.PC_ALAN_ACCURE.NAME"
+msgid ""
+msgstr "指责"
+
+#. CARD.PC_ALAN_ACCURE.DESC
+msgctxt "CARD.PC_ALAN_ACCURE.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：获得{1}行动点并抽{2}张牌。"
+
+#. CARD.PC_ALAN_ACCURE.FLAVOUR
+msgctxt "CARD.PC_ALAN_ACCURE.FLAVOUR"
+msgid ""
+msgstr "'阁下还需要浪费多少黑石的时间？！'"
+
+#. CARD.PC_ALAN_ACCURE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_ACCURE_PLUS.NAME"
+msgid ""
+msgstr "远见指责"
+
+#. CARD.PC_ALAN_ACCURE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_ACCURE_PLUS.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：获得{1}行动点并抽<#UPGRADE>{2}</>张牌。"
+
+#. CARD.PC_ALAN_ACCURE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_ACCURE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'阁下还需要浪费多少黑石的时间？！'"
+
+#. CARD.PC_ALAN_ACCURE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_ACCURE_PLUS2.NAME"
+msgid ""
+msgstr "增强指责"
+
+#. CARD.PC_ALAN_ACCURE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_ACCURE_PLUS2.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：获得<#UPGRADE>{1}</>行动点并抽{2}张牌。"
+
+#. CARD.PC_ALAN_ACCURE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_ACCURE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'阁下还需要浪费多少黑石的时间？！'"
+
+#. CARD.PC_ALAN_FOOLHARDY.NAME
+msgctxt "CARD.PC_ALAN_FOOLHARDY.NAME"
+msgid ""
+msgstr "无谋"
+
+#. CARD.PC_ALAN_FOOLHARDY.DESC
+msgctxt "CARD.PC_ALAN_FOOLHARDY.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：{INCEPT}{1}{PC_ALAN_RUDE}。"
+
+#. CARD.PC_ALAN_FOOLHARDY.FLAVOUR
+msgctxt "CARD.PC_ALAN_FOOLHARDY.FLAVOUR"
+msgid ""
+msgstr "'今天要么你妥协，要么有本事叫海军部的人过来。'"
+
+#. CARD.PC_ALAN_FOOLHARDY_PLUS.NAME
+msgctxt "CARD.PC_ALAN_FOOLHARDY_PLUS.NAME"
+msgid ""
+msgstr "黯淡无谋"
+
+#. CARD.PC_ALAN_FOOLHARDY_PLUS.DESC
+msgctxt "CARD.PC_ALAN_FOOLHARDY_PLUS.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：{INCEPT}{1}{PC_ALAN_RUDE}。"
+
+#. CARD.PC_ALAN_FOOLHARDY_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_FOOLHARDY_PLUS.FLAVOUR"
+msgid ""
+msgstr "'今天要么你妥协，要么有本事叫海军部的人过来。'"
+
+#. CARD.PC_ALAN_FOOLHARDY_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_FOOLHARDY_PLUS2.NAME"
+msgid ""
+msgstr "增强无谋"
+
+#. CARD.PC_ALAN_FOOLHARDY_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_FOOLHARDY_PLUS2.DESC"
+msgid ""
+msgstr "{PA_UNREASON}：{INCEPT}<#UPGRADE>{1}</>{PC_ALAN_RUDE}。"
+
+#. CARD.PC_ALAN_FOOLHARDY_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_FOOLHARDY_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'今天要么你妥协，要么有本事叫海军部的人过来。'"
+
+#. CARD.PC_ALAN_QUESTION.NAME
+msgctxt "CARD.PC_ALAN_QUESTION.NAME"
+msgid ""
+msgstr "询问"
+
+#. CARD.PC_ALAN_QUESTION.DESC
+msgctxt "CARD.PC_ALAN_QUESTION.DESC"
+msgid ""
+msgstr "若目标拥有任意植入物，则抽{1}张牌。"
+
+#. CARD.PC_ALAN_QUESTION.FLAVOUR
+msgctxt "CARD.PC_ALAN_QUESTION.FLAVOUR"
+msgid ""
+msgstr "'老兄说真的你头上插着两个问号牌真的不会有事吗？'"
+
+#. CARD.PC_ALAN_QUESTION_PLUS.NAME
+msgctxt "CARD.PC_ALAN_QUESTION_PLUS.NAME"
+msgid ""
+msgstr "增强询问"
+
+#. CARD.PC_ALAN_QUESTION_PLUS.DESC
+msgctxt "CARD.PC_ALAN_QUESTION_PLUS.DESC"
+msgid ""
+msgstr "若目标拥有任意植入物，则抽<#UPGRADE>{1}</>张牌。"
+
+#. CARD.PC_ALAN_QUESTION_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_QUESTION_PLUS.FLAVOUR"
+msgid ""
+msgstr "'老兄说真的你头上插着两个问号牌真的不会有事吗？'"
+
+#. CARD.PC_ALAN_QUESTION_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_QUESTION_PLUS2.NAME"
+msgid ""
+msgstr "即兴询问"
+
+#. CARD.PC_ALAN_QUESTION_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_QUESTION_PLUS2.DESC"
+msgid ""
+msgstr "若目标拥有任意植入物，则<#UPGRADE>{IMPROVISE_PLUS}</><#DOWNGRADE>{1}</>张牌。"
+
+#. CARD.PC_ALAN_QUESTION_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_QUESTION_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'老兄说真的你头上插着两个问号牌真的不会有事吗？'"
+
+#. CARD.PC_ALAN_INTERROGATE.NAME
+msgctxt "CARD.PC_ALAN_INTERROGATE.NAME"
+msgid ""
+msgstr "审问"
+
+#. CARD.PC_ALAN_INTERROGATE.DESC
+msgctxt "CARD.PC_ALAN_INTERROGATE.DESC"
+msgid ""
+msgstr "{PA_INTERROGATE|}创建1{PA_INTERROGATE}。"
+
+#. CARD.PC_ALAN_INTERROGATE.FLAVOUR
+msgctxt "CARD.PC_ALAN_INTERROGATE.FLAVOUR"
+msgid ""
+msgstr "'希望你只是开玩笑而已。'"
+
+#. CARD.PC_ALAN_INTERROGATE_PLUS.NAME
+msgctxt "CARD.PC_ALAN_INTERROGATE_PLUS.NAME"
+msgid ""
+msgstr "初始审问"
+
+#. CARD.PC_ALAN_INTERROGATE_PLUS.DESC
+msgctxt "CARD.PC_ALAN_INTERROGATE_PLUS.DESC"
+msgid ""
+msgstr "{PA_INTERROGATE|}创建1{PA_INTERROGATE}。"
+
+#. CARD.PC_ALAN_INTERROGATE_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_INTERROGATE_PLUS.FLAVOUR"
+msgid ""
+msgstr "'希望你只是开玩笑而已。'"
+
+#. CARD.PC_ALAN_INTERROGATE_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_INTERROGATE_PLUS2.NAME"
+msgid ""
+msgstr "黯淡审问"
+
+#. CARD.PC_ALAN_INTERROGATE_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_INTERROGATE_PLUS2.DESC"
+msgid ""
+msgstr "{PA_INTERROGATE|}创建1{PA_INTERROGATE}。"
+
+#. CARD.PC_ALAN_INTERROGATE_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_INTERROGATE_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'希望你只是开玩笑而已。'"
+
+#. CARD.PC_ALAN_PRAY.NAME
+msgctxt "CARD.PC_ALAN_PRAY.NAME"
+msgid ""
+msgstr "祷告"
+
+#. CARD.PC_ALAN_PRAY.DESC
+msgctxt "CARD.PC_ALAN_PRAY.DESC"
+msgid ""
+msgstr "施加{1}意志和{2}{COMPOSURE}。"
+
+#. CARD.PC_ALAN_PRAY.FLAVOUR
+msgctxt "CARD.PC_ALAN_PRAY.FLAVOUR"
+msgid ""
+msgstr "'黑石现，非恩非惩，乃心之所感也。'"
+
+#. CARD.PC_ALAN_PRAY_PLUS.NAME
+msgctxt "CARD.PC_ALAN_PRAY_PLUS.NAME"
+msgid ""
+msgstr "修复祷告"
+
+#. CARD.PC_ALAN_PRAY_PLUS.DESC
+msgctxt "CARD.PC_ALAN_PRAY_PLUS.DESC"
+msgid ""
+msgstr "施加<#UPGRADE>{1}</>意志和{2}{COMPOSURE}。"
+
+#. CARD.PC_ALAN_PRAY_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_PRAY_PLUS.FLAVOUR"
+msgid ""
+msgstr "'黑石现，非恩非惩，乃心之所感也。'"
+
+#. CARD.PC_ALAN_PRAY_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_PRAY_PLUS2.NAME"
+msgid ""
+msgstr "岩石祷告"
+
+#. CARD.PC_ALAN_PRAY_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_PRAY_PLUS2.DESC"
+msgid ""
+msgstr "施加{1}意志和<#UPGRADE>{2}</>{COMPOSURE}。"
+
+#. CARD.PC_ALAN_PRAY_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_PRAY_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'黑石现，非恩非惩，乃心之所感也。'"
+
+#. CARD.PC_ALAN_BUY_OFF.NAME
+msgctxt "CARD.PC_ALAN_BUY_OFF.NAME"
+msgid ""
+msgstr "收买"
+
+#. CARD.PC_ALAN_BUY_OFF.DESC
+msgctxt "CARD.PC_ALAN_BUY_OFF.DESC"
+msgid ""
+msgstr "将{1}张{hush_money}置入弃牌堆。"
+
+#. CARD.PC_ALAN_BUY_OFF.FLAVOUR
+msgctxt "CARD.PC_ALAN_BUY_OFF.FLAVOUR"
+msgid ""
+msgstr "'别声张！'"
+
+#. CARD.PC_ALAN_BUY_OFF_PLUS.NAME
+msgctxt "CARD.PC_ALAN_BUY_OFF_PLUS.NAME"
+msgid ""
+msgstr "增强收买"
+
+#. CARD.PC_ALAN_BUY_OFF_PLUS.DESC
+msgctxt "CARD.PC_ALAN_BUY_OFF_PLUS.DESC"
+msgid ""
+msgstr "将<#UPGRADE>{1}</>张{hush_money}置入弃牌堆。"
+
+#. CARD.PC_ALAN_BUY_OFF_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_BUY_OFF_PLUS.FLAVOUR"
+msgid ""
+msgstr "'别声张！'"
+
+#. CARD.PC_ALAN_BUY_OFF_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_BUY_OFF_PLUS2.NAME"
+msgid ""
+msgstr "及时收买"
+
+#. CARD.PC_ALAN_BUY_OFF_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_BUY_OFF_PLUS2.DESC"
+msgid ""
+msgstr "将{1}张{hush_money}置入<#UPGRADE>手牌中</>。"
+
+#. CARD.PC_ALAN_BUY_OFF_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_BUY_OFF_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'别声张！'"
+
+#. CARD.PC_ALAN_DEEP_BREATH.NAME
+msgctxt "CARD.PC_ALAN_DEEP_BREATH.NAME"
+msgid ""
+msgstr "深呼吸"
+
+#. CARD.PC_ALAN_DEEP_BREATH.DESC
+msgctxt "CARD.PC_ALAN_DEEP_BREATH.DESC"
+msgid ""
+msgstr "本回合所有友方论点造成的伤害翻倍。"
+
+#. CARD.PC_ALAN_DEEP_BREATH.FLAVOUR
+msgctxt "CARD.PC_ALAN_DEEP_BREATH.FLAVOUR"
+msgid ""
+msgstr "'给我点时间。 '"
+
+#. CARD.PC_ALAN_DEEP_BREATH_PLUS.NAME
+msgctxt "CARD.PC_ALAN_DEEP_BREATH_PLUS.NAME"
+msgid ""
+msgstr "黯淡深呼吸"
+
+#. CARD.PC_ALAN_DEEP_BREATH_PLUS.DESC
+msgctxt "CARD.PC_ALAN_DEEP_BREATH_PLUS.DESC"
+msgid ""
+msgstr "本回合所有友方论点造成的伤害翻倍。"
+
+#. CARD.PC_ALAN_DEEP_BREATH_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_DEEP_BREATH_PLUS.FLAVOUR"
+msgid ""
+msgstr "'给我点时间。 '"
+
+#. CARD.PC_ALAN_DEEP_BREATH_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_DEEP_BREATH_PLUS2.NAME"
+msgid ""
+msgstr "扭曲深呼吸"
+
+#. CARD.PC_ALAN_DEEP_BREATH_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_DEEP_BREATH_PLUS2.DESC"
+msgid ""
+msgstr "本回合所有<#UPGRADE>牌</>造成的伤害翻倍。\n<#DOWNGRADE>获得1{PC_ALAN_RUDE}和1{VULNERABILITY}</>。"
+
+#. CARD.PC_ALAN_DEEP_BREATH_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_DEEP_BREATH_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'给我点时间。 '"
+
+#. CARD.PC_ALAN_UNITED_FRONT.NAME
+msgctxt "CARD.PC_ALAN_UNITED_FRONT.NAME"
+msgid ""
+msgstr "众志成城"
+
+#. CARD.PC_ALAN_UNITED_FRONT.DESC
+msgctxt "CARD.PC_ALAN_UNITED_FRONT.DESC"
+msgid ""
+msgstr "为1个随机的己方论点施加{1}{COMPOSURE}。{PA_REASON} X：重复X次。"
+
+#. CARD.PC_ALAN_UNITED_FRONT.FLAVOUR
+msgctxt "CARD.PC_ALAN_UNITED_FRONT.FLAVOUR"
+msgid ""
+msgstr "'我后面还有我的同伴。 '"
+
+#. CARD.PC_ALAN_UNITED_FRONT_PLUS.NAME
+msgctxt "CARD.PC_ALAN_UNITED_FRONT_PLUS.NAME"
+msgid ""
+msgstr "岩石众志成城"
+
+#. CARD.PC_ALAN_UNITED_FRONT_PLUS.DESC
+msgctxt "CARD.PC_ALAN_UNITED_FRONT_PLUS.DESC"
+msgid ""
+msgstr "为1个随机的己方论点施加<#UPGRADE>{1}</>{COMPOSURE}。{PA_REASON} X：重复X次。"
+
+#. CARD.PC_ALAN_UNITED_FRONT_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_UNITED_FRONT_PLUS.FLAVOUR"
+msgid ""
+msgstr "'我后面还有我的同伴。 '"
+
+#. CARD.PC_ALAN_UNITED_FRONT_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_UNITED_FRONT_PLUS2.NAME"
+msgid ""
+msgstr "势单力薄"
+
+#. CARD.PC_ALAN_UNITED_FRONT_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_UNITED_FRONT_PLUS2.DESC"
+msgid ""
+msgstr "为1个随机的己方论点施加{1}{COMPOSURE}。{PA_REASON} X：重复X次。\n<#UPGRADE>{PA_UNREASON}：获得5{COMPOSURE}</>。"
+
+#. CARD.PC_ALAN_UNITED_FRONT_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_UNITED_FRONT_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'我后面还有我的同伴......好吧我承认我说谎了。'"
+
+#. CARD.PC_ALAN_GOSSIP.NAME
+msgctxt "CARD.PC_ALAN_GOSSIP.NAME"
+msgid ""
+msgstr "八卦"
+
+#. CARD.PC_ALAN_GOSSIP.DESC
+msgctxt "CARD.PC_ALAN_GOSSIP.DESC"
+msgid ""
+msgstr "{PA_GOSSIP|}获得：所有友方论点造成1额外伤害。"
+
+#. CARD.PC_ALAN_GOSSIP.FLAVOUR
+msgctxt "CARD.PC_ALAN_GOSSIP.FLAVOUR"
+msgid ""
+msgstr "'哎，你知道吗，最近这边可不太平。 '"
+
+#. CARD.PC_ALAN_GOSSIP_PLUS.NAME
+msgctxt "CARD.PC_ALAN_GOSSIP_PLUS.NAME"
+msgid ""
+msgstr "初始八卦"
+
+#. CARD.PC_ALAN_GOSSIP_PLUS.DESC
+msgctxt "CARD.PC_ALAN_GOSSIP_PLUS.DESC"
+msgid ""
+msgstr "{PA_GOSSIP|}获得：所有友方论点造成1额外伤害。"
+
+#. CARD.PC_ALAN_GOSSIP_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_GOSSIP_PLUS.FLAVOUR"
+msgid ""
+msgstr "'哎，你知道吗，最近这边可不太平。 '"
+
+#. CARD.PC_ALAN_GOSSIP_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_GOSSIP_PLUS2.NAME"
+msgid ""
+msgstr "黯淡八卦"
+
+#. CARD.PC_ALAN_GOSSIP_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_GOSSIP_PLUS2.DESC"
+msgid ""
+msgstr "{PA_GOSSIP|}获得：所有友方论点造成1额外伤害。"
+
+#. CARD.PC_ALAN_GOSSIP_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_GOSSIP_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'哎，你知道吗，最近这边可不太平。'"
+
+#. CARD.PC_ALAN_CAUSE_AND_EFFECT.NAME
+msgctxt "CARD.PC_ALAN_CAUSE_AND_EFFECT.NAME"
+msgid ""
+msgstr "有因有果"
+
+#. CARD.PC_ALAN_CAUSE_AND_EFFECT.DESC
+msgctxt "CARD.PC_ALAN_CAUSE_AND_EFFECT.DESC"
+msgid ""
+msgstr "{PA_CAUSE_AND_EFFECT|}获得{1}{PA_CAUSE_AND_EFFECT}。"
+
+#. CARD.PC_ALAN_CAUSE_AND_EFFECT.FLAVOUR
+msgctxt "CARD.PC_ALAN_CAUSE_AND_EFFECT.FLAVOUR"
+msgid ""
+msgstr "'史密斯再次眯上了眼睛，毕竟吃完饭后最适合睡觉了。 '"
+
+#. CARD.PC_ALAN_CAUSE_AND_EFFECT_PLUS.NAME
+msgctxt "CARD.PC_ALAN_CAUSE_AND_EFFECT_PLUS.NAME"
+msgid ""
+msgstr "增强有因有果"
+
+#. CARD.PC_ALAN_CAUSE_AND_EFFECT_PLUS.DESC
+msgctxt "CARD.PC_ALAN_CAUSE_AND_EFFECT_PLUS.DESC"
+msgid ""
+msgstr "{PA_CAUSE_AND_EFFECT|}获得<#UPGRADE>{1}</>{PA_CAUSE_AND_EFFECT}。"
+
+#. CARD.PC_ALAN_CAUSE_AND_EFFECT_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_CAUSE_AND_EFFECT_PLUS.FLAVOUR"
+msgid ""
+msgstr "'史密斯再次眯上了眼睛，毕竟吃完饭后最适合睡觉了。 '"
+
+#. CARD.PC_ALAN_CAUSE_AND_EFFECT_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_CAUSE_AND_EFFECT_PLUS2.NAME"
+msgid ""
+msgstr "黯淡有因有果"
+
+#. CARD.PC_ALAN_CAUSE_AND_EFFECT_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_CAUSE_AND_EFFECT_PLUS2.DESC"
+msgid ""
+msgstr "{PA_CAUSE_AND_EFFECT|}获得{1}{PA_CAUSE_AND_EFFECT}。"
+
+#. CARD.PC_ALAN_CAUSE_AND_EFFECT_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_CAUSE_AND_EFFECT_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'史密斯再次眯上了眼睛，毕竟吃完饭后最适合睡觉了。'"
+
+#. CARD.PC_ALAN_PROFANE_ARTIFACT.NAME
+msgctxt "CARD.PC_ALAN_PROFANE_ARTIFACT.NAME"
+msgid ""
+msgstr "亵渎之物"
+
+#. CARD.PC_ALAN_PROFANE_ARTIFACT.DESC
+msgctxt "CARD.PC_ALAN_PROFANE_ARTIFACT.DESC"
+msgid ""
+msgstr "{bog_boil|}摧毁1个指定的友方论点，随后创建1{bog_boil}。"
+
+#. CARD.PC_ALAN_PROFANE_ARTIFACT.FLAVOUR
+msgctxt "CARD.PC_ALAN_PROFANE_ARTIFACT.FLAVOUR"
+msgid ""
+msgstr "'这个装置里面含有某位自愿的沼泽人所携带的知识，带的时候注意点。 '"
+
+#. CARD.PC_ALAN_PROFANE_ARTIFACT_PLUS.NAME
+msgctxt "CARD.PC_ALAN_PROFANE_ARTIFACT_PLUS.NAME"
+msgid ""
+msgstr "黯淡亵渎之物"
+
+#. CARD.PC_ALAN_PROFANE_ARTIFACT_PLUS.DESC
+msgctxt "CARD.PC_ALAN_PROFANE_ARTIFACT_PLUS.DESC"
+msgid ""
+msgstr "{bog_boil|}摧毁1个指定的友方论点，随后创建1{bog_boil}。"
+
+#. CARD.PC_ALAN_PROFANE_ARTIFACT_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_PROFANE_ARTIFACT_PLUS.FLAVOUR"
+msgid ""
+msgstr "'这个装置里面含有某位自愿的沼泽人所携带的知识，带的时候注意点。 '"
+
+#. CARD.PC_ALAN_PROFANE_ARTIFACT_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_PROFANE_ARTIFACT_PLUS2.NAME"
+msgid ""
+msgstr "软化亵渎之物"
+
+#. CARD.PC_ALAN_PROFANE_ARTIFACT_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_PROFANE_ARTIFACT_PLUS2.DESC"
+msgid ""
+msgstr "{bog_boil|}<#UPGRADE>创建1{bog_boil}</>。"
+
+#. CARD.PC_ALAN_PROFANE_ARTIFACT_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_PROFANE_ARTIFACT_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'这个装置里面含有某位自愿的沼泽人所携带的知识，带的时候注意点。'"
+
+#. CARD.PC_ALAN_REPEAT.NAME
+msgctxt "CARD.PC_ALAN_REPEAT.NAME"
+msgid ""
+msgstr "复述"
+
+#. CARD.PC_ALAN_REPEAT.DESC
+msgctxt "CARD.PC_ALAN_REPEAT.DESC"
+msgid ""
+msgstr "复制1个指定的论点。"
+
+#. CARD.PC_ALAN_REPEAT.FLAVOUR
+msgctxt "CARD.PC_ALAN_REPEAT.FLAVOUR"
+msgid ""
+msgstr "'现在你应该明白了吧？ '"
+
+#. CARD.PC_ALAN_REPEAT_PLUS.NAME
+msgctxt "CARD.PC_ALAN_REPEAT_PLUS.NAME"
+msgid ""
+msgstr "广泛复述"
+
+#. CARD.PC_ALAN_REPEAT_PLUS.DESC
+msgctxt "CARD.PC_ALAN_REPEAT_PLUS.DESC"
+msgid ""
+msgstr "复制1个<#DOWNGRADE>随机</>的论点<#UPGRADE>两次</>。"
+
+#. CARD.PC_ALAN_REPEAT_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_REPEAT_PLUS.FLAVOUR"
+msgid ""
+msgstr "'现在你应该明白了吧？ '"
+
+#. CARD.PC_ALAN_REPEAT_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_REPEAT_PLUS2.NAME"
+msgid ""
+msgstr "黯淡复述"
+
+#. CARD.PC_ALAN_REPEAT_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_REPEAT_PLUS2.DESC"
+msgid ""
+msgstr "复制1个指定的论点。"
+
+#. CARD.PC_ALAN_REPEAT_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_REPEAT_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'现在你应该明白了吧？'"
+
+#. CARD.PC_ALAN_CLARIFICATION.NAME
+msgctxt "CARD.PC_ALAN_CLARIFICATION.NAME"
+msgid ""
+msgstr "深入解释"
+
+#. CARD.PC_ALAN_CLARIFICATION.DESC
+msgctxt "CARD.PC_ALAN_CLARIFICATION.DESC"
+msgid ""
+msgstr "{PC_ALAN_TRUTH|}每拥有1个{PC_ALAN_TRUTH}便创建1{PC_ALAN_TRUTH}。"
+
+#. CARD.PC_ALAN_CLARIFICATION.FLAVOUR
+msgctxt "CARD.PC_ALAN_CLARIFICATION.FLAVOUR"
+msgid ""
+msgstr "'好吧，更准确的说......'"
+
+#. CARD.PC_ALAN_CLARIFICATION_PLUS.NAME
+msgctxt "CARD.PC_ALAN_CLARIFICATION_PLUS.NAME"
+msgid ""
+msgstr "黯淡深入解释"
+
+#. CARD.PC_ALAN_CLARIFICATION_PLUS.DESC
+msgctxt "CARD.PC_ALAN_CLARIFICATION_PLUS.DESC"
+msgid ""
+msgstr "{PC_ALAN_TRUTH|}每拥有1个{PC_ALAN_TRUTH}便创建1{PC_ALAN_TRUTH}。"
+
+#. CARD.PC_ALAN_CLARIFICATION_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_CLARIFICATION_PLUS.FLAVOUR"
+msgid ""
+msgstr "'好吧，更准确的说......'"
+
+#. CARD.PC_ALAN_CLARIFICATION_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_CLARIFICATION_PLUS2.NAME"
+msgid ""
+msgstr "增强深入解释"
+
+#. CARD.PC_ALAN_CLARIFICATION_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_CLARIFICATION_PLUS2.DESC"
+msgid ""
+msgstr "{PC_ALAN_TRUTH|}<#UPGRADE>创建1{PC_ALAN_TRUTH}</>，随后每拥有1个{PC_ALAN_TRUTH}便创建1{PC_ALAN_TRUTH}。"
+
+#. CARD.PC_ALAN_CLARIFICATION_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_CLARIFICATION_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'好吧，更准确的说......'"
+
+#. CARD.PC_ALAN_PLAYING_THE_FOOL.NAME
+msgctxt "CARD.PC_ALAN_PLAYING_THE_FOOL.NAME"
+msgid ""
+msgstr "扮小丑"
+
+#. CARD.PC_ALAN_PLAYING_THE_FOOL.DESC
+msgctxt "CARD.PC_ALAN_PLAYING_THE_FOOL.DESC"
+msgid ""
+msgstr "将对手的核心论点的意志恢复至最大值。每通过此方式恢复{1}点意志便获得1{PC_ALAN_GENUINE}。"
+
+#. CARD.PC_ALAN_PLAYING_THE_FOOL.FLAVOUR
+msgctxt "CARD.PC_ALAN_PLAYING_THE_FOOL.FLAVOUR"
+msgid ""
+msgstr "'瞧，是我，史密斯·乌龟·班阔。'"
+
+#. CARD.PC_ALAN_PLAYING_THE_FOOL_PLUS.NAME
+msgctxt "CARD.PC_ALAN_PLAYING_THE_FOOL_PLUS.NAME"
+msgid ""
+msgstr "镜像扮小丑"
+
+#. CARD.PC_ALAN_PLAYING_THE_FOOL_PLUS.DESC
+msgctxt "CARD.PC_ALAN_PLAYING_THE_FOOL_PLUS.DESC"
+msgid ""
+msgstr "将对手的核心论点的意志恢复至最大值。每通过此方式恢复<#UPGRADE>{1}</>点意志便获得1{PC_ALAN_GENUINE}。"
+
+#. CARD.PC_ALAN_PLAYING_THE_FOOL_PLUS.FLAVOUR
+msgctxt "CARD.PC_ALAN_PLAYING_THE_FOOL_PLUS.FLAVOUR"
+msgid ""
+msgstr "'瞧，是我，史密斯·乌龟·班阔。'"
+
+#. CARD.PC_ALAN_PLAYING_THE_FOOL_PLUS2.NAME
+msgctxt "CARD.PC_ALAN_PLAYING_THE_FOOL_PLUS2.NAME"
+msgid ""
+msgstr "增强扮小丑"
+
+#. CARD.PC_ALAN_PLAYING_THE_FOOL_PLUS2.DESC
+msgctxt "CARD.PC_ALAN_PLAYING_THE_FOOL_PLUS2.DESC"
+msgid ""
+msgstr "将对手的核心论点的意志恢复至最大值。每通过此方式恢复{1}点意志便获得1{PC_ALAN_GENUINE}<#UPGRADE>+4</>。"
+
+#. CARD.PC_ALAN_PLAYING_THE_FOOL_PLUS2.FLAVOUR
+msgctxt "CARD.PC_ALAN_PLAYING_THE_FOOL_PLUS2.FLAVOUR"
+msgid ""
+msgstr "'瞧，是我，史密斯·乌龟·班阔。'"
