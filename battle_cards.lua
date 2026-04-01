@@ -73,7 +73,7 @@ local CONDITIONS =
     LUMIN_RESERVE =
     {
         name = "Lumin Reserve",
-        desc = "Your next attack applies <#HILITE>{1} {lumin_burnt}</> and <#HILITE>{2} {DEFEND}</> to the target.",
+        desc = "Your next attack applies <#HILITE>{1} {lumin_burnt}</> and <#HILITE>{2} {DEFEND}</> to the target.\nThe latter increases by 1 every 5 stacks.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.stacks, math.ceil(self.stacks / 5))
         end,
@@ -1698,7 +1698,7 @@ local CARDS =
         anim = "throw",
         desc =  "Discard {1} random card from your hand.\nAttack a random enemy.",
         desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self.discard_count, self.action_gain)
+            return loc.format(fmt_str, self.discard_count)
         end,
         flavour = "'Throw whatever you can first!'",
         rarity = CARD_RARITY.COMMON,
@@ -1733,7 +1733,7 @@ local CARDS =
         name = "Tactless Casual Toss",
         desc =  "Discard <#DOWNGRADE>{1}</> random card from your hand.\nAttack a random enemy.",
         desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self.discard_count, self.action_gain)
+            return loc.format(fmt_str, self.discard_count)
         end,
         min_damage = 10,
         max_damage = 10,
@@ -2281,7 +2281,7 @@ local CARDS =
         cost = 0,
         max_xp = 10, 
         defend_amount = 0,
-        defend_bonus = 1,
+        defend_bonus = 2,
         OnPostResolve = function( self, battle, attack)
             self.owner:AddCondition( "DEFEND", self.defend_amount + (self.defend_bonus * self.engine:CountCardsPlayed()), self )
         end,
@@ -2291,7 +2291,7 @@ local CARDS =
     {
         name = "Shoddy Stone Shield",
         desc = "Gain {1} {DEFEND}. Increase by <#UPGRADE>{2}</> for each card played this turn.\n({3} cards played).",
-        defend_bonus = 2,
+        defend_bonus = 3,
     },
 
     PC_ALAN_SHODDY_SHIELD_plus2 =
@@ -3106,7 +3106,7 @@ local CARDS =
     PC_ALAN_FINALE_plus2 =
     {
         name = "Grand Finale",
-        desc = "If this is the only card in your hand, deal 4 bonus damage\nIncrease by <#UPGRADE>{1}</> for each card played this turn.\n({2} cards played).",
+        desc = "Deal <#UPGRADE>{1}</> bonus damage for each cards played this turn.",
         bonus_damage = 5,
         flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND,
     },
@@ -3785,7 +3785,7 @@ local CARDS =
         name = "Suppressive Strike",
         icon = "battle/crusher.tex",
         anim = "punch",
-        desc = "{PC_ALAN_WEIGHTED}{1}: Gain 3 actions.",
+        desc = "{PC_ALAN_WEIGHTED}{1}: Gain 3 actions and draw 2 cards.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str,self.weight_thresh )
         end,
@@ -3796,32 +3796,40 @@ local CARDS =
         max_xp = 3,
         min_damage = 6,
         max_damage = 9,
-        weight_thresh = 8,
+        weight_thresh = 9,
         action_bonus = 3,
         OnPreResolve = function(self, battle)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost >= self.weight_thresh then
                 self.engine:ModifyActionCount(self.action_bonus)
+                battle:DrawCards(1)
             end
         end,
     },
 
     PC_ALAN_SUPPRESSIVE_STRIKE_plus = 
     {
-        name = "Boosted Suppressive Strike",
-        min_damage = 8,
-        max_damage = 11,
+        name = "Visionary Suppressive Strike",
+        desc = "{PC_ALAN_WEIGHTED}{1}: Gain 3 actions and draw <#UPGRADE>2</> cards.",
+        OnPreResolve = function(self, battle)
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
+            if total_cost >= self.weight_thresh then
+                self.engine:ModifyActionCount(self.action_bonus)
+                battle:DrawCards(2)
+            end
+        end,
     },
 
     PC_ALAN_SUPPRESSIVE_STRIKE_plus2 =
     {
         name = "Weighted Suppressive Strike",
-        desc = "{PC_ALAN_WEIGHTED}{1}: <#UPGRADE>Gain 3 {ADRENALINE}</> and 3 actions.",
+        desc = "{PC_ALAN_WEIGHTED}{1}: <#UPGRADE>Gain 3 {ADRENALINE}</>, 3 actions and draw 1 cards.",
         OnPreResolve = function(self, battle)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost >= self.weight_thresh then
                 self.engine:ModifyActionCount(self.action_bonus)
                 self.owner:AddCondition("ADRENALINE", 3, self)
+                battle:DrawCards(1)
             end
         end,
     },
@@ -4417,7 +4425,7 @@ local CARDS =
         name = "Focus",
         icon = "battle/concentrate.tex",
         anim = "taunt",
-        desc = "Draw 3 cards.",
+        desc = "Draw 5 cards.",
         flavour = "'Remember to take a deep breath.'",
         cost = 0,
         max_xp = 10,
@@ -4425,16 +4433,16 @@ local CARDS =
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
         target_type = TARGET_TYPE.SELF,
         OnPostResolve = function( self, battle, attack)
-            battle:DrawCards(3)
+            battle:DrawCards(5)
         end,
     },
 
     PC_ALAN_FOCUS_plus =
     {
         name = "Boosted Focus",
-        desc = "Draw 3 cards <#UPGRADE>and Gain 1 action</>.",
+        desc = "Draw 5 cards <#UPGRADE>and Gain 1 action</>.",
         OnPostResolve = function( self, battle, attack)
-            battle:DrawCards(3)
+            battle:DrawCards(5)
             self.engine:ModifyActionCount(1)
         end,
     },
@@ -4442,8 +4450,12 @@ local CARDS =
     PC_ALAN_FOCUS_plus2 =
     {
         name = "Enduring Focus",
+        desc = "Draw <#DOWNGRADE>3</> cards.",
         cost = 1,
         flags = CARD_FLAGS.SKILL,
+        OnPostResolve = function( self, battle, attack)
+            battle:DrawCards(3)
+        end,
     }, 
 
     PC_ALAN_RAISE_SHIELD = 
@@ -4592,7 +4604,7 @@ local CARDS =
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self:CalculateDefendText( self.defend_amount ), self.defend_bonus)
         end,
-        flavour = "'Wait—that’s my cargo!'",
+        flavour = "'You must always be on guard against the enemy's tricks.'",
         rarity = CARD_RARITY.UNCOMMON,
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.STICKY,
         target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
@@ -5028,7 +5040,7 @@ local CARDS =
             return loc.format( fmt_str, self.scanned_amt )
         end,
         cost = 0,
-        flags = CARD_FLAGS.SKILL,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
         rarity = CARD_RARITY.RARE,
         target_mod = TARGET_MOD.RANDOM1,
         scanned_amt = 1,
