@@ -2,19 +2,6 @@ local negotiation_defs = require "negotiation/negotiation_defs"
 local CARD_FLAGS = negotiation_defs.CARD_FLAGS
 local EVENT = negotiation_defs.EVENT
 
-AddOpinionEvent("GENUINE", 
-{
-    delta = OPINION_DELTAS.OPINION_UP,
-    txt = "Your genuine demeanor has touched their heart.",
-})
-
-AddOpinionEvent("RUDE", 
-{
-    delta = OPINION_DELTAS.OPINION_DOWN,
-    txt = "Think you're being too rude.",
-})
-
-
 local function CountArguments(self)
     local count = 0
     for i, modifier in self.negotiator:Modifiers() do
@@ -57,30 +44,6 @@ local function IsCardUnique(self)
     end
 
     return true
-end
-
-local function CountPositiveRelationsCPR(self)
-    local rel = self.negotiator and self.negotiator.agent.social_connections
-    local loved = 0
-    local liked = 0
-    if rel then
-        loved = rel:GetNumberOfConnections(RELATIONSHIP.LOVED)
-        liked = rel:GetNumberOfConnections(RELATIONSHIP.LIKED)
-        return (loved + liked)
-    end
-    return 0
-end
-
-local function CountNegativeRelationsCNR(self)
-    local rel = self.negotiator and self.negotiator.agent.social_connections
-    local hated = 0
-    local disliked = 0
-    if rel then
-        disliked = rel:GetNumberOfConnections(RELATIONSHIP.DISLIKED)
-        hated = rel:GetNumberOfConnections(RELATIONSHIP.HATED)
-        return (disliked + hated)
-    end
-    return 0
 end
 
 local MODIFIERS =
