@@ -2990,17 +2990,17 @@ local CARDS =
     {
         name = "Redundant Reminder",
         icon = "negotiation/nonsequitur.tex",
-        desc = "Deal 1 to 3 damage.\nShuffle your deck once per resolve lost.",
+        desc = "Deal 2 to 4 damage.\nShuffle your deck once per resolve lost.",
         desc_fn = function( self, fmt_str )
             return loc.format( fmt_str, self.draw_count)
         end,
         flavour = "'So what exactly do you think the guns and blades are for? Or did you seriously think people go into the wild empty-handed?'",
         cost = 1,
         max_xp = 9,
-        flags = CARD_FLAGS.MANIPULATE,
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
         rarity = CARD_RARITY.UNCOMMON,
-        min = 1,
-        max = 3,
+        min = 2,
+        max = 4,
         OnPostResolve = function( self, minigame, targets )
             for i,target in ipairs(targets) do
                 minigame:ApplyPersuasion( self, target, self.min, self.max )
@@ -3026,15 +3026,15 @@ local CARDS =
     PC_ALAN_REDUNDANT_REMINDER_plus =
     {
         name = "Tall Redundant Reminder",
-        desc = "Deal 1 to <#UPGRADE>5</> damage.\nShuffle your deck once per resolve lost.",
-        max = 5,
+        desc = "Deal 2 to <#UPGRADE>6</> damage.\nShuffle your deck once per resolve lost.",
+        max = 6,
     },
 
     PC_ALAN_REDUNDANT_REMINDER_plus2 =
     {
         name = "Rooted Redundant Reminder",
-        desc = "Deal <#UPGRADE>3</> damage.\nShuffle your deck once per resolve lost.",
-        min = 3,
+        desc = "Deal <#UPGRADE>4</> damage.\nShuffle your deck once per resolve lost.",
+        min = 4,
     },
 
     PC_ALAN_NONSENSE =
@@ -3963,7 +3963,7 @@ local CARDS =
 }
 
 for i, id, carddef in sorted_pairs( CARDS ) do
-    carddef.series = "SHEL"
+    carddef.series = "ALAN"
     Content.AddNegotiationCard( id, carddef )
 end
 
