@@ -2420,8 +2420,8 @@ local CARDS =
         rarity = CARD_RARITY.UNIQUE,
         flags = CARD_FLAGS.RANGED | CARD_FLAGS.EXPEND,
         cost = 0,
-        min_damage = 3,
-        max_damage = 5,
+        min_damage = 2,
+        max_damage = 4,
         quick_amt = 1,
         event_handlers =
         {
