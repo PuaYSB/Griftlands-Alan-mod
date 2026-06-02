@@ -1138,7 +1138,7 @@ local CARDS =
     PC_ALAN_RAGE =
     {
         name = "Rage",
-        icon = "negotiation/seethe.tex",
+        icon = "negotiation/rage.tex",
         desc = "Add two copy of this card to your discards.\nIncreases the cost of all same-named cards by 1 and gain 3 bonus damage.",
         flavour = "'Ennggggggggg……'",
         cost = 1,
