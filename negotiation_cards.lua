@@ -25,6 +25,40 @@ local function CountArguments(self)
     return count
 end
 
+local function DiscardPileCount(self)
+    return self.engine:GetDeck( DECK_TYPE.DISCARDS ):CountCards() or 0
+end
+
+local function IsCardUnique(self)
+    if not (self.owner and self.negotiator) then
+        return true
+    end
+
+    local decks_to_check = {
+        self.engine:GetDeck( DECK_TYPE.DISCARDS ),
+        self.engine:GetDeck( DECK_TYPE.DRAW ),
+        self.engine:GetDeck( DECK_TYPE.IN_HAND )
+    }
+
+    local self_core_id = self.base_id or self.id
+    if not self_core_id then 
+        return true 
+    end
+    for _, deck in ipairs(decks_to_check) do
+        local cards = type(deck) == "table" and (deck.cards or deck) or {}
+        for _, check_card in ipairs(cards) do
+            if check_card ~= self then
+                local check_core_id = check_card.base_id or check_card.id
+                if check_core_id == self_core_id then
+                    return false 
+                end
+            end
+        end
+    end
+
+    return true
+end
+
 local function CountPositiveRelationsCPR(self)
     local rel = self.negotiator and self.negotiator.agent.social_connections
     local loved = 0
@@ -53,159 +87,128 @@ local MODIFIERS =
 {
     PC_ALAN_CORE =
     {
-        name = "Well-reasoned",
-        desc = "All friendly arguments deal 1 bonus damage.",
+        name = "Reorganize",
+        desc = "Whenever you shuffle your deck, Gain 2 compure and deal 2 damage to a random opponent argument.",
         modifier_type = MODIFIER_TYPE.CORE,
-        icon = "negotiation/modifiers/deadline.tex",
+        icon = "negotiation/modifiers/all_business.tex",
         icon_force_flip = true,
-        event_priorities =
+        target_enemy = TARGET_ANY_RESOLVE,
+        target_mod = TARGET_MOD.RANDOM1,
+        event_handlers = 
         {
-            [ EVENT.CALC_PERSUASION ] = EVENT_PRIORITY_ADDITIVE,
-        },
+            [ EVENT.BEGIN_NEGOTIATION ] = function( self, source, negotiator, minigame, target, agent )
+                self.negotiator:AddModifier( "PA_DRAW_CARD", 1 )
+            end,
 
+            [ EVENT.SHUFFLE_DISCARDS ] = function( self, num_cards )
+                self.negotiator:DeltaComposure( 2, self )
+                self.min_persuasion, self.max_persuasion = 2, 2
+                self.engine:ApplyPersuasion( self )
+                self.min_persuasion, self.max_persuasion = nil, nil
+            end
+        },
+    },
+
+    PA_BASIC_SKILLS = 
+    {
+        name = "Basic skills",
+        desc = "Basic cards deal <#HILITE>{1}</> bonus damage and apply additional <#HILITE>{2}</> {COMPOSURE}.\nThe latter increases by 1 every 3 stacks.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.stacks, math.floor(self.stacks / 3) )
+        end,
+        modifier_type = MODIFIER_TYPE.ARGUMENT,
+        icon = "negotiation/modifiers/deadline.tex",
+        sound = "event:/sfx/battle/cards/neg/create_argument/vulnerability",
+        max_resolve = 2,
+        event_handlers =
+        {
+            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
+                if source.owner == self.owner and is_instance( source, Negotiation.Card ) and source.rarity == CARD_RARITY.BASIC then
+                    if persuasion.preview or self.engine:IsResolving( source ) then
+                        persuasion:AddPersuasion( self.stacks, self.stacks, self )
+                    end
+                end
+            end,
+
+            [ EVENT.CALC_DELTA_COMPOSURE ] = function( self, composure_acc, target, source )
+                if source and source.negotiator == self.negotiator and is_instance(source, Negotiation.Card) and source.rarity == CARD_RARITY.BASIC and composure_acc.value > 0 then
+                    composure_acc:AddValue(math.floor(self.stacks / 3), self)
+                end
+            end,
+        },
+    },
+
+    PA_DRAW_CARD =
+    {
+        hidden = true,
+        max_stacks = 999,
+        event_handlers = 
+        {
+            [ EVENT.DRAW_CARD ] = function( self, engine, card, start_of_turn )
+                if not start_of_turn then
+                    self.negotiator:AddModifier( self, 1 )
+                    self.negotiator:AddModifier( "PA_DRAW_CARD_ALT", 1 )
+                end
+            end,
+
+            [ EVENT.END_TURN ] = function( self, minigame, negotiator )
+                self.negotiator:RemoveModifier(self.id, self.stacks - 1, self)
+            end,
+        },
+    },
+
+    PA_DRAW_CARD_ALT =
+    {
+        hidden = true,
+        max_stacks = 999,
+    },
+
+    PA_RAGE =
+    {
+        hidden = true,
         event_handlers = 
         {
             [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-                if source.owner == self.owner
-                and is_instance( source, Negotiation.Modifier )
-                and source.modifier_type ~= MODIFIER_TYPE.INCEPTION
-                and source.modifier_type ~= MODIFIER_TYPE.BOUNTY
-                and source:IsAttack() then
-                    persuasion:AddPersuasion( 1, 1, self )
+                if source.owner == self.owner and is_instance( source, Negotiation.Card ) and (source.id == "PC_ALAN_RAGE" or source.base_id == "PC_ALAN_RAGE" ) then
+                    if persuasion.preview or self.engine:IsResolving( source ) then
+                        persuasion:ModifyPersuasion( persuasion.min_persuasion + (self.stacks * 3), persuasion.max_persuasion + (self.stacks * 3), self )
+                    end
                 end
-            end
-        }
-    },
-
-    PC_ALAN_TRUTH =
-    {
-        name = "Truth",
-        desc = "For every 3 modifiers, deal 1 bonus damage.",
-        modifier_type = MODIFIER_TYPE.ARGUMENT,
-        icon = "negotiation/modifiers/rumor_monger.tex",
-        sound = "event:/sfx/battle/cards/neg/create_argument/vulnerability",
-        max_resolve = 4,
-        min_persuasion = 1,
-        max_persuasion = 1,
-        target_enemy = TARGET_ANY_RESOLVE,
-        IsValidTarget = function( target )
-            return target:GetResolve() ~= nil
-        end,
-
-        OnApply = function( self )
-            self:PrepareTurn()
-        end,
-
-        event_handlers =
-        {
-            [ EVENT.MODIFIER_ADDED ] = function( self, modifier, source )
-            self.min_persuasion = self.def.min_persuasion
-            self.max_persuasion = self.def.max_persuasion
-            local mod_num = CountArguments(self)
-            local bonus_damage = math.floor(mod_num / 3)
-                self.min_persuasion, self.max_persuasion = (self.stacks + bonus_damage), (self.stacks + bonus_damage)
             end,
 
-            [ EVENT.MODIFIER_REMOVED ] = function( self, modifier, source )
-            self.min_persuasion = self.def.min_persuasion
-            self.max_persuasion = self.def.max_persuasion
-            local mod_num = CountArguments(self)
-            local bonus_damage = math.floor(mod_num / 3)
-                self.min_persuasion, self.max_persuasion = (self.stacks + bonus_damage), (self.stacks + bonus_damage)
-            end,
-
-            [ EVENT.END_TURN ] = function( self, minigame, negotiator )
-            self.min_persuasion = self.def.min_persuasion
-            self.max_persuasion = self.def.max_persuasion
-            local mod_num = CountArguments(self)
-            local bonus_damage = math.floor(mod_num / 3)
-            self.min_persuasion, self.max_persuasion = (self.stacks + bonus_damage), (self.stacks + bonus_damage)
-                if negotiator == self.negotiator then
-                    self:ApplyPersuasion()
+            [ EVENT.CALC_ACTION_COST ] = function( self, cost_acc, source, target )
+                if source.owner == self.owner and is_instance( source, Negotiation.Card ) and (source.id == "PC_ALAN_RAGE" or source.base_id == "PC_ALAN_RAGE" ) then
+                    cost_acc:AddValue( self.stacks , self )
                 end
             end,
         },
     },
 
-    PC_ALAN_GENUINE = 
+    PA_SHUFFLE =
     {
-        name = "Genuine",
-        desc = "At the end of the turn, if the stacks of {PC_ALAN_GENUINE} is more than opponent's core resovle, win the negotiation and upgrade their opinion of you by one level.",
-        icon = "negotiation/modifiers/puppy_snail_eyes.tex",
-        sound = "event:/sfx/battle/cards/neg/create_argument/vulnerability",
-        modifier_type = MODIFIER_TYPE.INCEPTION,
-        event_handlers =
-        {
-            [ EVENT.END_TURN ] = function( self, minigame, agent )
-            local genuine = self.negotiator:GetModifierStacks("PC_ALAN_GENUINE")
-            local enemy_resolve = self.anti_negotiator:GetResolve()
-            if genuine > enemy_resolve then
-                minigame:Win()
-                self.anti_negotiator.agent:OpinionEvent( OPINION.GENUINE )
-            end
-            end
-        } 
-    },
-
-    PC_ALAN_RUDE =
-    {
-        name = "Rude",
-        desc = "All resolve loss is increased by 2. Remove 1 stack at the start of your turn. At the end of the negotiation, if opponent still having this inception, downgrade their opinion of you by one level.",
-        icon = "negotiation/modifiers/animosity.tex",
-        sound = "event:/sfx/battle/cards/neg/create_argument/vulnerability",
-        modifier_type = MODIFIER_TYPE.INCEPTION,
-        event_handlers =
-        {
-            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion, minigame, target )
-                if target and target.owner == self.owner then
-                    persuasion:AddPersuasion( 2, 2, self )
-                end
-            end,
-
-            [ EVENT.END_TURN ] = function( self, minigame, negotiator )
-                if negotiator == self.negotiator then
-                    self.negotiator:RemoveModifier(self, 1, self)
-                end
-            end,
-
-            [ EVENT.END_NEGOTIATION ] = function( self, source, negotiator, minigame, target, agent )
-                self.negotiator.agent:OpinionEvent( OPINION.ARRRESSIVE )
-            end
-        }
-    },
-
-    PC_ALAN_FALLACY =
-    {
-        name = "Fallacy",
-        desc = "At the end of your turn, deal 3 damage to a random opponent arguments for every stack of {PC_ALAN_FALLACY}.\nAt the begin of your turn, clear all stacks.",
-        icon = "negotiation/modifiers/hostility.tex",        
-        modifier_type = MODIFIER_TYPE.ARGUMENT,
-        min_persuasion = 3,
-        max_persuasion = 3,
-        max_resolve = 1,
-        sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
-        OnSetStacks = function( self, old_stacks )
-            self.min_persuasion, self.max_persuasion = self.min_persuasion, self.max_persuasion
+        name = "Shuffle",
+        desc = "Whenever you shuffle your deck, deal {1} damage to all opponent arguments.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.stacks )
         end,
-
+        icon = "negotiation/modifiers/stacked_deck.tex",        
+        modifier_type = MODIFIER_TYPE.ARGUMENT,
+        target_enemy = TARGET_ANY_RESOLVE,
+        target_mod = TARGET_MOD.TEAM,
+        max_resolve = 3,
+        sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
         OnApply = function( self )
             self:PrepareTurn()
         end,
-        event_handlers =
+        event_handlers = 
         {
-            [ EVENT.END_PLAYER_TURN ] = function( self, minigame )
-            self.target_enemy = TARGET_ANY_RESOLVE
-                for i = 1, self.negotiator:GetModifierStacks("PC_ALAN_FALLACY") do
-                    minigame:ApplyPersuasion( self )
-                end
-                self.target_enemy = nil
-            end,
-
-            [ EVENT.BEGIN_TURN ] = function( self, minigame, negotiator )
-                if negotiator == self.negotiator then
-                    self.negotiator:RemoveModifier( self, self.stacks, self )
-                end
-            end,
+            [ EVENT.SHUFFLE_DISCARDS ] = function( self, num_cards )
+                self.min_persuasion = self.stacks
+                self.max_persuasion = self.stacks
+                self:ApplyPersuasion()
+                self.min_persuasion = nil
+                self.max_persuasion = nil
+            end
         },
     },
 
@@ -214,18 +217,18 @@ local MODIFIERS =
         name = "Breezy",
         desc = "At the end of your turn, give <#HILITE>{1}</> {COMPOSURE} to a random friendly argument.",
         desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.stacks * 2 )
+            return loc.format( fmt_str, self.stacks )
         end,
         icon = "negotiation/modifiers/airtight.tex",        
         modifier_type = MODIFIER_TYPE.ARGUMENT,
-        max_resolve = 3,
+        max_resolve = 4,
         sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
         target_self = TARGET_ANY_RESOLVE,
         event_handlers =
         {
             [ EVENT.END_PLAYER_TURN ] = function( self, minigame )
                 local target = minigame:CollectPrimaryTarget(self)
-                target:DeltaComposure(self.stacks * 2, self)
+                target:DeltaComposure(self.stacks, self)
                 self:ClearTarget()
             end,
         },
@@ -234,28 +237,81 @@ local MODIFIERS =
     PA_NONSTOP_DEBATE =
     {
         name = "Nonstop Debate",
-        desc = "At the Start of the turn, if your amount of arguments before reaches the maximum, create <#HILITE>{1}</> {PC_ALAN_TRUTH}.",
+        desc = "Increase the maximum damage of {PC_ALAN_DISCUSS} by {1}.",
         desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.stacks )
+            return loc.format( fmt_str, self.stacks * 4 )
         end,
         icon = "negotiation/modifiers/formality.tex",        
         modifier_type = MODIFIER_TYPE.ARGUMENT,
-        max_resolve = 2,
+        max_resolve = 3,
         sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
         event_handlers =
         {
-            [ EVENT.BEGIN_PLAYER_TURN ] = function( self, minigame )
-                local mod_num = CountArguments(self)
-                if mod_num < (12 - self.stacks) then
-                    for i=1,self.stacks do
-                        self.negotiator:CreateModifier("PC_ALAN_TRUTH", 1, self)
-                    end
-                elseif mod_num < 12 then
-                    for i=1,math.min(self.stacks, 12 - mod_num) do
-                        self.negotiator:CreateModifier("PC_ALAN_TRUTH", 1, self)
+            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
+                if source.owner == self.owner and is_instance( source, Negotiation.Card ) and (source.id == "PC_ALAN_DISCUSS" or source.base_id == "PC_ALAN_DISCUSS") then
+                    if persuasion.preview or self.engine:IsResolving( source ) then
+                        persuasion:AddPersuasion( 0, self.stacks * 4, self )
                     end
                 end
             end,
+        },
+    },
+
+    PA_ANTI_BASIC_SKILLS =
+    {
+        name = "Snap out of it",
+        max_resolve = 2,
+        sound = "event:/sfx/battle/cards/neg/create_argument/setup",
+        icon = "negotiation/modifiers/go_between.tex",
+        desc = "At the end of your turn, lose {1} {PA_BASIC_SKILLS}, then remove this argument.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self.stacks or 1)
+        end,
+        event_handlers =
+        {
+            [ EVENT.END_PLAYER_TURN ] = function( self, minigame )
+                self.negotiator:RemoveModifier("PA_BASIC_SKILLS", self.stacks, self)
+                self.negotiator:RemoveModifier( self )
+            end,
+        },
+    },
+
+    PA_STALL =
+    {
+        hidden = true,
+            event_handlers =
+            {
+                [ EVENT.BEGIN_TURN ] = function( self, minigame, negotiator )
+                    if negotiator == self.negotiator then
+                        minigame:ShuffleDiscardToDraw()
+                        minigame:DrawCards(2)
+                        minigame:ModifyActionCount( 2, self )
+                        self.negotiator:RemoveModifier(self.id, self.stacks, self)
+                    end
+                end,
+            }
+    },
+
+    PA_APPLAUSE = 
+    {
+        name = "Applause",
+        max_resolve = 4,
+        sound = "event:/sfx/battle/cards/neg/create_argument/setup",
+        icon = "negotiation/modifiers/setup.tex",
+        desc = "When you shuffle your deck, deal {1} damage to random argument, then destroy this argument.",
+        target_enemy = TARGET_ANY_RESOLVE,
+        target_mod = TARGET_MOD.RANDOM1,
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self.stacks or 1)
+        end,
+        event_handlers =
+        {
+            [ EVENT.SHUFFLE_DISCARDS ] = function( self, num_cards )
+                self.min_persuasion = self.stacks
+                self.max_persuasion = self.stacks
+                self:ApplyPersuasion()
+                self.negotiator:DestroyModifier(self, self)
+            end
         },
     },
 
@@ -279,19 +335,25 @@ local MODIFIERS =
     PA_TURN_THE_TABLES =
     {
         name = "Turn the Tables",
-        desc = "Whenever you play a card, gain {1} {PC_ALAN_FALLACY}.",
+        desc = "Whenever you play a card, deal {1} damage to a random opponent argument.\nLose all stacks at the end of the turn.",
         desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.stacks )
+            return loc.format( fmt_str, self.stacks * 3 )
         end,
         icon = "negotiation/modifiers/quip.tex",        
         modifier_type = MODIFIER_TYPE.ARGUMENT,
         max_resolve = 1,
+        target_enemy = TARGET_ANY_RESOLVE,
+        target_mod = TARGET_MOD.RANDOM1,
         sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
         event_handlers =
         {
             [ EVENT.PRE_RESOLVE ] = function( self, minigame, card )
                 if card:GetNegotiator() == self.negotiator then
-                    self.negotiator:AddModifier("PC_ALAN_FALLACY", self.stacks, self)
+                    self.min_persuasion = 3 * self.stacks
+                    self.max_persuasion = 3 * self.stacks
+                    self:ApplyPersuasion()
+                    self.min_persuasion = nil
+                    self.max_persuasion = nil
                 end
             end,
 
@@ -301,77 +363,57 @@ local MODIFIERS =
         }
     },
 
-    PA_INTERROGATE =
+    PA_PUMP = 
     {
-        name = "Interrogate",
-        desc = "When this argument destroys another argument, restore 3 core argument resolve.",
-        icon = "negotiation/modifiers/interrogate.tex",        
-        modifier_type = MODIFIER_TYPE.ARGUMENT,
-        max_resolve = 2,
-        sound = "event:/sfx/battle/cards/neg/create_argument/interrogate",
-        event_handlers =
-        {
-            [ EVENT.MODIFIER_REMOVED ] = function ( self, modifier, source )
-                if source == self then
-                    local core = self.negotiator:FindCoreArgument()
-                    if core then
-                        core:RestoreResolve( 3, self )
-                    end
-                end
-            end
-        }
-    },
-
-    PA_DEEP_BREATH =
-    {
-        hidden = true,
-        event_priorities = 
-        {
-            [ EVENT.CALC_PERSUASION ] = EVENT_PRIORITY_MULTIPLIER,
-        },
-        event_handlers = 
-        {
-            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-                if source.owner == self.owner
-                and is_instance( source, Negotiation.Modifier )
-                and source.modifier_type ~= MODIFIER_TYPE.INCEPTION
-                and source.modifier_type ~= MODIFIER_TYPE.BOUNTY
-                and source:IsAttack() then
-                    persuasion:AddPersuasion( persuasion.min_persuasion * self.stacks, persuasion.max_persuasion * self.stacks, self )
-                end
-            end,
-
-            [ EVENT.BEGIN_PLAYER_TURN ] = function( self, minigame )
-                self.negotiator:RemoveModifier(self.id, self.stacks, self)
-            end
-        },
-    },
-
-    PA_GOSSIP =
-    {
-        name = "Gossip",
-        desc = "All friendly arguments deal <#HILITE>{1}</> bonus damage.",
+        name = "Pump",
+        desc = "Whenever you play a card, move up to {1} cards from your draw pile to your discard.",
         desc_fn = function( self, fmt_str )
             return loc.format( fmt_str, self.stacks )
         end,
-        icon = "negotiation/modifiers/ad_hominem.tex",        
+        icon = "negotiation/modifiers/obscurity.tex",        
+        modifier_type = MODIFIER_TYPE.ARGUMENT,
+        max_resolve = 3,
+        sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
+        event_handlers =
+        {
+            [ EVENT.PRE_RESOLVE ] = function( self, minigame, card )
+                if card:GetNegotiator() == self.negotiator then
+                    local cards = ObtainWorkTable()
+                        for i,card in minigame:GetDrawDeck():Cards() do
+                                table.insert(cards, card)
+                                if #cards >= self.stacks then
+                                    break
+                                end
+                            end
+                    if #cards > 0 then
+                        for i,card in ipairs(cards) do
+                            card:TransferCard(minigame:GetDiscardDeck())
+                        end
+                    end
+                end
+            end
+        },
+    },
+
+    PA_BROKEN_RECORD =
+    {
+        name = "Broken Record",
+        desc = "For every 7 cards played, Add a copy of 7th card to your discards.",
+        icon = "negotiation/modifiers/bidder.tex",        
         modifier_type = MODIFIER_TYPE.ARGUMENT,
         max_resolve = 4,
-        sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
-        event_priorities =
+        sound = "event:/sfx/battle/cards/neg/create_argument/interrogate",
+        event_handlers =
         {
-            [ EVENT.CALC_PERSUASION ] = EVENT_PRIORITY_ADDITIVE,
-        },
+            [ EVENT.PRE_RESOLVE ] = function( self, minigame, card )
+                if card.owner == self.owner then
+                    self.negotiator:AddModifier( self, 1 )
+                end
 
-        event_handlers = 
-        {
-            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-                if source.owner == self.owner
-                and is_instance( source, Negotiation.Modifier )
-                and source.modifier_type ~= MODIFIER_TYPE.INCEPTION
-                and source.modifier_type ~= MODIFIER_TYPE.BOUNTY
-                and source:IsAttack() then
-                    persuasion:AddPersuasion( self.stacks, self.stacks, self )
+                if self.negotiator:GetModifierStacks(self.id) > 7 and card.owner == self.owner then
+                    local copy = card:Duplicate()
+                    minigame:DealCard( copy, minigame:GetDeck( DECK_TYPE.DISCARDS ))
+                    self.negotiator:RemoveModifier(self.id, self.stacks - 1, self)  
                 end
             end
         }
@@ -389,9 +431,111 @@ local MODIFIERS =
         event_handlers = 
         {
             [ EVENT.POST_RESOLVE ] = function( self, minigame, card )
-            if self.owner == card.owner then
+                if self.owner == card.owner then
                     minigame:DrawCards(1)
                     self.negotiator:RemoveModifier( "PA_CAUSE_AND_EFFECT", 1 )
+                end 
+            end
+        }
+    },
+
+    PA_SQUARE_TABLE_MEETING =
+    {
+        name = "Square Table Meeting",
+        desc = "Whenever you play {PC_ALAN_DISCUSS}, {EXPEND} it.\nAt the end of your turn, play all {PC_ALAN_DISCUSS} in your trash deck.",
+        icon = "negotiation/modifiers/drunk.tex",        
+        modifier_type = MODIFIER_TYPE.ARGUMENT,
+        max_resolve = 3,
+        sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
+        event_handlers = 
+        {
+            [ EVENT.POST_RESOLVE ] = function( self, minigame, card )
+                if self.owner == card.owner and (card.id == "PC_ALAN_DISCUSS" or card.base_id == "PC_ALAN_DISCUSS") then
+                    card:SetFlags(CARD_FLAGS.EXPEND)
+                end
+            end,
+
+            [ EVENT.END_PLAYER_TURN ] = function( self, minigame )
+                local trash_cards = self.engine:GetTrashDeck().cards
+                local to_play = {}
+
+                for i, card in ipairs(trash_cards) do
+                    if card.owner == self.owner and (card.id == "PC_ALAN_DISCUSS" or card.base_id == "PC_ALAN_DISCUSS") then
+                        table.insert(to_play, card)
+                    end
+                end
+
+                for _, card in ipairs(to_play) do
+                    card:SetFlags(CARD_FLAGS.FREEBIE)
+                    self.engine:PlayCard(card)
+                end
+            end
+        },
+    },
+
+    PA_CHIME_IN =
+    {
+        name = "Chime In",
+        desc = "Whenever you draw a basic card, gain {1} {COMPOSURE} and deal {1} damage to a random opponent argument.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.stacks)
+        end,
+        icon = "negotiation/modifiers/rumor_monger.tex",        
+        modifier_type = MODIFIER_TYPE.ARGUMENT,
+        max_resolve = 2,
+        target_enemy = TARGET_ANY_RESOLVE,
+        target_mod = TARGET_MOD.RANDOM1,
+        sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
+        event_handlers = 
+        {
+            [ EVENT.DRAW_CARD ] = function( self, engine, card )
+                if card.owner == self.owner and card.rarity == CARD_RARITY.BASIC then
+                    self.negotiator:DeltaComposure( self.stacks, self )
+                    self.min_persuasion = self.stacks
+                    self.max_persuasion = self.stacks
+                    self:ApplyPersuasion()
+                    self.min_persuasion = nil
+                    self.max_persuasion = nil
+                end
+            end,
+        },
+    },
+
+    PA_TRUST =
+    {
+        name = "Trust",
+        desc = "When the stacks of {PA_TRUST} reaches 10, win the negotiation.",
+        icon = "negotiation/modifiers/compromise.tex",
+        sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
+        modifier_type = MODIFIER_TYPE.ARGUMENT,
+        max_resolve = 1,
+        event_handlers =
+        {
+            [ EVENT.END_TURN ] = function( self, minigame, agent )
+                local trust = self.negotiator:GetModifierStacks("PA_TRUST")
+                if genuine >= 10 then
+                    minigame:Win()
+                end
+            end
+        } 
+    },
+
+    PA_ECHO =
+    {
+        name = "Echo",
+        desc = "After you play a card, copy it and lose 1 stacks.",
+        icon = "negotiation/modifiers/influence.tex",        
+        modifier_type = MODIFIER_TYPE.ARGUMENT,
+        max_resolve = 3,
+        sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
+
+        event_handlers = 
+        {
+            [ EVENT.PRE_RESOLVE ] = function( self, minigame, card )
+                if self.owner == card.owner then
+                    local clone = card:Duplicate()
+                    minigame:DealCard( clone, minigame:GetDiscardDeck() )
+                    self.negotiator:RemoveModifier( "PA_ECHO", 1 )
                 end 
             end
         }
@@ -407,10 +551,6 @@ local CARDS =
     PC_ALAN_DISCUSS = 
     {
         name = "Discuss",
-        desc = "{PA_REASON} {1}: increase the maximum damage of this card by 2.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.reason_amt)
-        end,
         icon = "negotiation/decency.tex",
         flavour = "'Let’s try looking at our current problem from a different angle.'",
         cost = 1,
@@ -420,23 +560,12 @@ local CARDS =
         max_persuasion = 3,
         max_xp = 6,
         wild = true,
-        reason_amt = 1,
-        bonus_damage = 2,
-        event_handlers = 
-        {
-            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-                local mod_num = CountArguments(self)
-                if source == self and mod_num >= self.reason_amt then
-                    persuasion:AddPersuasion( 0, self.bonus_damage, self )
-                end
-            end,
-        },
     },
 
     PC_ALAN_DISCUSS_plus2a =
     {
-        name = "Visionary Discuss ",
-        desc = "<#UPGRADE>Draw a card</>.\n{PA_REASON} {1}: increase the maximum damage of this card by 2.",
+        name = "Visionary Discuss",
+        desc = "<#UPGRADE>Draw a card</>.",
         OnPostResolve = function( self, minigame, targets )
             minigame:DrawCards(1)
         end,
@@ -444,8 +573,8 @@ local CARDS =
 
     PC_ALAN_DISCUSS_plus2b =
     {
-        name = "Rooted Discuss",
-        min_persuasion = 3,
+        name = "Tall Discuss",
+        max_persuasion = 5,
     },
 
     PC_ALAN_DISCUSS_plus2c =
@@ -459,9 +588,9 @@ local CARDS =
     PC_ALAN_DISCUSS_plus2d =
     {
         name = "Stone Discuss",
-        desc = "<#UPGRADE>Gain {1} {COMPOSURE}</>.\n{PA_REASON} {2}: increase the maximum damage of this card by 2.",
+        desc = "<#UPGRADE>Gain {1} {COMPOSURE}</>.",
         desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self:CalculateComposureText( self.composure_amt ), self.reason_amt)
+            return loc.format(fmt_str, self:CalculateComposureText( self.composure_amt ))
         end,
         composure_amt = 3,
         OnPostResolve = function( self, minigame, targets )
@@ -471,60 +600,34 @@ local CARDS =
 
     PC_ALAN_DISCUSS_plus2e =
     {
-        name = "Friendly Discuss",
-        desc = "<#UPGRADE>{PA_FRIENDLY} {1}: increase the maximum damage of this card by 2</>.\n{PA_REASON} {2}: increase the maximum damage of this card by 2.",
-        desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self.friend_need, self.reason_amt)
-        end,
-        friend_need = 2,
-        event_handlers = 
-        {
-            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-                local mod_num = CountArguments(self)
-                if source == self and mod_num >= self.reason_amt then
-                    persuasion:AddPersuasion( 0, self.bonus_damage, self )
-                end
-
-                local friend = CountPositiveRelationsCPR(self)
-                if source == self and friend >= self.friend_need then
-                    persuasion:AddPersuasion( 0, self.bonus_damage, self )
-                end
-            end
-        },
+        name = "Pale Discuss",
+        cost = 0,
+        max_persuasion = 2,
     },
 
     PC_ALAN_DISCUSS_plus2f =
     {
-        name = "Truthful Discuss",
-        desc = "<#UPGRADE>{PC_ALAN_TRUTH|}Create 1 {PC_ALAN_TRUTH}</>.\n{PA_REASON} {1}: increase the maximum damage of this card by 2.",
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:CreateModifier("PC_ALAN_TRUTH", 1, self)
-        end,
-    },
-
-    PC_ALAN_DISCUSS_plus2g =
-    {
-        name = "Genuine Discuss",
-        desc = "<#UPGRADE>Gain {1} {PC_ALAN_GENUINE}</>.\n{PA_REASON} {2}: increase the maximum damage of this card by 2.",
+        name = "Tentative Discuss",
+        desc = "<#UPGRADE>{PA_TENTATIVE} {1}: deal 2 bonus damage.</>.",
         desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self.genuine_amt, self.reason_amt)
+            return loc.format(fmt_str, self.tentative_amt)
         end,
-        genuine_amt = 2,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:InceptModifier("PC_ALAN_GENUINE", self.genuine_amt, self)
-        end,
+        tentative_amt = 1,
+        event_handlers = 
+        {
+            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
+                if source == self and self.negotiator:GetModifierStacks("PA_DRAW_CARD") > self.tentative_amt then
+                    persuasion:AddPersuasion( 2, 2, self )
+                end
+            end,
+        },
     },
 
     PC_ALAN_BLUFF =
     {
         name = "Bluff",
-        desc = "{PA_UNREASON}: deal 1 bonus damage.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.reason_amt)
-        end,
         icon = "negotiation/debate.tex",
-        flavour = "'Who needs logic? I’ve never used it anyway.'",
+        flavour = "'Trust me, this one's perfect!'",
         cost = 1,
         min_persuasion = 1,
         max_persuasion = 3,
@@ -532,22 +635,12 @@ local CARDS =
         wild = true,
         flags = CARD_FLAGS.HOSTILE,
         rarity = CARD_RARITY.BASIC,
-        bonus_damage = 1,
-        event_handlers = 
-        {
-            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-                local mod_num = CountArguments(self)
-                if source == self and mod_num == 0 then
-                    persuasion:AddPersuasion( self.bonus_damage, self.bonus_damage, self )
-                end
-            end,
-        },
     },
 
     PC_ALAN_BLUFF_plus2a =
     {
-        name = "Tall Bluff",
-        max_persuasion = 5,
+        name = "Rooted Bluff",
+        min_persuasion = 3,
     },
 
     PC_ALAN_BLUFF_plus2b =
@@ -560,14 +653,37 @@ local CARDS =
 
     PC_ALAN_BLUFF_plus2c =
     {
-        name = "Rooted Bluff",
-        min_persuasion = 3,
+        name = "Boosted Bluff",
+        desc = "<#UPGRADE>{BRAVADO}</>.",
+        bonus_damage = 1,
+        event_handlers = 
+        {
+            [ EVENT.END_RESOLVE ] = function( self, minigame, card )
+                if card.negotiator == self.negotiator then
+                    if CheckBits(card.flags, CARD_FLAGS.HOSTILE) then
+                        self.bonus = (self.bonus or 0) + self.bonus_damage
+                    else
+                        self.bonus = 0
+                    end
+                end
+            end,
+
+            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
+                if source == self and self.bonus and self.bonus > 0 then
+                    persuasion:AddPersuasion(self.bonus, self.bonus, self)
+                end
+            end,
+
+            [ EVENT.BEGIN_PLAYER_TURN ] = function( self, minigame )
+                self.bonus = 0
+            end,
+        },
     },
 
     PC_ALAN_BLUFF_plus2d =
     {
         name = "Visionary Bluff",
-        desc = "<#UPGRADE>Draw a card</>.\n{PA_UNREASON} {1}: deal 1 bonus damage.",
+        desc = "<#UPGRADE>Draw a card</>.",
         OnPostResolve = function( self, minigame, targets )
             minigame:DrawCards(1)
         end,
@@ -575,47 +691,36 @@ local CARDS =
 
     PC_ALAN_BLUFF_plus2e =
     {
-        name = "Rude Bluff",
-        desc = "<#UPGRADE>{INCEPT} 1 {PC_ALAN_RUDE}</>.\n{PA_UNREASON} {2}: deal 1 bonus damage.",
+        name = "Lucid Bluff",
+        desc = "<#UPGRADE>Gain 2 {DOMINANCE}.</>.",
         flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
-        rude_amt = 1,
         OnPostResolve = function( self, minigame, targets )
-            self.anti_negotiator:InceptModifier("PC_ALAN_RUDE", self.rude_amt, self)
-        end,
+            self.negotiator:AddModifier("DOMINANCE", 2, self)
+        end
     },
 
     PC_ALAN_BLUFF_plus2f =
     {
-        name = "Violent Bluff",
-        desc = "<#UPGRADE>{PA_VIOLENT} {1}: deal 1 bonus damage</>.\n{PA_UNREASON} {2}: deal 1 bonus damage.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.enemy_need, self.reason_amt)
-        end,
-        enemy_need = 2,
+        name = "Fluent Bluff",
+        desc = "<#UPGRADE>{EVOKE}: Play a same-named cards</>.",
+        evoke_max = 1,
+        deck_handlers = { DECK_TYPE.DRAW, DECK_TYPE.DISCARDS },
         event_handlers = 
         {
-            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-                local mod_num = CountArguments(self)
-                if source == self and mod_num == 0 then
-                    persuasion:AddPersuasion( self.bonus_damage, self.bonus_damage, self )
+            [ EVENT.POST_RESOLVE ] = function( self, minigame, card )
+                if card.owner == self.owner then
+                    if card.base_id == self.base_id or card.id == "PC_ALAN_BLUFF" then
+                        self:Evoke( self.evoke_max )
+                    end
                 end
+            end,
 
-                local enemy = CountNegativeRelationsCNR(self)
-                if source == self and enemy >= self.enemy_need then
-                    persuasion:AddPersuasion( self.bonus_damage, self.bonus_damage, self )
+            [ EVENT.END_TURN ] = function( self, minigame, negotiator )
+                if negotiator == self.negotiator then
+                    self:ResetEvoke()
                 end
-            end
+            end,
         },
-    },
-
-    PC_ALAN_BLUFF_plus2g =
-    {
-        name = "Warped Bluff",
-        desc = "<#UPGRADE>Gain 1 {PC_ALAN_FALLACY}</>.\n{PA_UNREASON} {1}: deal 1 bonus damage.",
-        max_persuasion = 2,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PC_ALAN_FALLACY", 1, self)
-        end,
     },
 
     PC_ALAN_GUIDANCE =
@@ -659,323 +764,103 @@ local CARDS =
     PC_ALAN_GUIDANCE_plus2c =
     {
         name = "Pale Guidance",
+        desc = "Apply <#DOWNGRADE>{1}</> {COMPOSURE}.",
         cost = 0,
+        composure_amt = 1,
     },
 
     PC_ALAN_GUIDANCE_plus2d =
     {
         name = "Wide Guidance",
-        desc = "Apply <#DOWNGRADE>{1}</> {COMPOSURE} <#UPGRADE>to all friendly arguments</>.",
+        desc = "Apply <#UPGRADE>{1} {COMPOSURE} to all friendly arguments</>.",
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
         target_mod = TARGET_MOD.TEAM,
         auto_target = true,
-        composure_amt = 2,
+        composure_amt = 4,
     },
 
     PC_ALAN_GUIDANCE_plus2e =
     {
-        name = "Reasonable Guidance",
-        desc = "Apply {1} {COMPOSURE}.\n<#UPGRADE>{PA_REASON} {2}: Apply {1} {COMPOSURE}</>.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self:CalculateComposureText( self.composure_amt ), self.reason_amt)
-        end,
-        reason_amt = 2,
+        name = "Visionary Guidance",
+        desc = "Apply {1} {COMPOSURE}.\n<#UPGRADE>Draw a card</>.",
         OnPostResolve = function( self, minigame, targets )
-            for i,target in ipairs(targets) do
-                target:DeltaComposure(self.composure_amt, self)
-                local mod_num = CountArguments(self)
-                if mod_num >= self.reason_amt then
-                    target:DeltaComposure(self.composure_amt, self)
-                end
-            end
-        end
+            minigame:DrawCards(1)
+        end,
     },
 
     PC_ALAN_GUIDANCE_plus2f =
     {
-        name = "Rude Guidance",
-        desc = "Apply {1} {COMPOSURE}.\n<#UPGRADE>{INCEPT} 1 {PC_ALAN_RUDE}</>",
-        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
-        rude_amt = 1,
+        name = "Tentative Guidance",
+        desc = "Apply {1} {COMPOSURE}.\n<#UPGRADE>{PA_TENTATIVE} {2}: Apply 3 bonus {COMPOSURE}.</>.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self:CalculateComposureText( self.composure_amt ) , self.tentative_amt)
+        end,
+        tentative_amt = 1,
         OnPostResolve = function( self, minigame, targets )
-            self.anti_negotiator:InceptModifier("PC_ALAN_RUDE", self.rude_amt, self)
+            local draw_cards = self.negotiator:GetModifierStacks("PA_DRAW_CARD")
             for i,target in ipairs(targets) do
                 target:DeltaComposure(self.composure_amt, self)
+                if draw_cards > self.tentative_amt then
+                    target:DeltaComposure(self.composure_amt, self)
+                end
             end
-        end
+        end,
+        
     },
 
-    PC_ALAN_GUIDANCE_plus2g =
+    PC_ALAN_BASIC_SKILLS =
     {
-        name = "Genuine Guidance",
-        desc = "Apply {1} {COMPOSURE}.\n<#UPGRADE>Gain 2 {PC_ALAN_GENUINE}</>",
-        genuine_amt = 2,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:InceptModifier("PC_ALAN_GENUINE", self.genuine_amt, self)
-            for i,target in ipairs(targets) do
-                target:DeltaComposure(self.composure_amt, self)
-            end
-        end
-    },
-
-    PC_ALAN_NEGOTIATION_SKILLS =
-    {
-        name = "Negotiation Skills",
-        desc = "Insert {PC_ALAN_DIPLOMACY} or {PC_ALAN_HOSTILE} into your hand.",
+        name = "Basic skills",
         icon = "negotiation/negotiation_wild.tex",
-        flavour = "'If you want to survive out here, you'd better know how to strike a deal.'",
-        max_xp = 8,
-        cost = 1,
+        desc = "Gain {1} {PA_BASIC_SKILLS}.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self.basic_amt)
+        end,
+        flavour = "'Wanna win a negotiation? It’s all about the hand you play.'",
         flags = CARD_FLAGS.MANIPULATE,
         rarity = CARD_RARITY.BASIC,
-        OnPostResolve = function( self, minigame, targets )
-            local cards = {
-                Negotiation.Card( "PC_ALAN_DIPLOMACY", self.owner ),
-                Negotiation.Card( "PC_ALAN_HOSTILE", self.owner ),
-            }
-
-            minigame:ImproviseCards( cards, 1, nil, nil, nil, self )
-        end,
-    },
-
-    PC_ALAN_DIPLOMACY =
-    {
-        name = "Friendly Negotiation",
-        desc = "{PC_ALAN_TRUTH|}Gain {1} {PC_ALAN_GENUINE}\nCreate {2} {PC_ALAN_TRUTH}.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.genuine_amt, self.truth_amt)
-        end,
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNIQUE,
-        cost = 0,
-        genuine_amt = 2,
-        truth_amt = 1,
-        icon = "negotiation/solid_point.tex",
-        flavour = "'A few simple tricks—keep your tone friendly, remember the common truths, and above all, be patient.'",
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:CreateModifier("PC_ALAN_TRUTH", self.truth_amt, self)
-            self.negotiator:InceptModifier("PC_ALAN_GENUINE", self.genuine_amt, self) 
-        end,
-    },
-
-    PC_ALAN_HOSTILE =
-    {
-        name = "Unfriendly Negotiation",
-        desc = "{INCEPT} {1} {PC_ALAN_RUDE}\nGain {2} {PC_ALAN_FALLACY}.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.rude_amt, self.fallacy_amt)
-        end,
-        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNIQUE,
-        cost = 0,
-        rude_amt = 1,
-        fallacy_amt = 1,
-        icon = "negotiation/overwhelm.tex",
-        flavour = "'Or, spout something they’ve never heard and probably isn’t right anyway. The goal? Make 'em give up thinking altogether.'",
-        OnPostResolve = function( self, minigame, targets )
-            self.anti_negotiator:InceptModifier("PC_ALAN_RUDE", self.rude_amt, self)
-            self.negotiator:AddModifier("PC_ALAN_FALLACY", self.fallacy_amt, self)
-        end,
-    },
-
-    PC_ALAN_NEGOTIATION_SKILLS_plus =
-    {
-        name = "Diplomacy Skills",
-        desc = "Insert {PC_ALAN_DIPLOMACY_a}, {PC_ALAN_DIPLOMACY_b} or {PC_ALAN_DIPLOMACY_c} into your hand.",
-        icon = "negotiation/negotiation_wild.tex",
+        max_xp = 6,
         cost = 1,
-        flags = CARD_FLAGS.DIPLOMACY,
+        basic_amt = 1,
         OnPostResolve = function( self, minigame, targets )
-            local cards = {
-                Negotiation.Card( "PC_ALAN_DIPLOMACY_a", self.owner ),
-                Negotiation.Card( "PC_ALAN_DIPLOMACY_b", self.owner ),
-                Negotiation.Card( "PC_ALAN_DIPLOMACY_c", self.owner ),
-            }
-
-            minigame:ImproviseCards( cards, 1, nil, nil, nil, self )
+            self.negotiator:AddModifier("PA_BASIC_SKILLS", self.basic_amt, self)
         end,
     },
 
-    PC_ALAN_DIPLOMACY_a =
+    PC_ALAN_BASIC_SKILLS_plus =
     {
-        name = "Genuine",
-        icon = "negotiation/pleasantries.tex",
-        desc = "Gain {1} {PC_ALAN_GENUINE}.",
+        name = "Stone Basic skills",
+        desc = "Gain {1} {PA_BASIC_SKILLS}.\n<#UPGRADE>Apply {2} {COMPOSURE}</>.",
         desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.genuine_amt)
+            return loc.format(fmt_str, self.basic_amt, self:CalculateComposureText( self.composure_amt ))
         end,
-        flavour = "'Tone alone won’t cut it—add a bit of body language if you want folks to let their guard down.'",
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNIQUE,
-        cost = 0,
-        genuine_amt = 5,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:InceptModifier("PC_ALAN_GENUINE", self.genuine_amt, self) 
-        end,
-    },
-
-    PC_ALAN_DIPLOMACY_b =
-    {
-        name = "Truth",
-        icon = "negotiation/compromise.tex",
-        desc = "If has no {PC_ALAN_TRUTH}, {PC_ALAN_TRUTH|}Create {1} {PC_ALAN_TRUTH}. Otherwise, gain {2} {INFLUENCE}.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.truth_amt, self.influence)
-        end,
-        flavour = "'The best kind of persuasion? The kind where everyone walks away feeling like they won.'",
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNIQUE,
-        cost = 0,
-        truth_amt = 2,
-        influence = 1,
-        OnPostResolve = function( self, minigame, targets )
-            if not self.negotiator:HasModifier("PC_ALAN_TRUTH") then
-                for i=1,self.truth_amt do
-                self.negotiator:CreateModifier("PC_ALAN_TRUTH", 1, self)
-            end
-            else
-                self.negotiator:AddModifier("INFLUENCE", self.influence, self)
-            end
-        end
-    },
-
-    PC_ALAN_DIPLOMACY_c =
-    {
-        name = "Friendly",
-        icon = "negotiation/name_drop.tex",
-        desc = "{PA_FRIENDLY} {1}: This card deals double damage.\n{PA_FRIENDLY} {2}: Hits all opponent arguments.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.friend_need, self.friend_need_alt)
-        end,
-        flavour = "'When needed, drop a few familiar names. Helps people believe you're someone worth listening to.'",
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNIQUE,
-        cost = 0,
-        min_persuasion = 2,
-        max_persuasion = 3,
-        friend_need = 3,
-        friend_need_alt = 6,
-        event_priorities =
-        {
-            [ EVENT.CALC_PERSUASION ] = EVENT_PRIORITY_ADDITIVE,
-        },
-
-        event_handlers =
-        {
-            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-            local friend = CountPositiveRelationsCPR(self)
-            if source == self and friend >= self.friend_need then
-                persuasion:AddPersuasion( persuasion.min_persuasion, persuasion.max_persuasion, self )
-            end
-
-            if friend >= self.friend_need_alt then
-                self.auto_target = true
-            else
-                self.auto_target = false
-            end
-            end,
-
-
-            [ EVENT.START_RESOLVE ] = function( self, minigame, card )
-            local friend = CountPositiveRelationsCPR(self)
-                if card == self and friend >= self.friend_need_alt then
-                    card.target_mod = TARGET_MOD.TEAM
-                end
-            end
-        },
-    },
-
-    PC_ALAN_NEGOTIATION_SKILLS_plus2 =
-    {
-        name = "Hostility Skills",
-        desc = "Insert {PC_ALAN_HOSTILE_a}, {PC_ALAN_HOSTILE_b} or {PC_ALAN_HOSTILE_c} into your hand.",
-        icon = "negotiation/negotiation_wild.tex",
-        cost = 1,
-        flags = CARD_FLAGS.HOSTILE,
-        OnPostResolve = function( self, minigame, targets )
-            local cards = {
-                Negotiation.Card( "PC_ALAN_HOSTILE_a", self.owner ),
-                Negotiation.Card( "PC_ALAN_HOSTILE_b", self.owner ),
-                Negotiation.Card( "PC_ALAN_HOSTILE_c", self.owner ),
-            }
-
-            minigame:ImproviseCards( cards, 1, nil, nil, nil, self )
-        end,
-    },
-
-    PC_ALAN_HOSTILE_a =
-    {
-        name = "Rude",
-        icon = "negotiation/invective.tex",
-        desc = "{INCEPT} {1} {PC_ALAN_RUDE} and Gain {2} {COMPOSURE}.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.rude_amt, self:CalculateComposureText( self.composure_amt ))
-        end,
-        flavour = "'Negotiation gets a lot easier once you're okay with being the bad guy.'",
-        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNIQUE,
-        cost = 0,
-        rude_amt = 1,
         composure_amt = 3,
+        target_self = TARGET_ANY_RESOLVE,
         OnPostResolve = function( self, minigame, targets )
-            self.anti_negotiator:InceptModifier("PC_ALAN_RUDE", self.rude_amt, self) 
-            self.negotiator:DeltaComposure( self.composure_amt, self )
+            self.negotiator:AddModifier("PA_BASIC_SKILLS", self.basic_amt, self)
+            for i,target in ipairs(targets) do
+                target:DeltaComposure(self.composure_amt, self)
+            end
         end,
     },
 
-    PC_ALAN_HOSTILE_b =
+    PC_ALAN_BASIC_SKILLS_plus2 =
     {
-        name = "Fallacy",
-        icon = "negotiation/barrage.tex",
-        desc = "{PC_ALAN_FALLACY|}Gain {1} {PC_ALAN_FALLACY}.",
+        name = "Only Basic skills",
+        desc = "Gain {1} {PA_BASIC_SKILLS}.\n<#UPGRADE>{PA_UNIQUE}: Gain additional {2} {PA_BASIC_SKILLS}</>.",
         desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.fallacy_amt)
+            return loc.format(fmt_str, self.basic_amt, self.alt_basic_amt)
         end,
-        flavour = "'Can’t remember the right arguments? Sometimes overwhelming them with nonsense works just as well.'",
-        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNIQUE,
-        cost = 0,
-        fallacy_amt = 2,
+        alt_basic_amt = 2,
+        deck_handlers = { DECK_TYPE.DRAW, DECK_TYPE.DISCARDS, DECK_TYPE.RESOLVE, DECK_TYPE.IN_HAND },
         OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PC_ALAN_FALLACY", self.fallacy_amt, self)
-        end
-    },
-
-    PC_ALAN_HOSTILE_c =
-    {
-        name = "Violent",
-        icon = "negotiation/bluster.tex",
-        desc = "{BLIND}.\n{PA_VIOLENT} {1}: Attack with this card 2 times.\n{PA_VIOLENT} {2}: Attack with this card 3 times.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.enemy_need, self.enemy_need_alt)
+            self.negotiator:AddModifier("PA_BASIC_SKILLS", self.basic_amt, self)
+            
+            local is_unique = IsCardUnique(self)
+            if is_unique then
+                self.negotiator:AddModifier("PA_BASIC_SKILLS", self.alt_basic_amt, self)
+            end
         end,
-        flavour = "'Say the roughest thing you can think of—whatever makes them believe you’re not to be messed with.'",
-        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNIQUE,
-        cost = 0,
-        min_persuasion = 3,
-        max_persuasion = 3,
-        enemy_need = 2,
-        enemy_need_alt = 5,
-        auto_target = true,
-        extra_targets = 0,
-        event_handlers =
-        {
-            [ EVENT.START_RESOLVE ] = function( self, minigame, card )
-            if card == self then
-                local enemy = CountNegativeRelationsCNR(self)
-                if enemy >= self.enemy_need_alt then
-                    self.extra_targets = 2
-                elseif enemy >= self.enemy_need then
-                    self.extra_targets = 1
-                end
-            end
-            end
-        },
-        OnPostResolve = function( self, minigame, targets )
-            for i=1, self.extra_targets do
-                minigame:ApplyPersuasion(self)
-            end
-        end
     },
 
     PC_ALAN_BRAINSTORM =
@@ -989,7 +874,7 @@ local CARDS =
         rarity = CARD_RARITY.BASIC,
         sound = "event:/sfx/battle/cards/gen/play_card/promoted_thinking",
         pool_size = 3,
-        pool_cards = {"improvise_gruff", "improvise_carry_over", "improvise_options", "improvise_withdrawn", "PC_ALAN_GENUINE_CARD", "PC_ALAN_FALLACY_CARD", "improvise_wide_composure", "improvise_bait", "improvise_vulnerability"},
+        pool_cards = {"improvise_gruff", "improvise_carry_over", "improvise_options", "improvise_withdrawn", "PC_ALAN_INFLUENCE", "PC_ALAN_DOMINANCE", "improvise_wide_composure", "improvise_sleight", "improvise_vulnerability"},
         OnPostResolve = function( self, minigame, targets)
             local cards = ObtainWorkTable()
 
@@ -1006,7 +891,7 @@ local CARDS =
     {
         name = "Promoted Brainstorm",
         desc = "{IMPROVISE} a card from a pool of <#UPGRADE>upgraded</> special cards.",
-        pool_cards = {"improvise_gruff_upgraded", "improvise_carry_over_upgraded", "improvise_options_upgraded", "improvise_withdrawn_upgraded", "PC_ALAN_GENUINE_CARD_upgraded", "PC_ALAN_FALLACY_CARD_upgraded", "improvise_wide_composure_upgraded", "improvise_bait_upgraded", "improvise_vulnerability_upgraded"},
+        pool_cards = {"improvise_gruff_upgraded", "improvise_carry_over_upgraded", "improvise_options_upgraded", "improvise_withdrawn_upgraded", "PC_ALAN_INFLUENCE_upgraded", "PC_ALAN_DOMINANCE_upgraded", "improvise_wide_composure_upgraded", "improvise_sleight_upgraded", "improvise_vulnerability_upgraded"},
     },
 
     PC_ALAN_BRAINSTORM_plus2 = 
@@ -1016,184 +901,50 @@ local CARDS =
         pool_size = 5,
     },
 
-    PC_ALAN_GENUINE_CARD =
+    PC_ALAN_INFLUENCE =
     {
         name = "Explain",
         icon = "negotiation/elucidate.tex",
-        desc = "Gain {1} {PC_ALAN_GENUINE}.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.genuine_amt)
-        end,
         flavour = "'Trust me—I swear I’m not trying to screw you over.'",
-        genuine_amt = 2,
         flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
         rarity = CARD_RARITY.UNIQUE,
+        max_xp = 0,
         cost = 0,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:InceptModifier("PC_ALAN_GENUINE", self.genuine_amt, self) 
-        end,
+        features =
+        {
+            INFLUENCE = 1,
+        },
     },
 
-    PC_ALAN_GENUINE_CARD_upgraded =
+    PC_ALAN_INFLUENCE_upgraded =
     {
         name = "Boosted Explain",
-        genuine_amt = 4,
+        min_persuasion = 0,
+        max_persuasion = 4,
     },
 
-    PC_ALAN_FALLACY_CARD =
+    PC_ALAN_DOMINANCE =
     {
         name = "Doubt",
         icon = "negotiation/threaten.tex",
-        desc = "Gain 1 {PC_ALAN_FALLACY}.",
-        flavour = "'You sure about that?'",
+        desc = "Gain 1 {DOMINANCE}.",
+        flavour = "'Are you sure?'",
+        max_xp = 0,
         flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
         rarity = CARD_RARITY.UNIQUE,
-        cost = 1,
+        cost = 0,
         OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PC_ALAN_FALLACY", 1, self)
+            self.negotiator:AddModifier("DOMINANCE", 1, self)
         end
     },
 
-    PC_ALAN_FALLACY_CARD_upgraded =
+    PC_ALAN_DOMINANCE_upgraded =
     {
-        name = "Pale Doubt",
-        cost = 0,
-    },
-
-    PC_ALAN_CONFIDENCE =
-    {
-        name = "Confidence",
-        icon = "negotiation/upright.tex",
-        desc = "{PA_REASON} {1}: Attack with this card twice.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.reason_amt)
-        end,
-        flavour = "'Let’s get started.'",
-        flags = CARD_FLAGS.DIPLOMACY,
-        rarity = CARD_RARITY.COMMON,
-        min_persuasion = 1,
-        max_persuasion = 4,
-        max_xp = 9,
-        cost = 1,
-        reason_amt = 2,
-        event_handlers = 
-        {
-            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-            local mod_num = CountArguments(self)
-                if source == self and mod_num >= self.reason_amt then
-                    persuasion:ModifyPersuasion( persuasion.max_persuasion, persuasion.max_persuasion, self )
-                end
-            end,
-        },
-    },
-
-    PC_ALAN_CONFIDENCE_plus =
-    {
-        name = "Rooted Confidence",
-        max_persuasion = 6,
-    },
-
-    PC_ALAN_CONFIDENCE_plus2 =
-    {
-        name = "Pale Confidence",
-        desc = "{PA_REASON} <#UPGRADE>{1}</>: Attack with this card twice.",
-        reason_amt = 1,
-    },
-
-    PC_ALAN_PERSENTATION =
-    {
-        name = "Presentation",
-        icon = "negotiation/agency.tex",
-        desc = "{PA_REASON} X: Reduce the cost of this card by X.",
-        flavour = "'Take a look at this, sir.'",
-        flags = CARD_FLAGS.DIPLOMACY,
-        rarity = CARD_RARITY.COMMON,
-        min_persuasion = 2,
-        max_persuasion = 5,
-        max_xp = 3,
-        cost = 3,
-        cost_reduction = 0,
+        name = "Boosted Doubt",
+        desc = "Gain <#UPGRADE>2</> {DOMINANCE}.",
         OnPostResolve = function( self, minigame, targets )
-            self.cost_reduction = 0
-        end,
-
-        event_priorities =
-        {
-            [EVENT.CALC_ACTION_COST ] = 999,
-        },
-
-        event_handlers =
-        {
-            [ EVENT.MODIFIER_ADDED ] = function( self, modifier, source )
-            self.cost_reduction = self.cost_reduction + 1
-            end,
-
-            [ EVENT.CALC_ACTION_COST ] = function( self, acc, card, target )
-                if card == self then
-                    acc:AddValue( -self.cost_reduction, self )
-                end
-            end,
-        },
-    },
-
-    PC_ALAN_PERSENTATION_plus =
-    {
-        name = "Rooted Presentation",
-        max_persuasion = 8,
-    },
-
-    PC_ALAN_PERSENTATION_plus2 =
-    {
-        name = "Pale Presentation",
-        min_persuasion = 5,
-    },
-
-    PC_ALAN_REBUTTAL =
-    {
-        name = "Rebuttal",
-        icon = "negotiation/swift_rebuttal.tex",
-        desc = "Targets a random opponent argument.\n{EVOKE}: Create a friendly argument.",
-        flavour = "'Hold it!'",
-        flags = CARD_FLAGS.DIPLOMACY,
-        rarity = CARD_RARITY.COMMON,
-        target_mod = TARGET_MOD.RANDOM1,
-        min_persuasion = 2,
-        max_persuasion = 3,
-        max_xp = 10,
-        cost = 1,
-        auto_target = true,
-        evoke_max = 1,
-        deck_handlers = { DECK_TYPE.DRAW, DECK_TYPE.DISCARDS },
-        event_handlers =
-        {
-            [ EVENT.MODIFIER_ADDED ] = function( self, modifier, source )
-            if modifier.negotiator == self.negotiator then
-                self:Evoke( self.evoke_max )
-            end
-            end,
-
-            [ EVENT.END_TURN ] = function( self, minigame, negotiator )
-                if negotiator == self.negotiator then
-                    self:ResetEvoke()
-                end
-            end,
-        },
-    },
-
-    PC_ALAN_REBUTTAL_plus =
-    {
-        name = "Boosted Rebuttal",
-        min_persuasion = 4,
-        max_persuasion = 5,
-    },
-
-    PC_ALAN_REBUTTAL_plus2 =
-    {
-        name = "Genuine Rebuttal",
-        desc = "Targets a random opponent argument.\n<#UPGRADE>Gain 1 {PC_ALAN_GENUINE}</>.\n{EVOKE}: Create a friendly argument.",
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:InceptModifier("PC_ALAN_GENUINE", 1, self)
-        end,
+            self.negotiator:AddModifier("DOMINANCE", 2, self)
+        end
     },
 
     PC_ALAN_AGREEMENT =
@@ -1229,360 +980,255 @@ local CARDS =
 
     PC_ALAN_AGREEMENT_plus2 =
     {
-        name = "Stone Agreement",
-        desc = "Gain {1} {INFLUENCE}.\n<#UPGRADE>Gain {2} {COMPOSURE}</>.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.influence, self:CalculateComposureText( self.composure_amt ))
-        end,
-        composure_amt = 3,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("INFLUENCE", self.influence, self)
-            self.negotiator:DeltaComposure( self.composure_amt, self )
-        end
+        name = "Tall Agreement",
+        max_persuasion = 5,
     },
 
-    PC_ALAN_FACT =
+    PC_ALAN_SMALL_TALK =
     {
-        name = "Fact",
-        icon = "negotiation/hard_facts.tex",
-        desc = "{PC_ALAN_TRUTH|}Create {1} {PC_ALAN_TRUTH}.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.truth_amt)
-        end,
-        flavour = "'That’s just how it is.'",
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.COMMON,
-        truth_amt = 1,
-        max_xp = 9,
-        cost = 1,
-        OnPostResolve = function( self, minigame, targets )
-            for i=1,self.truth_amt do
-                self.negotiator:CreateModifier("PC_ALAN_TRUTH", 1, self)
-            end
-        end
-    },
-
-    PC_ALAN_FACT_plus =
-    {
-        name = "Pale Fact",
-        cost = 0,
-    },
-
-    PC_ALAN_FACT_plus2 =
-    {
-        name = "Mirrored Fact",
-        desc = "{PC_ALAN_TRUTH|}Create <#UPGRADE>{1}</> {PC_ALAN_TRUTH}.",
-        truth_amt = 2,
-    },
-
-    PC_ALAN_PLEA =
-    {
-        name = "Plea",
-        icon = "negotiation/plead.tex",
-        desc = "Gain {1} {PC_ALAN_GENUINE}.\nDraw a card.",
-        flavour = "'C’mon, man… I’m beggin’ ya here.'",
+        name = "Small Talk",
+        icon = "negotiation/pleasantries.tex",
+        desc = "{PA_TENTATIVE} {1}: Deal an additional {2} damage.",
         desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self.genuine_amt, self.composure_amt)
+            return loc.format( fmt_str, self.tentative_amt, self.bonus_damage )
         end,
-        cost = 1,
-        max_xp = 9,
-        flags = CARD_FLAGS.DIPLOMACY,
-        rarity = CARD_RARITY.COMMON,
-        genuine_amt = 2,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:InceptModifier("PC_ALAN_GENUINE", self.genuine_amt, self)
-            minigame:DrawCards(1)
-        end
-    },
-
-    PC_ALAN_PLEA_plus =
-    {
-        name = "Boosted Plea",
-        desc = "Gain <#UPGRADE>{1}</> {PC_ALAN_GENUINE}.\nDraw a card.",
-        genuine_amt = 3,
-    },
-
-    PC_ALAN_PLEA_plus2 =
-    {
-        name = "Stone Plea",
-        desc = "Gain {1} {PC_ALAN_GENUINE}.\n<#UPGRADE>Apply {2} {COMPOSURE}</>.",
-        composure_amt = 3,
-        target_self = TARGET_ANY_RESOLVE,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:InceptModifier("PC_ALAN_GENUINE", self.renown_amt, self)
-            for i,target in ipairs(targets) do
-                target:DeltaComposure( self.composure_amt, self )
-            end
-        end
-    },
-
-    PC_ALAN_GOOD_IMPRESSION =
-    {
-        name = "Good Impression",
-        icon = "negotiation/subtlety.tex",
-        desc = "{PA_FRIENDLY} {1}: Deal an additional {2} damage.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.friend_need, self.bonus_damage )
-        end,
-        flavour = "*wink*",
+        flavour = "How have you been lately?",
         cost = 1,
         max_xp = 9,
         flags = CARD_FLAGS.DIPLOMACY,
         rarity = CARD_RARITY.COMMON,
         min_persuasion = 2,
         max_persuasion = 3,
-        friend_need = 4,
+        tentative_amt = 2,
         bonus_damage = 3,
-        action_bonus = 0,
         OnPostResolve = function( self, minigame, targets )
-            local friend = CountPositiveRelationsCPR(self)
-            if friend >= self.friend_need then
+            local draw_cards = self.negotiator:GetModifierStacks("PA_DRAW_CARD")
+            if draw_cards > self.tentative_amt then
                 minigame:ApplyPersuasion( self, nil, self.bonus_damage, self.bonus_damage )
-                minigame:ModifyActionCount(self.action_bonus)
             end
-        end
+        end,
+
     },
 
-    PC_ALAN_GOOD_IMPRESSION_plus =
+    PC_ALAN_SMALL_TALK_plus =
     {
-        name = "Boosted Good Impression",
-        desc = "{PA_FRIENDLY} {1}: Deal an additional <#UPGRADE>{2}</> damage.",
+        name = "Boosted Small Talk",
+        desc = "{PA_TENTATIVE} {1}: Deal an additional <#UPGRADE>{2}</> damage.",
         bonus_damage = 5,
     },
 
-    PC_ALAN_GOOD_IMPRESSION_plus2 =
+    PC_ALAN_SMALL_TALK_plus2 =
     {
-        name = "Pale Good Impression",
-        desc = "{PA_FRIENDLY} {1}: Deal an additional <#DOWNGRADE>{2}</> damage and <#UPGRADE>gain 1 action</>.",
-        action_bonus = 1,
-        bonus_damage = 1,
+        name = "Pale Small Talk",
+        desc = "{PA_TENTATIVE} <#UPGRADE>{1}</>: Deal an additional {2} damage.",
+        tentative_amt = 1,
     },
 
-    PC_ALAN_UNREASONABLE_RAGE =
+    PC_ALAN_PERSENTATION =
     {
-        name = "Unreasonable Rage",
-        icon = "negotiation/caprice.tex",
-        desc = "{PA_UNREASON}: Gain 1 {PC_ALAN_FALLACY}.",
-        flavour = "I’m telling you, this isn’t over today!",
-        cost = 1,
-        max_xp = 9,
-        flags = CARD_FLAGS.HOSTILE,
+        name = "Presentation",
+        icon = "negotiation/agency.tex",
+        desc = "Draw a card.",
+        flavour = "'Take a look at this.'",
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND | CARD_FLAGS.REPLENISH,
         rarity = CARD_RARITY.COMMON,
-        fallacy_amt = 1,
-        min_persuasion = 2,
-        max_persuasion = 2,
-        rude_amt = 0,
-        draw = 0,
-        OnPostResolve = function( self, minigame, targets )
-            local mod_num = CountArguments(self)
-            if mod_num == 0 then
-                self.negotiator:AddModifier("PC_ALAN_FALLACY", self.fallacy_amt, self)
-                self.anti_negotiator:InceptModifier("PC_ALAN_RUDE", self.rude_amt, self)
-            end
-        end,
-    },
-
-    PC_ALAN_UNREASONABLE_RAGE_plus =
-    {
-        name = "Boosted Unreasonable Rage",
-        min_persuasion = 4,
-        max_persuasion = 4,
-    },
-
-    PC_ALAN_UNREASONABLE_RAGE_plus2 =
-    {
-        name = "Rude Unreasonable Rage",
-        desc = "{PA_UNREASON}: <#UPGRADE>{INCEPT} 1 {PC_ALAN_RUDE}</>.",
-        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
-        fallacy_amt = 0,
-        rude_amt = 1,
-    },
-
-    PC_ALAN_BREAK_PACT =
-    {
-        name = "Break Pact",
-        icon = "negotiation/rescind.tex",
-        desc = "If you have any {PC_ALAN_FALLACY}, gain {1} {PC_ALAN_FALLACY}.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.fallacy_amt )
-        end,
-        flavour = "No one said I had to follow this damned treaty.",
-        cost = 1,
-        max_xp = 9,
-        flags = CARD_FLAGS.HOSTILE,
-        rarity = CARD_RARITY.BASIC,
-        fallacy_amt = 1,
-        OnPostResolve = function( self, minigame, targets )
-            if self.negotiator:HasModifier("PC_ALAN_FALLACY") then
-                self.negotiator:AddModifier("PC_ALAN_FALLACY", self.fallacy_amt, self)
-            end
-        end,
-    },
-
-    PC_ALAN_BREAK_PACT_plus =
-    {
-        name = "Pale Break Pact",
+        max_xp = 10,
         cost = 0,
-    },
-
-    PC_ALAN_BREAK_PACT_plus2 =
-    {
-        name = "Boosted Break Pact",
-        desc = "If you have any {PC_ALAN_FALLACY}, gain <#UPGRADE>{1}</> {PC_ALAN_FALLACY}.",
-        fallacy_amt = 2,
-    },
-
-    PC_ALAN_URGE =
-    {
-        name = "Urge",
-        icon = "negotiation/improvise_mean.tex",
-        desc = "{PA_VIOLENT} {1}: {INCEPT} 2 {VULNERABILITY}.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.enemy_need )
+        OnPostResolve = function( self, minigame, targets )
+            minigame:DrawCards(1)
         end,
-        flavour = "Move it!",
-        cost = 1,
-        max_xp = 9,
-        flags = CARD_FLAGS.HOSTILE,
+    },
+
+    PC_ALAN_PERSENTATION_plus =
+    {
+        name = "Sticky Presentation",
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND | CARD_FLAGS.REPLENISH | CARD_FLAGS.STICKY,
+    },
+
+    PC_ALAN_PERSENTATION_plus2 =
+    {
+        name = "Only Presentation",
+        desc = "Draw a card.\n<#UPGRADE>{PA_UNIQUE}: Draw additional 2 cards</>.",
+        OnPostResolve = function( self, minigame, targets )
+            minigame:DrawCards(1)
+
+            local is_unique = IsCardUnique(self)
+            if is_unique then
+                minigame:DrawCards(2)
+            end
+        end,
+    },
+
+    PC_ALAN_ELABORATION =
+    {
+        name = "Elaboration",
+        icon = "negotiation/setup.tex",
+        desc = "Add a copy of {PC_ALAN_DISCUSS} to your hand.",
+        flavour = "'I feel I need to dive a bit deeper into this point.'",
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
         rarity = CARD_RARITY.COMMON,
-        enemy_need = 2,
         min_persuasion = 1,
-        max_persuasion = 3,
-        OnPostResolve = function( self, minigame, targets )
-            local enemy = CountNegativeRelationsCNR(self)
-            if enemy >= self.enemy_need then
-                self.anti_negotiator:InceptModifier("VULNERABILITY", 2, self )
-            end
-        end,
-    },
-
-    PC_ALAN_URGE_plus =
-    {
-        name = "Boosted Urge",
-        min_persuasion = 3,
-        max_persuasion = 5,
-    },
-
-    PC_ALAN_URGE_plus2 =
-    {
-        name = "Twisted Urge",
-        desc = "<#UPGRADE>{PA_FRIENDLY} {1}</>: {INCEPT} 2 {VULNERABILITY}.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.friend_need )
-        end,
-        min_persuasion = 3,
-        max_persuasion = 5,
-        friend_need = 3,
-        OnPostResolve = function( self, minigame, targets )
-            local friend = CountPositiveRelationsCPR(self)
-            if friend >= self.friend_need then
-                self.anti_negotiator:InceptModifier("VULNERABILITY", 2, self )
-            end
-        end,
-    },
-
-    PC_ALAN_ABANDON = 
-    {
-        name = "Abandon",
-        icon = "negotiation/refusal.tex",
-        desc = "Randomly destroy a friendly argument.",
-        flavour = "I never said I needed your help.",
-        cost = 1,
+        max_persuasion = 4,
         max_xp = 9,
-        flags = CARD_FLAGS.HOSTILE,
-        rarity = CARD_RARITY.COMMON,
-        min_persuasion = 3,
-        max_persuasion = 5,
-        draw = 0,
+        cost = 1,
         OnPostResolve = function( self, minigame, targets )
-            minigame:DrawCards(self.draw)
-            local options = {}
-            for i, arg in self.negotiator:Modifiers() do
-                if arg.modifier_type ~= MODIFIER_TYPE.CORE and arg:GetResolve() then
-                    table.insert(options, arg)
+            local cards = {}
+            for i = 1, 1 do
+                local card = Negotiation.Card( "PC_ALAN_DISCUSS", self.owner )
+                if self.upgraded then
+                    card:UpgradeCard()
+                end
+                card:ClearXP()
+                card:MakeTemporary()
+                table.insert( cards, card )
+            end
+            minigame:DealCards( cards, minigame:GetHandDeck() )
+        end,
+    },
+
+    PC_ALAN_ELABORATION_plus =
+    {
+        name = "Tall Elaboration",
+        max_persuasion = 6,
+    },
+
+    PC_ALAN_ELABORATION_plus2 =
+    {
+        name = "Boosted Elaboration",
+        desc = "Add a copy of <#UPGRADE>randomly upgraded</> {PC_ALAN_DISCUSS} to your hand.",
+        upgraded = true,
+    },
+
+    PC_ALAN_GOODWILL =
+    {
+        name = "Goodwill",
+        icon = "negotiation/subtlety.tex",
+        desc = "{PA_TENTATIVE} X: Costs 1 less for each X.",
+        flavour = "*wink*",
+        flags = CARD_FLAGS.DIPLOMACY,
+        rarity = CARD_RARITY.COMMON,
+        min_persuasion = 2,
+        max_persuasion = 6,
+        max_xp = 3,
+        cost = 3,
+        event_priorities =
+        {
+            [ EVENT.CALC_ACTION_COST ] = EVENT_PRIORITY_PRESETTOR
+        },
+        deck_handlers = ALL_DECKS,
+        event_handlers =
+        {
+            [ EVENT.CALC_ACTION_COST ] = function( self, cost_acc, card, target )
+                if card == self then
+                    cost_acc:ModifyValue( card.def.cost - (self.negotiator:GetModifierStacks("PA_DRAW_CARD") - 1), self )
+                end
+            end,
+        },
+    },
+
+    PC_ALAN_GOODWILL_plus =
+    {
+        name = "Rooted Goodwill",
+        min_persuasion = 6,
+    },
+
+    PC_ALAN_GOODWILL_plus2 =
+    {
+        name = "Tall Rebuttal",
+        max_persuasion = 8,
+    },
+
+    PC_ALAN_FINGER_SNAP =
+    {
+        name = "Finger Snap",
+        icon = "negotiation/blank.tex",
+        desc = "{PA_UNIQUE}: Attack with this card three times.",
+        flavour = "'Don't do it too often, or you'll start getting on people's nerves.'",
+        flags = CARD_FLAGS.DIPLOMACY,
+        rarity = CARD_RARITY.COMMON,
+        min_persuasion = 2,
+        max_persuasion = 4,
+        max_xp = 9,
+        cost = 2,
+        OnPostResolve = function( self, minigame )
+            local is_unique = IsCardUnique(self)
+            if is_unique then
+                for i = 1, 2 do
+                    minigame:ApplyPersuasion( self )
                 end
             end
-            if #options > 0 then
-                local chosen = options[math.random(#options)]
-                self.negotiator:DestroyModifier(chosen, self)
-            end
-        end
-    },
-
-    PC_ALAN_ABANDON_plus =
-    {
-        name = "Visionary Abandon",
-        desc = "Randomly destroy a friendly argument and <#UPGRADE>draw a card</>.",
-        draw = 1,
-    },
-
-    PC_ALAN_ABANDON_plus2 =
-    {
-        name = "Rooted Abandon",
-        min_persuasion = 5,
-    },
-
-    PC_ALAN_INSULT =
-    {
-        name = "Insult",
-        icon = "negotiation/reckless_insults.tex",
-        desc = "{INCEPT} 1 {PC_ALAN_RUDE}.",
-        flavour = "Your face is so ugly, even Hesh needs a prophet to prep before taking a second look!",
-        cost = 2,
-        max_xp = 7,
-        flags = CARD_FLAGS.HOSTILE,
-        rarity = CARD_RARITY.COMMON,
-        OnPostResolve = function( self, minigame, targets )
-            self.anti_negotiator:InceptModifier("PC_ALAN_RUDE", 1, self)
-        end
-    },
-
-    PC_ALAN_INSULT_plus =
-    {
-        name = "Violent Insult",
-        desc = "{INCEPT} 1 {PC_ALAN_RUDE}.\n<#UPGRADE>{PA_VIOLENT} {1}: Gain 1 action</>.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.enemy_need )
         end,
-        action_bonus = 1,
-        enemy_need = 4,
-        OnPostResolve = function( self, minigame, targets )
-            self.anti_negotiator:InceptModifier("PC_ALAN_RUDE", 1, self)
-            local enemy = CountNegativeRelationsCNR(self)
-            if enemy >= self.enemy_need then
-                minigame:ModifyActionCount(self.action_bonus)
-            end
-        end
     },
 
-    PC_ALAN_INSULT_plus2 =
+    PC_ALAN_FINGER_SNAP_plus =
     {
-        name = "Warped Insult",
-        desc = "{INCEPT} 1 {PC_ALAN_RUDE}.\n<#UPGRADE>Gain 1 {PC_ALAN_FALLACY}</>.",
-        OnPostResolve = function( self, minigame, targets )
-            self.anti_negotiator:InceptModifier("PC_ALAN_RUDE", 1, self)
-            self.negotiator:AddModifier("PC_ALAN_FALLACY", self.fallacy_amt, self)
-        end
+        name = "Pale Finger Snap",
+        cost = 1,
+    },
+
+    PC_ALAN_FINGER_SNAP_plus2 =
+    {
+        name = "Rooted Finger Snap",
+        max_persuasion = 6,
+    },
+
+    PC_ALAN_RAGE =
+    {
+        name = "Rage",
+        icon = "negotiation/seethe.tex",
+        desc = "Add two copy of this card to your discards.\nIncreases the cost of all same-named cards by 1 and gain 3 bonus damage.",
+        flavour = "'Ennggggggggg……'",
+        cost = 1,
+        max_xp = 9,
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.COMMON,
+        min_persuasion = 1,
+        max_persuasion = 3,
+        OnPostResolve = function( self, minigame )
+            self.negotiator:AddModifier("PA_RAGE", 1, self)
+            for i = 1, 2 do
+                local copy = self:Duplicate()
+                minigame:DealCard( copy, minigame:GetDiscardDeck() )
+            end
+        end,
+    },
+
+    PC_ALAN_RAGE_plus =
+    {
+        name = "Visionary Rage",
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND | CARD_FLAGS.REPLENISH,
+    },
+
+    PC_ALAN_RAGE_plus2 =
+    {
+        name = "Pale Rage",
+        cost = 0,
+        min_persuasion = 1,
+        max_persuasion = 1,
     },
 
     PC_ALAN_MISFIRE =
     {
         name = "Misfire",
         icon = "negotiation/burn.tex",
-        desc = "{PA_UNREASON}: Hits all opponent arguments.",
-        flavour = "Sorry, this gun acts up sometimes.",
+        desc = "{PA_PRECURSUR} {1}: Hits all opponent arguments.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.precursor_amt)
+        end,
+        flavour = "'Sorry, this gun acts up sometimes.'",
         cost = 1,
         max_xp = 9,
         flags = CARD_FLAGS.HOSTILE,
         rarity = CARD_RARITY.COMMON,
         min_persuasion = 2,
         max_persuasion = 2,
+        precursor_amt = 8,
         event_handlers = 
         {
             [ EVENT.CARD_MOVED ] = function( self, card, source_deck, source_idx, target_deck, target_idx )
-            local mod_num = CountArguments(self)
-                if card == self and target_deck == self.engine:GetHandDeck() then
-                    if mod_num == 0 then
+            local discards_count = DiscardPileCount(self)
+                if card == self and discards_count ~= nil then
+                    if discards_count >= self.precursor_amt then
                         self.target_mod = TARGET_MOD.TEAM
                         self.auto_target = true
                     else
@@ -1592,27 +1238,10 @@ local CARDS =
                 end
             end,
 
-            [ EVENT.MODIFIER_ADDED ] = function( self, card )
-            local mod_num = CountArguments(self)
-                if mod_num == 0 then
-                    self.target_mod = TARGET_MOD.TEAM
-                    self.auto_target = true
-                else
-                    self.target_mod = TARGET_MOD.SINGLE
-                    self.auto_target = nil
-                end
-            end,
-
-            [ EVENT.MODIFIER_REMOVED ] = function( self, card )
-            local mod_num = CountArguments(self)
-                if mod_num == 0 then
-                    self.target_mod = TARGET_MOD.TEAM
-                    self.auto_target = true
-                else
-                    self.target_mod = TARGET_MOD.SINGLE
-                    self.auto_target = nil
-                end
-            end,
+            [ EVENT.SHUFFLE_DISCARDS ] = function( self, num_cards )
+                self.target_mod = TARGET_MOD.SINGLE
+                self.auto_target = nil
+            end
         },
     },
 
@@ -1624,43 +1253,104 @@ local CARDS =
 
     PC_ALAN_MISFIRE_plus2 =
     {
-        name = "Focused Misfire",
-        desc = "{PA_UNREASON}: <#UPGRADE>Attack twice</>.",
-        event_handlers = 
-        {
-            [ EVENT.CARD_MOVED ] = function( self, card, source_deck, source_idx, target_deck, target_idx )
+        name = "Boosted Misfire",
+        min_persuasion = 3,
+        max_persuasion = 3,
+    },
 
-            end,
+    PC_ALAN_PREPARE =
+    {
+        name = "Prepare",
+        icon = "negotiation/notion.tex",
+        desc = "Gain 1 {DOMINANCE} for each {PC_ALAN_BLUFF} in your hand.",
+        loc_strings = 
+        {
+            ALT_DESC = "Gain 1 {DOMINANCE} for each {PC_ALAN_BLUFF} in your hand.\n({1} {DOMINANCE})",
         },
-        OnPostResolve = function( self, minigame )
-            local mod_num = CountArguments(self)
-            if mod_num == 0 then
-                for i = 1, 1 do
-                    minigame:ApplyPersuasion( self )
+        desc_fn = function(self, fmt_str)
+            if self.engine then
+                local count = 0
+                for i,card in self.engine:GetHandDeck():Cards() do
+                    if card.base_id == "PC_ALAN_BLUFF" or card.id == "PC_ALAN_BLUFF" then
+                        count = count + 1
+                    end
                 end
+                return loc.format(self.def:GetLocalizedString("ALT_DESC"), (self.dominance_amt * count) + self.dominance_bonus)
+            else
+                return loc.format(fmt_str, 0)
+            end
+        end,
+        flavour = "'Alright, settle in. Time for my blu—... brilliant analysis!.'",
+        cost = 1,
+        max_xp = 9,
+        dominance_amt = 1,
+        dominance_bonus = 0,
+        flags = CARD_FLAGS.HOSTILE,
+        rarity = CARD_RARITY.COMMON,
+        PreReq = function( self, minigame )
+            local count = 0
+            for i,card in self.engine:GetHandDeck():Cards() do
+                if card.base_id == "PC_ALAN_BLUFF" or card.id == "PC_ALAN_BLUFF" then
+                    count = count + 1
+                end
+            end
+            return count > 0
+        end,
+        
+        OnPostResolve = function( self, minigame, targets )
+            local count = 0
+            for i,card in self.engine:GetHandDeck():Cards() do
+                if card.base_id == "PC_ALAN_BLUFF" or card.id == "PC_ALAN_BLUFF" then
+                    count = count + 1
+                end
+            end
+            self.negotiator:AddModifier("DOMINANCE", (self.dominance_amt * count) + self.dominance_bonus, self)
+            if self.lose_dominance then
+                self.negotiator:AddModifier( "notion", (self.dominance_amt * count) + self.dominance_bonus, self )
             end
         end,
     },
 
-    PC_ALAN_PROHIBIT =
+    PC_ALAN_PREPARE_plus =
     {
-        name = "Prohibit",
-        icon = "negotiation/domain.tex",
-        desc = "{EVOKE}: Draw 3 Hostility cards in a single turn.",
-        flavour = "Yotes—and you—are not allowed in!",
-        cost = 0,
-        max_xp = 10,
-        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.UNPLAYABLE,
+        name = "Boosted Prepare",
+        desc = "Gain 1 {DOMINANCE}<#UPGRADE>+1</> for each {PC_ALAN_BLUFF} in your hand.",
+        dominance_bonus = 1,
+    },
+
+    PC_ALAN_PREPARE_plus2 =
+    {
+        name = "Tactless Prepare",
+        desc = "Gain <#UPGRADE>2</> {DOMINANCE} for each {PC_ALAN_BLUFF} in your hand.\n<#DOWNGRADE>At the end of your turn, lose those {DOMINANCE} that gain by this card</>.",
+        loc_strings = 
+        {
+            ALT_DESC = "Gain 2 {DOMINANCE} for each {PC_ALAN_BLUFF} in your hand.\nAt the end of your turn, lose those {DOMINANCE} that gain by this card.\n({1} {DOMINANCE})",
+        },
+        dominance_amt = 2,
+        lose_dominance = true,
+    },
+
+    PC_ALAN_STRAIGHT_FORWARD =
+    {
+        name = "Straight forward",
+        icon = "negotiation/invective.tex",
+        desc = "{EVOKE}: Play a same-named cards.",
+        flavour = "'You Idiot!'",
+        cost = 1,
+        max_xp = 9,
+        flags = CARD_FLAGS.HOSTILE,
         rarity = CARD_RARITY.COMMON,
         min_persuasion = 2,
-        max_persuasion = 2,
-        evoke_max = 3,
+        max_persuasion = 3,
+        evoke_max = 1,
         deck_handlers = { DECK_TYPE.DRAW, DECK_TYPE.DISCARDS },
         event_handlers = 
         {
-            [ EVENT.DRAW_CARD ] = function( self, minigame, card )
-                if card:IsFlagged( CARD_FLAGS.HOSTILE ) then
-                    self:Evoke( self.evoke_max )
+            [ EVENT.POST_RESOLVE ] = function( self, minigame, card )
+                if card.owner == self.owner then
+                    if card.id == "PC_ALAN_STRAIGHT_FORWARD" or card.base_id == "PC_ALAN_STRAIGHT_FORWARD" then
+                        self:Evoke( self.evoke_max )
+                    end
                 end
             end,
 
@@ -1672,157 +1362,143 @@ local CARDS =
         },
     },
 
-    PC_ALAN_PROHIBIT_plus =
+    PC_ALAN_STRAIGHT_FORWARD_plus =
     {
-        name = "Boosted Prohibit",
-        min_persuasion = 4,
+        name = "Tall Straight forward",
         max_persuasion = 4,
     },
 
-    PC_ALAN_PROHIBIT_plus2 =
+    PC_ALAN_STRAIGHT_FORWARD_plus2 =
     {
-        name = "Warped Prohibit",
-        desc = "<#UPGRADE>Gain 1 {PC_ALAN_FALLACY}</>.\n{EVOKE}: Draw 3 Hostility cards in a single turn.",
-        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.UNPLAYABLE,
-        min_persuasion = 0,
-        max_persuasion = 0,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PC_ALAN_FALLACY", 1, self)
-        end,
+        name = "Rooted Straight forward",
+        min_persuasion = 3,
     },
 
-    PC_ALAN_SOCIAL_CIRCLE =
+    PC_ALAN_SEIZE =
     {
-        name = "Social Circle",
-        icon = "negotiation/networked.tex",
-        desc = "Apply 1 {COMPOSURE} for every 2 person that loves or likes you.\n(Apply {1} {COMPOSURE}).",
+        name = "Seize",
+        icon = "negotiation/dig.tex",
+        desc = "{PA_PRECURSUR} {1}: This card costs 0.",
         desc_fn = function( self, fmt_str )
-            local friend = CountPositiveRelationsCPR(self)
-            local composure = math.floor(friend / 2) + self.composure_bonus
-            return loc.format( fmt_str, composure )
+            return loc.format( fmt_str, self.precursor_amt )
         end,
-        flavour = "I’ve got some connections, you know.",
+        flavour = "'Seriously, why are there so many snails around here?!'",
         cost = 1,
-        max_xp = 9,
-        flags = CARD_FLAGS.MANIPULATE,
+        max_xp = 10,
+        min_persuasion = 2,
+        max_persuasion = 3,
+        flags = CARD_FLAGS.HOSTILE,
         rarity = CARD_RARITY.COMMON,
-        composure_amt = 1,
-        composure_bonus = 0,
-        target_self = TARGET_ANY_RESOLVE,
-        OnPostResolve = function( self, minigame, targets )
-            local friend = CountPositiveRelationsCPR(self)
-            local composure = math.floor(friend / 2) + self.composure_bonus
-            for i,target in ipairs(targets) do
-                target:DeltaComposure(composure, self)
+        precursor_amt = 5,
+        event_priorities =
+        {
+            [ EVENT.CALC_ACTION_COST ] = EVENT_PRIORITY_SETTOR,
+        },
+
+        event_handlers =
+        {
+            [ EVENT.CARD_MOVED ] = function( self, card, source_deck, source_idx, target_deck, target_idx )
+                local discards_count = DiscardPileCount(self)
+                if card == self and discards_count ~= nil then
+                    if discards_count >= self.precursor_amt then
+                        self.precursor_active = true
+                    else
+                        self.precursor_active = false
+                    end
+                end
+            end,
+
+            [ EVENT.SHUFFLE_DISCARDS ] = function( self, num_cards )
+                self.precursor_active = false
+            end,
+
+            [ EVENT.CALC_ACTION_COST ] = function( self, acc, card, target )
+                if card == self then
+                    if self.precursor_active then
+                        acc:ModifyValue(0)
+                    end
+                end
             end
-        end
+        }
     },
 
-    PC_ALAN_SOCIAL_CIRCLE_plus =
+    PC_ALAN_SEIZE_plus =
     {
-        name = "Boosted Social Circle",
-        desc = "Apply 1 {COMPOSURE}<#UPGRADE>+3</> for every 2 person that loves or likes you.\n(Apply {1} {COMPOSURE}).",
-        composure_bonus = 3,
+        name = "Boosted Seize",
+        min_persuasion = 4,
+        max_persuasion = 5,
     },
 
-    PC_ALAN_SOCIAL_CIRCLE_plus2 =
+    PC_ALAN_SEIZE_plus2 =
     {
-        name = "Twisted Social Circle",
-        desc = "Apply 1 {COMPOSURE}<#UPGRADE>+3</> for every 2 person that <#UPGRADE>hates</> or <#UPGRADE>dislikes</> you.\n(Apply {1} {COMPOSURE}).",
+        name = "Twisted Seize",
+        desc = "<#UPGRADE>{PA_TENTATIVE} {1}</>: This card costs 0.",
         desc_fn = function( self, fmt_str )
-            local enemy = CountNegativeRelationsCNR(self)
-            local composure = math.floor(enemy / 2) + self.composure_bonus
-            return loc.format( fmt_str, composure )
+            return loc.format( fmt_str, self.tentative_amt )
         end,
-        composure_bonus = 3,
-        OnPostResolve = function( self, minigame, targets )
-            local enemy = CountNegativeRelationsCNR(self)
-            local composure = math.floor(enemy / 2) + self.composure_bonus
-            for i,target in ipairs(targets) do
-                target:DeltaComposure(composure, self)
+        min_persuasion = 4,
+        max_persuasion = 5,
+        tentative_amt = 1,
+        event_handlers = 
+        {
+            [ EVENT.CALC_ACTION_COST ] = function( self, acc, card, target )
+                if card == self then
+                    if self.negotiator:GetModifierStacks("PA_DRAW_CARD") > self.tentative_amt then
+                        acc:ModifyValue(0)
+                    end
+                end
             end
-        end
+        },
     },
 
-    PC_ALAN_BREEZY =
+    PC_ALAN_PROVOKE =
     {
-        name = "Breezy",
-        icon = "negotiation/standing.tex",
-        desc = "{PA_BREEZY|}Create: At the end of the turn, apply 2 {COMPOSURE} to a random friendly argument.",
-        flavour = "The wind’s a bit rowdy today.",
-        cost = 1,
-        max_xp = 9,
-        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.COMMON,
-        count = 1,
-        OnPostResolve = function( self, minigame, targets )
-            for i=1,self.count do
-                self.negotiator:CreateModifier("PA_BREEZY", 1, self)
-            end
-        end
-    },
-
-    PC_ALAN_BREEZY_plus =
-    {
-        name = "Pale Breezy",
-        cost = 0,
-    },
-
-    PC_ALAN_BREEZY_plus2 =
-    {
-        name = "Mirrored Breezy",
-        desc = "{PA_BREEZY|}Create <#UPGRADE>2</>: At the end of the turn, apply 2 {COMPOSURE} to a random friendly argument.",
-        count = 2,
-    },
-
-    PC_ALAN_TARGETED =
-    {
-        name = "Targeted",
-        icon = "negotiation/turnabout.tex",
-        desc = "Destroy target argument.",
-        flavour = "Yeah, that’s right—you, the one with the drink.",
-        cost = 1,
-        max_xp = 9,
-        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.COMMON,
-        target_self = TARGET_ANY_RESOLVE,
-        target_enemy = TARGET_ANY_RESOLVE,
-        draw = 0,
-        CanTarget = function( self, target )
-            if target and target.modifier_type == MODIFIER_TYPE.CORE then
-                return false, CARD_PLAY_REASONS.INVALID_TARGET
-            end
-            return true
+        name = "Provoke",
+        icon = "negotiation/grumble.tex",
+        desc = "{PA_UNIQUE}: Gain {1} {COMPOSURE}.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self:CalculateComposureText( self.composure_amt ))
         end,
-        OnPostResolve = function( self, minigame, targets )
-            minigame:DrawCards(self.draw)
-            for i,target in ipairs(targets) do
-                if target.modifier_type ~= MODIFIER_TYPE.CORE then
-                    target.negotiator:DestroyModifier(target, self)
+        flavour = "'Tsk. And here I thought it’d be something special. Guess that’s it?'",
+        cost = 2,
+        max_xp = 7,
+        min_persuasion = 2,
+        max_persuasion = 6,
+        flags = CARD_FLAGS.HOSTILE,
+        rarity = CARD_RARITY.COMMON,
+        composure_amt = 4,
+        bonus_damage = false,
+        OnPostResolve = function( self, minigame )
+            local is_unique = IsCardUnique(self)
+            if is_unique then
+                self.negotiator:DeltaComposure( self.composure_amt, self )
+                if self.bonus_damage then
+                    minigame:ApplyPersuasion( self, nil, 3, 3 )
                 end
             end
         end,
     },
 
-    PC_ALAN_TARGETED_plus =
+    PC_ALAN_PROVOKE_plus =
     {
-        name = "Pale Targeted",
-        cost = 0,
+        name = "Stone Provoke",
+        desc = "{PA_UNIQUE}: Gain <#UPGRADE>{1}</> {COMPOSURE}.",
+        composure_amt = 6,
     },
 
-    PC_ALAN_TARGETED_plus2 =
+    PC_ALAN_PROVOKE_plus2 =
     {
-        name = "Visionary Targeted",
-        desc = "Destroy target argument and <#UPGRADE>draw a card</>.",
-        draw = 1,
+        name = "Boosted Provoke",
+        desc = "{PA_UNIQUE}: Gain {1} {COMPOSURE} <#UPGRADE>and deal 3 bonus damage</>.",
+        bonus_damage = true,
     },
 
     PC_ALAN_SHOWTIME = 
     {
         name = "Showtime",
         icon = "negotiation/pure_style.tex",
-        desc = "Draw {1} card.\n{IMPROVISE} a card from your draw pile.",
-        flavour = "Watch closely—this is how it’s done.",
+        desc = "Draw a card.\n{IMPROVISE} a card from your draw pile.",
+        flavour = "'Watch closely—this is how it’s done.'",
         cost = 1,
         max_xp = 9,
         flags = CARD_FLAGS.MANIPULATE,
@@ -1849,7 +1525,7 @@ local CARDS =
     PC_ALAN_SHOWTIME_plus =
     {
         name = "Boosted Showtime",
-        desc = "Draw <#UPGRADE>{1}</> card.\n{IMPROVISE} a card from your draw pile.",
+        desc = "Draw <#UPGRADE>2</> card.\n{IMPROVISE} a card from your draw pile.",
         draw = 2,
     },
 
@@ -1860,686 +1536,936 @@ local CARDS =
         pool_size = 5,
     },
 
-    PC_ALAN_ARGUMENT = 
+    PC_ALAN_ARCHIVE =
     {
-        name = "Argument",
-        desc = "{PA_REASON} X: Attack again for X times.\n(Up to <#UPGRADE>{1}</> times).",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.reason_amt)
-        end,
-        icon = "negotiation/fast_talk.tex",
-        flavour = "'Hear me out.'",
+        name = "Archive",
+        icon = "negotiation/stool_pigeon.tex",
+        desc = "Draw a card and duplicate it, the copy have {EXPEND}.",
+        flavour = "'Don't ask why there's a pigeon here. That's our court reporter!'",
         cost = 1,
-        flags = CARD_FLAGS.DIPLOMACY,
-        rarity = CARD_RARITY.UNCOMMON,
-        min_persuasion = 2,
-        max_persuasion = 3,
         max_xp = 9,
-        reason_amt = 3,
-        OnPreResolve = function( self, minigame, targets )
-            local mod_num = CountArguments(self)
-            local count = math.min( mod_num, self.reason_amt)
-            for i = 1, count do
-                minigame:ApplyPersuasion( self )
-                self:AssignTarget( nil )
-            end
-        end,
-    },
-
-    PC_ALAN_ARGUMENT_plus =
-    {
-        name = "Boosted Argument",
-        desc = "{PA_REASON} X: Attack again for X times.\n(Up to <#UPGRADE>{1}</> times).",
-        reason_amt = 5,
-    },
-
-    PC_ALAN_ARGUMENT_plus2 =
-    {
-        name = "Tall Argument",
-        max_persuasion = 5,
-    },
-
-    PC_ALAN_SNAP_FINGERS =
-    {
-        name = "Snap Fingers",
-        icon = "negotiation/blank.tex",
-        desc = "While this is in your hand, apply {1} {COMPOSURE} to all friendly arguments and lose 1 action whenever you play a card.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self:CalculateComposureText( self.composure_amt ))
-        end,
-        flavour = "'Hey, could you stay focused? Thanks.'",
-        cost = 1,
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.UNPLAYABLE,
-        rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 9,
-        composure_amt = 2,
-        target_mod = TARGET_MOD.TEAM,
-        target_self = TARGET_ANY_RESOLVE,
-        event_handlers =
-        {
-            [ EVENT.POST_RESOLVE ] = function( self, minigame, card )
-                if card.negotiator == self.negotiator then
-                    self:AddXP(1)
-                    minigame:ModifyActionCount(-1)
-                    local targets = self.engine:CollectAlliedTargets(self.negotiator)
-                    if #targets > 0 then
-                        for i,target in ipairs(targets) do
-                            target:DeltaComposure(self.composure_amt, self)
-                        end                            
-                    end
-                end
-            end
-        },
-    },
-
-    PC_ALAN_SNAP_FINGERS_plus =
-    {
-        name = "Visionary Snap Fingers",
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.UNPLAYABLE | CARD_FLAGS.REPLENISH,
-    },
-
-    PC_ALAN_SNAP_FINGERS_plus2 =
-    {
-        name = "Twisted Snap Fingers",
-        desc = "<#UPGRADE>Apply {1} {COMPOSURE} to all friendly arguments</>.",
-        flags = CARD_FLAGS.DIPLOMACY,
-        composure_amt = 3,
-        event_handlers =
-        {
-            [ EVENT.POST_RESOLVE ] = function( self, minigame, card )
-                
-            end
-        },
-        auto_target = true,
-        cost = 1,
+        flags = CARD_FLAGS.MANIPULATE,
+        rarity = CARD_RARITY.COMMON,
+        draw = 1,
         OnPostResolve = function( self, minigame, targets )
-            for i,target in ipairs(targets) do
-                target:DeltaComposure(self.composure_amt, self)
+            local cards = minigame:DrawCards(self.draw)
+            for i,card in ipairs(cards) do
+                local clone = card:Duplicate()
+                clone:SetFlags(CARD_FLAGS.EXPEND)
+                clone:TransferCard( minigame:GetHandDeck() )
             end
         end
     },
 
-    PC_ALAN_APPLAUSE =
+    PC_ALAN_ARCHIVE_plus =
     {
-        name = "Applause",
-        icon = "negotiation/praise.tex",
-        desc = "Gain {PC_ALAN_GENUINE} equal to damage dealt by this card.",
-        flavour = "'Brilliant plan!'",
+        name = "Improvised Archive",
+        desc = "<#UPGRADE>{IMPROVISE} a card from your draw pile</> and duplicate it, the copy have {EXPEND}.",
+        OnPostResolve = function( self, minigame, targets )
+            local cards = {}
+            for i, card in minigame:GetDrawDeck():Cards() do
+                table.insert(cards, card)
+            end
+            if #cards == 0 then
+                minigame:ShuffleDiscardToDraw()
+                for i, card in minigame:GetDrawDeck():Cards() do
+                    table.insert(cards, card)
+                end
+            end
+
+            local chosen_cards = minigame:ImproviseCards(table.multipick(cards, 3), 1, nil, nil, nil, self)
+            if chosen_cards[1] then
+                local clone = chosen_cards[1]:Duplicate()
+                clone:SetFlags(CARD_FLAGS.EXPEND)
+                clone:TransferCard( minigame:GetHandDeck() )
+            end
+        end
+    },
+
+    PC_ALAN_ARCHIVE_plus2 =
+    {
+        name = "Visionary Archive",
+        desc = "Draw <#UPGRADE>2</> card and duplicate it, the copy have {EXPEND}.",
         cost = 2,
+        draw = 2,
+    },
+
+    PC_ALAN_BREEZY =
+    {
+        name = "Breezy",
+        icon = "negotiation/standing.tex",
+        desc = "{PA_BREEZY|}Create: At the end of the turn, apply 1 {COMPOSURE} to a random friendly argument.",
+        flavour = "'The wind’s a bit rowdy today.'",
+        cost = 1,
+        max_xp = 9,
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.COMMON,
+        count = 1,
+        OnPostResolve = function( self, minigame, targets )
+            for i=1,self.count do
+                self.negotiator:CreateModifier("PA_BREEZY", 1, self)
+            end
+        end
+    },
+
+    PC_ALAN_BREEZY_plus =
+    {
+        name = "Pale Breezy",
+        cost = 0,
+    },
+
+    PC_ALAN_BREEZY_plus2 =
+    {
+        name = "Mirrored Breezy",
+        desc = "{PA_BREEZY|}Create <#UPGRADE>2</>: At the end of the turn, apply 1 {COMPOSURE} to a random friendly argument.",
+        count = 2,
+    },
+
+    PC_ALAN_SHUFFLE =
+    {
+        name = "Shuffle",
+        icon = "negotiation/stacked_deck.tex",
+        desc = "{PA_SHUFFLE|}Gain {1} {PA_SHUFFLE}.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.count)
+        end,
+        flavour = "'Don't worry, my shuffling is top-tier. Not a single card will be harmed.'",
+        cost = 1,
+        max_xp = 9,
+        flags = CARD_FLAGS.MANIPULATE,
+        rarity = CARD_RARITY.COMMON,
+        count = 2,
+        OnPostResolve = function( self, minigame, targets )
+            for i=1,self.count do
+                self.negotiator:AddModifier("PA_SHUFFLE", 1, self)
+            end
+        end
+    },
+
+    PC_ALAN_SHUFFLE_plus =
+    {
+        name = "Boosted Shuffle",
+        desc = "{PA_SHUFFLE|}Gain <#UPGRADE>{1}</> {PA_SHUFFLE}.",
+        count = 3,
+    },
+
+    PC_ALAN_SHUFFLE_plus2 =
+    {
+        name = "Pale Shuffle",
+        desc = "{PA_SHUFFLE|}Gain <#DOWNGRADE>{1}</> {PA_SHUFFLE}.",
+        count = 1,
+        cost = 0,
+        
+    },
+
+    PC_ALAN_FACADE =
+    {
+        name = "Facade",
+        icon = "negotiation/back_pedal.tex",
+        desc = "Discard {1} cards from your hand.\nDraw {2} cards.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.discard_count, self.draw_count)
+        end,
+        flavour = "'Um... well...'",
+        cost = 1,
+        max_xp = 9,
+        flags = CARD_FLAGS.MANIPULATE,
+        rarity = CARD_RARITY.COMMON,
+        draw_count = 2,
+        discard_count = 2,
+        OnPostResolve = function( self, minigame, targets )
+            minigame:DiscardCards(self.discard_count, self.discard_count, self)
+            minigame:DrawCards(self.draw_count)
+        end
+    },
+
+    PC_ALAN_FACADE_plus =
+    {
+        name = "Pale Facade",
+        desc = "Discard <#UPGRADE>{1}</> cards from your hand.\nDraw <#DOWNGRADE>{2}</> cards.",
+        cost = 0,
+        draw_count = 1,
+        discard_count = 1,
+    },
+
+    PC_ALAN_FACADE_plus2 =
+    {
+        name = "Visionary Facade",
+        desc = "Discard {1} cards from your hand.\nDraw <#UPGRADE>{2}</> cards.",
+        draw_count = 3,
+    },
+
+    PC_ALAN_WINDBAG =
+    {
+        name = "Windbag",
+        icon = "negotiation/prattle.tex",
+        desc = "Apply {1} {COMPOSURE}.\n{PA_PRECURSUR} {2}: Double {COMPOSURE} on all arguments.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self:CalculateComposureText( self.composure_amt ), self.precursor_amt)
+        end,
+        flavour = "'And then there's this, and that, and—honestly, you get the point. Yadda yadda yadda.'",
+        cost = 1,
+        max_xp = 9,
+        flags = CARD_FLAGS.MANIPULATE,
+        rarity = CARD_RARITY.COMMON,
+        target_self = TARGET_ANY_RESOLVE,
+        composure_amt = 2,
+        precursor_amt = 10,
+        discard = false,
+        event_handlers =
+        {
+            [ EVENT.CARD_MOVED ] = function( self, card, source_deck, source_idx, target_deck, target_idx )
+                local discards_count = DiscardPileCount(self)
+                if card == self and discards_count ~= nil then
+                    if discards_count >= self.precursor_amt then
+                        self.precursor_active = true
+                    else
+                        self.precursor_active = false
+                    end
+                end
+            end,
+
+            [ EVENT.SHUFFLE_DISCARDS ] = function( self, num_cards )
+                self.precursor_active = false
+            end,
+        },
+        OnPostResolve = function( self, minigame, targets )
+            if self.discard then
+                minigame:DiscardCards(2, 2, self)
+            end
+            for i,target in ipairs(targets) do
+                target:DeltaComposure(self.composure_amt, self)
+            end
+            if self.precursor_active then
+                for i, modifier in self.negotiator:ModifierSlots() do
+                    if modifier:GetComposure() > 0 then
+                        modifier:DeltaComposure(modifier:GetComposure())
+                    end
+                end
+            end
+        end
+    },
+
+    PC_ALAN_WINDBAG_plus =
+    {
+        name = "Strained Windbag",
+        desc = "<#DOWNGRADE>Discard 2 cards</>.\nApply <#UPGRADE>{1}</> {COMPOSURE}.\n{PA_PRECURSUR} {2}: Double {COMPOSURE} on all arguments.",
+        flavour = "'And then there's this, and that, and—honestly, i hope you get the point, right? Yadda yadda yadda.'",
+        discard = true,
+        composure_amt = 4,
+    },
+
+    PC_ALAN_WINDBAG_plus2 =
+    {
+        name = "Boosted Windbag",
+        desc = "Apply <#UPGRADE>{1}</> {COMPOSURE}.\n{PA_PRECURSUR} {2}: Double {COMPOSURE} on all arguments.",
+        composure_amt = 3,
+    },
+
+    PC_ALAN_PLEAD = 
+    {
+        name = "Plead",
+        desc = "Treat the damage dealt by this card as cards drawn.",
+        icon = "negotiation/plead.tex",
+        flavour = "'Please, this is really important to me.'",
+        cost = 1,
         flags = CARD_FLAGS.DIPLOMACY,
         rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 7,
         min_persuasion = 1,
-        max_persuasion = 4,
+        max_persuasion = 3,
+        max_xp = 9,
+        draw_card = false,
         event_handlers =
         {
             [ EVENT.ATTACK_RESOLVE ] = function( self, source, target, damage, params, defended )
                 if source == self and damage > 0 then
-                    self.negotiator:InceptModifier("PC_ALAN_GENUINE", damage, self)
+                    if self.draw_card then
+                        self.engine:DrawCards(damage)
+                    else
+                        self.negotiator:AddModifier("PA_DRAW_CARD", damage, self)
+                        self.negotiator:AddModifier("PA_DRAW_CARD_ALT", damage, self)
+                    end                    
                 end
             end
         },
     },
 
-    PC_ALAN_APPLAUSE_plus =
+    PC_ALAN_PLEAD_plus =
     {
-        name = "Boosted Applause",
-        min_persuasion = 2,
+        name = "Boosted Plead",
+        min_persuasion = 3,
         max_persuasion = 5,
     },
 
-    PC_ALAN_APPLAUSE_plus2 =
+    PC_ALAN_PLEAD_plus2 =
     {
-        name = "Pale Applause",
-        cost = 1,
-        min_persuasion = 0,
-        max_persuasion = 3,
-    },
-
-    PC_ALAN_LIKE_WIND_AND_RAIN =
-    {
-        name = "Like Wind and Rain",
-        icon = "negotiation/calm.tex",
-        desc = "Add {1} resolve to a random friendly arguments.",
-        desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self.resolve_gain)
-        end,
-        flavour = "'Close your eyes—just enjoy the moment.'",
-        cost = 1,
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 9,
-        target_self = TARGET_FLAG.ARGUMENT | TARGET_FLAG.BOUNTY,
-        target_mod = TARGET_MOD.RANDOM1,
-        auto_target = true,
-        resolve_gain = 2,
-        OnPostResolve = function( self, minigame, targets )
-            for i,arg in ipairs(targets) do
-                arg:ModifyResolve( self.resolve_gain, self )
-            end
-        end
-    },
-
-    PC_ALAN_LIKE_WIND_AND_RAIN_plus =
-    {
-        name = "Pale Like Wind and Rain",
-        cost = 0,
-    },
-
-    PC_ALAN_LIKE_WIND_AND_RAIN_plus2 =
-    {
-        name = "Wide Like Wind and Rain",
-        desc = "Add {1} resolve to <#UPGRADE>all friendly arguments</>.",
-        cost = 2,
-        target_mod = TARGET_MOD.TEAM,
-    },
-
-    PC_ALAN_PROMOTION =
-    {
-        name = "Promotion",
-        icon = "negotiation/appeal_to_reason.tex",
-        desc = "Costs 1 less for every 2 person that loves or likes you have.",
-        flavour = "'This book is seriously good.'",
-        cost = 5,
-        flags = CARD_FLAGS.DIPLOMACY,
-        rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 3,
-        min_persuasion = 7,
-        max_persuasion = 9,
-        event_handlers =
-        {
-            [ EVENT.CALC_ACTION_COST ] = function( self, cost_acc, card, target )
-                if card == self then
-                    local friend = CountPositiveRelationsCPR(self)
-                    cost_acc:ModifyValue( card.def.cost - math.floor( friend / 2 ), self )
-                end
-            end,
-        },
-    },
-
-    PC_ALAN_PROMOTION_plus =
-    {
-        name = "Tall Promotion",
-        max_persuasion = 12,
-    },
-
-    PC_ALAN_PROMOTION_plus2 =
-    {
-        name = "Rooted Promotion",
-        min_persuasion = 10,
-        max_persuasion = 10,
+        name = "Visionary Plead",
+        desc = "<#UPGRADE>Draw cards equal to the damage dealt by this card</>.",
+        draw_card = true,
     },
 
     PC_ALAN_NONSTOP_DEBATE =
     {
         name = "Nonstop Debate",
         icon = "negotiation/level_playing_field.tex",
-        desc = "{PA_NONSTOP_DEBATE|}{PC_ALAN_TRUTH|}Gain: At the Start of the turn, if your amount of arguments before reaches the maximum, create 1 {PC_ALAN_TRUTH}.",
-        flavour = "Are you seriously telling me you brought a gun just to say... That's wrong?",
+        desc = "{PA_NONSTOP_DEBATE|}Gain: increase the maximum damage of {PC_ALAN_DISCUSS} by 4.",
+        flavour = "'Let's put the guns away and discuss things normally.'",
         cost = 2,
         max_xp = 7,
         flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
         rarity = CARD_RARITY.UNCOMMON,
+        influence = false,
         OnPostResolve = function( self, minigame, targets )
             self.negotiator:AddModifier("PA_NONSTOP_DEBATE", 1, self)
+            if self.influence then
+                self.negotiator:AddModifier("INFLUENCE", 1, self)
+            end
         end
     },
 
     PC_ALAN_NONSTOP_DEBATE_plus =
     {
-        name = "Initial Nonstop Debate",
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+        name = "Boosted Nonstop Debate",
+        desc = "{PA_NONSTOP_DEBATE|}Gain: increase the maximum damage of {PC_ALAN_DISCUSS} by 4.\n<#UPGRADE>Gain 1 {INFLUENCE}</>.",
+        influence = true,
     },
 
     PC_ALAN_NONSTOP_DEBATE_plus2 =
     {
-        name = "Pale Nonstop Debate",
-        cost = 1,
+        name = "Initial Nonstop Debate",
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
     },
 
-    PC_ALAN_REPUTATION =
+    PC_ALAN_CONTRACT = 
     {
-        name = "Reputation",
-        icon = "negotiation/fame.tex",
-        desc = "{PA_VIOLENT} {1}: This card will be unplayable.\nDraw a card.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.enemy_need )
+        name = "Contract",
+        desc = "Double your {PA_BASIC_SKILLS}.\nAt the end of your turn, lose those {PA_BASIC_SKILLS} that gain by this card.",
+        icon = "negotiation/compel.tex",
+        flavour = "'Just a very simple contract and no catches inside.'",
+        cost = 1,
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 9,
+        OnPostResolve = function( self, minigame, targets )
+            local stacks = self.negotiator:GetModifierStacks("PA_BASIC_SKILLS")
+            self.negotiator:AddModifier("PA_BASIC_SKILLS", stacks, self)
+            self.negotiator:AddModifier("PA_ANTI_BASIC_SKILLS", stacks, self)
         end,
-        flavour = "'People say I’m a decent person—go ahead, ask around.'",
-        cost = 0,
+    },
+
+    PC_ALAN_CONTRACT_plus =
+    {
+        name = "Boosted Argument",
+        desc = "<#UPGRADE>Gain 1 {PA_BASIC_SKILLS}, then</> Double your {PA_BASIC_SKILLS}.\nAt the end of your turn, lose those {PA_BASIC_SKILLS} that gain by this card.",
+        OnPostResolve = function( self, minigame, targets )
+            self.negotiator:AddModifier("PA_BASIC_SKILLS", 1, self)
+            self.negotiator:AddModifier("PA_ANTI_BASIC_SKILLS", 1, self)
+            local stacks = self.negotiator:GetModifierStacks("PA_BASIC_SKILLS")
+            self.negotiator:AddModifier("PA_BASIC_SKILLS", stacks, self)
+            self.negotiator:AddModifier("PA_ANTI_BASIC_SKILLS", stacks, self)
+        end,
+    },
+
+    PC_ALAN_CONTRACT_plus2 =
+    {
+        name = "Sticky Argument",
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND | CARD_FLAGS.STICKY,
+    },
+
+    PC_ALAN_OBSERVE = 
+    {
+        name = "Observe",
+        desc = "{PA_TENTATIVE} X: gains 2X bonus damage until the end of your turn.",
+        icon = "negotiation/swift_rebuttal.tex",
+        flavour = "'Objection!'",
+        cost = 1,
         flags = CARD_FLAGS.DIPLOMACY,
         rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 10,
         min_persuasion = 1,
-        max_persuasion = 4,
-        enemy_need = 2,
-        loc_strings =
-        {
-            ENEMY = "You already have more than one enemy.",
-        },
-        CanPlayCard = function( self, source, engine, target )
-            local enemy = CountNegativeRelationsCNR(self)
-            if enemy >= self.enemy_need then
-                return false, self.def:GetLocalizedString( "ENEMY" )
-            else
-                return true
-            end
-        end,
-        OnPostResolve = function( self, minigame, targets )
-            minigame:DrawCards(1)
-        end,
-    },
-
-    PC_ALAN_REPUTATION_plus =
-    {
-        name = "Tall Reputation",
-        max_persuasion = 6,
-    },
-
-    PC_ALAN_REPUTATION_plus2 =
-    {
-        name = "Rooted Reputation",
-        min_persuasion = 4,
-    },
-
-    PC_ALAN_COIN_BRIDE =
-    {
-        name = "Coin Bride",
-        icon = "negotiation/prominence.tex",
-        desc = "Draw {1} cards.\nGain 2 {PC_ALAN_GENUINE} for each Diplomacy card drawn.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.draw )
-        end,
-        flavour = "I’ve got some rare commemoratives—just... let me off this time, yeah?",
-        cost = 1,
+        max_persuasion = 3,
         max_xp = 9,
-        flags = CARD_FLAGS.DIPLOMACY,
-        rarity = CARD_RARITY.UNCOMMON,
-        draw = 2,
-        OnPostResolve = function( self, minigame )
-            local cards = minigame:DrawCards( self.draw )
-            local genuine_amt = 0
-            for i, card in ipairs( cards ) do
-                if card:IsFlagged( CARD_FLAGS.DIPLOMACY ) then
-                    genuine_amt = genuine_amt + 1
-                end
-            end
-            self.negotiator:InceptModifier( "PC_ALAN_GENUINE", (genuine_amt * 2), self )
-        end,
-    },
-
-    PC_ALAN_COIN_BRIDE_plus =
-    {
-        name = "Enhanced Coin Bride",
-        desc = "Draw <#UPGRADE>{1}</> cards.\nGain 2 {PC_ALAN_GENUINE} for each Diplomacy card drawn.",
-        draw = 3,
-    },
-
-    PC_ALAN_COIN_BRIDE_plus2 =
-    {
-        name = "Truthful Coin Bride",
-        desc = "Draw {1} cards.\n{PC_ALAN_TRUTH|}<#UPGRADE>Create 1 {PC_ALAN_TRUTH}</> for each Diplomacy card drawn.",
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
-        OnPostResolve = function( self, minigame )
-            local cards = minigame:DrawCards( self.draw )
-            local truth_amt = 0
-            for i, card in ipairs( cards ) do
-                if card:IsFlagged( CARD_FLAGS.DIPLOMACY ) then
-                    truth_amt = truth_amt + 1
-                end
-            end
-            if truth_amt > 0 then
-                for i=1,self.truth_amt do
-                    self.negotiator:CreateModifier("PC_ALAN_TRUTH", 1, self)
-                end
-            end
-        end,
-    },
-
-    PC_ALAN_UNDERSTAND = 
-    {
-        name = "Understand",
-        icon = "negotiation/incredulous.tex",
-        desc = "Gain {1} {PC_ALAN_GENUINE}.\n{PA_FRIENDLY} {2}: Add a copy of this card to your discards.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.genuine_amt, self.friend_need )
-        end,
-        flavour = "'Ohhh... I see now.'",
-        cost = 1,
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 9,
-        min_persuasion = 3,
-        max_persuasion = 5,
-        genuine_amt = 3,
-        friend_need = 6,
-        OnPostResolve = function( self, minigame )
-            self.negotiator:InceptModifier( "PC_ALAN_GENUINE", self.genuine_amt, self )
-            local friend = CountPositiveRelationsCPR(self)
-            if friend >= self.friend_need then
-                local copy = self:Duplicate()
-                minigame:DealCard( copy, minigame:GetDeck( DECK_TYPE.DISCARDS ))
-            end
-        end,
-    },
-
-    PC_ALAN_UNDERSTAND_plus =
-    {
-        name = "Tall Understand",
-        max_persuasion = 8,
-    },
-
-    PC_ALAN_UNDERSTAND_plus2 =
-    {
-        name = "Genuine Understand",
-        desc = "Gain <#UPGRADE>{1}</> {PC_ALAN_GENUINE}.\n{PA_FRIENDLY} {2}: Add a copy of this card to your discards.",
-        genuine_amt = 5,
-    },
-
-    PC_ALAN_STAY_CALM =
-    {
-        name = "Stay Calm",
-        icon = "negotiation/collected.tex",
-        desc = "Choose an argument, gain {PC_ALAN_GENUINE} double of the argument's stack.",
-        flavour = "'Yep, that’s exactly it!'",
-        cost = 0,
-        flags = CARD_FLAGS.DIPLOMACY,
-        rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 10,
-        target_self = TARGET_FLAG.ARGUMENT | TARGET_FLAG.BOUNTY,
-        target_enemy = TARGET_FLAG.ARGUMENT | TARGET_FLAG.BOUNTY,
-        composure_bonus = 0,
-        genuine_amt= 2,
-        genuine_bonus = 0,
-        OnPostResolve = function( self, minigame, targets )
-            local stacks = targets[1].stacks
-            self.negotiator:InceptModifier( "PC_ALAN_GENUINE", stacks * self.genuine_amt + self.genuine_bonus , self )
-            self.negotiator:DeltaComposure( stacks * self.composure_bonus, self )
-        end,
-    },
-
-    PC_ALAN_STAY_CALM_plus =
-    {
-        name = "Stay Calm Like a Stone",
-        desc = "Choose an argument, gain {PC_ALAN_GENUINE} and <#UPGRADE>{COMPOSURE}</> double of the argument's stack.",
-        composure_bonus = 2,
-    },
-
-    PC_ALAN_STAY_CALM_plus2 =
-    {
-        name = "Rooted Stay Calm",
-        desc = "Choose an argument, gain {PC_ALAN_GENUINE}<#UPGRADE>+2</> double of the argument's stack.",
-        genuine_bonus = 2,
-    },
-
-    PC_ALAN_SUPPORT =
-    {
-        name = "Support",
-        icon = "negotiation/claim_to_fame.tex",
-        desc = "Gain 2 {INFLUENCE}, then Create 1 {PC_ALAN_TRUTH} for every 2 {INFLUENCE} you have.",
-        flavour = "'I’ve still got people backing me.'",
-        cost = 2,
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 7,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("INFLUENCE", 2, self)
-            local influence = math.floor(self.negotiator:GetModifierStacks( "INFLUENCE" ) / 2)
-            if influence > 0 then
-                for i=1, influence do
-                    self.negotiator:CreateModifier("PC_ALAN_TRUTH", 1, self)
-                end
-            end
-        end,
-    },
-
-    PC_ALAN_SUPPORT_plus =
-    {
-        name = "Pale Support",
-        cost = 1,
-    },
-
-    PC_ALAN_SUPPORT_plus2 =
-    {
-        name = "Warped Support",
-        desc = "Gain 2 <#UPGRADE>{DOMINANCE}, then Create 2 {PC_ALAN_FALLACY} for every {DOMINANCE} you have</>.",
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("DOMINANCE", 2, self)
-            local dominance = math.floor(self.negotiator:GetModifierStacks( "DOMINANCE" ) / 2)
-            if dominance > 0 then
-                self.negotiator:AddModifier("PC_ALAN_FALLACY", dominance, self)
-            end
-        end,
-    },
-
-    PC_ALAN_RECKLESS =
-    {
-        name = "Reckless",
-        icon = "negotiation/all_out.tex",
-        desc = "Deals {1} less damage per friendly argument.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.reduction_amt )
-        end,
-        flavour = "'Come on then—I'm all in!'",
-        cost = 1,
-        flags = CARD_FLAGS.HOSTILE,
-        rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 9,
-        min_persuasion = 5,
-        max_persuasion = 7,
-        reduction_amt = 3,
-        event_handlers =
-        {
-            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-                if source == self then
-                    local mod_num = CountArguments(self)
-                    persuasion:AddPersuasion(-( mod_num * self.reduction_amt ), -( mod_num * self.reduction_amt ), self)
-                end
-            end,
-        },
-    },
-
-    PC_ALAN_RECKLESS_plus =
-    {
-        name = "Softened Reckless",
-        desc = "Deals <#UPGRADE>{1}</> less damage per friendly argument.",
-        reduction_amt = 2,
-    },
-
-    PC_ALAN_RECKLESS_plus2 =
-    {
-        name = "Tactless Reckless",
-        desc = "<#DOWNGRADE>{PA_REASON} {1}: This card deal no damage</>.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.reason_amt )
-        end,
-        min_persuasion = 8,
-        max_persuasion = 10,
-        reason_amt = 1,
-        reduction_amt = 99,
-    },
-
-    PC_ALAN_APPLY_PRESSURE =
-    {
-        name = "Apply Pressure",
-        icon = "negotiation/overturn.tex",
-        desc = "After play this card, it will gains {1} damage until the end of this negotiation.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.gain )
-        end,
-        flavour = "'Nothing much, just a reminder—we're running out of time.'",
-        cost = 1,
-        flags = CARD_FLAGS.HOSTILE,
-        rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 9,
-        min_persuasion = 2,
-        max_persuasion = 2,
-        gain = 2,
-        OnPostResolve = function( self, minigame, targets )
-            self.bonus = (self.bonus or 0) + self.gain
-            self:NotifyChanged()
-        end,
-        deck_handlers = ALL_DECKS,
-        event_handlers =
-        {
-            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-                if source == self and (self.bonus or 0) > 0 then
-                    persuasion:AddPersuasion( self.bonus, self.bonus, self )
-                end
-            end
-        }
-    },
-
-    PC_ALAN_APPLY_PRESSURE_plus =
-    {
-        name = "Boosted Apply Pressure",
-        min_persuasion = 4,
-        max_persuasion = 4,
-    },
-
-    PC_ALAN_APPLY_PRESSURE_plus2 =
-    {
-        name = "Unreasonable Apply Pressure",
-        desc = "<#DOWNGRADE>{PA_UNREASON}: </>After play this card, it will gains <#UPGRADE>{1}</> damage until the end of this negotiation.",
-        gain = 4,
-        OnPostResolve = function( self, minigame, targets )
-            local mod_num = CountArguments(self)
-            if mod_num == 0 then
-                self.bonus = (self.bonus or 0) + self.gain
-                self:NotifyChanged()
-            end
-        end,
-    },
-
-    PC_ALAN_BULLY =
-    {
-        name = "Bully",
-        icon = "negotiation/bully.tex",
-        desc = "For every person that hate you and love you, deal {1} bonus damage.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.bonus_damage )
-        end,
-        flavour = "'Nothing much, just a reminder—we're running out of time.'",
-        cost = 1,
-        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 9,
-        min_persuasion = 0,
-        max_persuasion = 0,
         bonus_damage = 2,
         deck_handlers = ALL_DECKS,
         event_handlers =
         {
             [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-            local enemy = CountNegativeRelationsCNR(self)
-                if source == self and enemy > 0 then
-                    persuasion:AddPersuasion( self.bonus_damage * enemy, self.bonus_damage * enemy, self )
+            local draw_cards = (self.negotiator:GetModifierStacks("PA_DRAW_CARD") - 1)
+                if source == self then
+                    persuasion:AddPersuasion( draw_cards * self.bonus_damage, draw_cards * self.bonus_damage, self )
                 end
             end
         }
     },
 
-    PC_ALAN_BULLY_plus =
+    PC_ALAN_OBSERVE_plus =
     {
-        name = "Pale Bully",
-        desc = "For every person that hate you and love you, deal <#DOWNGRADE>{1}</> bonus damage.",
-        cost = 0,
-        bonus_damage = 1,
+        name = "Boosted Observe",
+        min_persuasion = 3,
+        max_persuasion = 5,
     },
 
-    PC_ALAN_BULLY_plus2 =
+    PC_ALAN_OBSERVE_plus2 =
     {
-        name = "Rude Bully",
-        desc = "For every person that hate you and love you, deal {1} bonus damage.\n<#UPGRADE>{INCEPT} 1 {PC_ALAN_RUDE}</>.",
+        name = "Enduring Observe",
+        desc = "{PA_TENTATIVE} X: gains <#DOWNGRADE>X</> bonus damage until the end of <#UPGRADE>this negotiation</>.",
+        event_handlers =
+        {
+            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
+                if source == self then
+                    local bonus = self.negotiator:GetModifierStacks("PA_DRAW_CARD_ALT") or 0
+                    persuasion:AddPersuasion( bonus, bonus, self )
+                end
+            end
+        },
+    },
+
+    PC_ALAN_NOTES = 
+    {
+        name = "Notes",
+        desc = "Gain {PA_BASIC_SKILLS} equal to damage dealt by this card.",
+        icon = "negotiation/contacts.tex",
+        flavour = "'Hold on, let me write this down!'",
+        cost = 1,
+        flags = CARD_FLAGS.DIPLOMACY,
+        rarity = CARD_RARITY.UNCOMMON,
+        min_persuasion = 0,
+        max_persuasion = 2,
+        max_xp = 9,
+        event_handlers =
+        {
+            [ EVENT.ATTACK_RESOLVE ] = function( self, source, target, damage, params, defended )
+                if source == self and damage > 0 then
+                    self.negotiator:AddModifier("PA_BASIC_SKILLS", damage, self)
+                end
+            end
+        },
+    },
+
+    PC_ALAN_NOTES_plus =
+    {
+        name = "Boosted Notes",
+        min_persuasion = 1,
+        max_persuasion = 3,
+    },
+
+    PC_ALAN_NOTES_plus2 =
+    {
+        name = "Only Notes",
+        desc = "Gain {PA_BASIC_SKILLS} equal to damage dealt by this card.\n<#DOWNGRADE>{PA_UNIQUE}: This card is able to deal damage</>.",
+        min_persuasion = 2,
+        max_persuasion = 4,
+        event_handlers =
+        {
+            [ EVENT.ATTACK_RESOLVE ] = function( self, source, target, damage, params, defended )
+                if source == self and damage > 0 then
+                    self.negotiator:AddModifier("PA_BASIC_SKILLS", damage, self)
+                end
+            end,
+
+            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
+                if source == self then
+                    local is_unique = IsCardUnique(self)
+                    if not is_unique then
+                        persuasion:AddPersuasion(-999, -999, self)
+                    end
+                end
+            end,
+        },
+    },
+
+    PC_ALAN_STRATEGY_CONFIRMED = 
+    {
+        name = "Strategy Confirmed",
+        desc = "Replace all {PC_ALAN_BLUFF} in your deck with {PC_ALAN_DISCUSS} and add them to your draw pile.",
+        icon = "negotiation/instincts_diplomatic.tex",
+        flavour = "'Great, let's go with this.'",
+        cost = 1,
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+        rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 9,
         OnPostResolve = function( self, minigame, targets )
-            self.anti_negotiator:InceptModifier("PC_ALAN_RUDE", 1, self)
+            local cards_to_remove = {}
+            for i,card in minigame:GetDrawDeck():Cards() do
+                if card.id == "PC_ALAN_BLUFF" or card.base_id == "PC_ALAN_BLUFF" then
+                    table.insert(cards_to_remove, card)
+                end 
+            end
+            for i,card in minigame:GetDiscardDeck():Cards() do
+                if card.id == "PC_ALAN_BLUFF" or card.base_id == "PC_ALAN_BLUFF" then
+                    table.insert(cards_to_remove, card)
+                end 
+            end
+            for i,card in minigame:GetHandDeck():Cards() do
+                if card.id == "PC_ALAN_BLUFF" or card.base_id == "PC_ALAN_BLUFF" then
+                    table.insert(cards_to_remove, card)
+                end 
+            end
+
+            if #cards_to_remove > 0 then
+                local change = Negotiation.Card("PC_ALAN_DISCUSS", self.owner)
+                for i=1, #cards_to_remove do
+                    minigame:DealCard( change:Duplicate(), minigame:GetDrawDeck())
+                end
+                for i,card in ipairs(cards_to_remove) do
+                    minigame:ExpendCard(card)
+                end
+            end
         end,
     },
 
-    PC_ALAN_YANK =
+    PC_ALAN_STRATEGY_CONFIRMED_plus =
     {
-        name = "Yank",
-        icon = "negotiation/instigate.tex",
-        desc = "{PA_VIOLENT} {1}: Draw {2} card.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.enemy_need, self.draw )
+        name = "Boosted Strategy Confirmed",
+        desc = "Replace all {PC_ALAN_BLUFF} in your deck with <#UPGRADE>randomly upgraded</> {PC_ALAN_DISCUSS} and add them to your draw pile.",
+        OnPostResolve = function( self, minigame, targets )
+            local cards_to_remove = {}
+            for i,card in minigame:GetDrawDeck():Cards() do
+                if card.id == "PC_ALAN_BLUFF" or card.base_id == "PC_ALAN_BLUFF" then
+                    table.insert(cards_to_remove, card)
+                end 
+            end
+            for i,card in minigame:GetDiscardDeck():Cards() do
+                if card.id == "PC_ALAN_BLUFF" or card.base_id == "PC_ALAN_BLUFF" then
+                    table.insert(cards_to_remove, card)
+                end 
+            end
+            for i,card in minigame:GetHandDeck():Cards() do
+                if card.id == "PC_ALAN_BLUFF" or card.base_id == "PC_ALAN_BLUFF" then
+                    table.insert(cards_to_remove, card)
+                end 
+            end
+
+            if #cards_to_remove > 0 then
+                local change = Negotiation.Card("PC_ALAN_DISCUSS", self.owner)
+                for i=1, #cards_to_remove do
+                    local card = Negotiation.Card(table.arraypick(change.def.upgrade_ids), self.owner)
+                    minigame:DealCard( card:Clone(), minigame:GetDrawDeck())
+                end
+                for i,card in ipairs(cards_to_remove) do
+                    minigame:ExpendCard(card)
+                end
+            end
         end,
-        flavour = "'Get over here!'",
+    },
+
+    PC_ALAN_STRATEGY_CONFIRMED_plus2 =
+    {
+        name = "Twisted Strategy Confirmed",
+        desc = "Replace all <#UPGRADE>{PC_ALAN_DISCUSS}</> in your deck with <#UPGRADE>randomly upgraded {PC_ALAN_BLUFF}</> and add them to your draw pile.",
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+        icon = "negotiation/instincts_hostile.tex",
+        OnPostResolve = function( self, minigame, targets )
+            local cards_to_remove = {}
+            for i,card in minigame:GetDrawDeck():Cards() do
+                if card.id == "PC_ALAN_DISCUSS" or card.base_id == "PC_ALAN_DISCUSS" then
+                    table.insert(cards_to_remove, card)
+                end 
+            end
+            for i,card in minigame:GetDiscardDeck():Cards() do
+                if card.id == "PC_ALAN_DISCUSS" or card.base_id == "PC_ALAN_DISCUSS" then
+                    table.insert(cards_to_remove, card)
+                end 
+            end
+            for i,card in minigame:GetHandDeck():Cards() do
+                if card.id == "PC_ALAN_DISCUSS" or card.base_id == "PC_ALAN_DISCUSS" then
+                    table.insert(cards_to_remove, card)
+                end 
+            end
+
+            if #cards_to_remove > 0 then
+                local change = Negotiation.Card("PC_ALAN_BLUFF", self.owner)
+                for i=1, #cards_to_remove do
+                    local card = Negotiation.Card(table.arraypick(change.def.upgrade_ids), self.owner)
+                    minigame:DealCard( card:Clone(), minigame:GetDrawDeck())
+                end
+                for i,card in ipairs(cards_to_remove) do
+                    minigame:ExpendCard(card)
+                end
+            end
+        end,
+    },
+
+    PC_ALAN_GOOD_POINT = 
+    {
+        name = "Good Point",
+        desc = "When this card is drawn, gain 1 {INFLUENCE} and let it gain 2 resolve.",
+        icon = "negotiation/solid_point.tex",
+        flavour = "'You couldn't help but appreciate that argument too, right?'",
         cost = 0,
-        flags = CARD_FLAGS.HOSTILE,
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.UNPLAYABLE | CARD_FLAGS.BURNOUT,
         rarity = CARD_RARITY.UNCOMMON,
         max_xp = 10,
+        event_handlers =
+        {
+           [ EVENT.DRAW_CARD ] = function( self, minigame, card, start_of_turn )
+                 if card == self then
+                    self.engine:PushPostHandler( function()
+                        self:NotifyTriggeredPre()
+                        local influence = self.negotiator:AddModifier("INFLUENCE", 1, self)
+                        if influence then
+                            influence:ModifyResolve( 2, self )
+                        end
+                        self:AddXP(1)
+                        self:NotifyTriggeredPost()
+                    end )
+                end
+            end,
+        }
+    },
+
+    PC_ALAN_GOOD_POINT_plus =
+    {
+        name = "Visionary Good Point",
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.UNPLAYABLE | CARD_FLAGS.BURNOUT | CARD_FLAGS.REPLENISH,
+    },
+
+    PC_ALAN_GOOD_POINT_plus2 =
+    {
+        name = "Twisted Good Point",
+        desc = "When this card is drawn, gain <#UPGRADE>2 {DOMINANCE}</> and let it gain 2 resolve.",
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.UNPLAYABLE | CARD_FLAGS.BURNOUT | CARD_FLAGS.REPLENISH,
+        event_handlers =
+        {
+           [ EVENT.DRAW_CARD ] = function( self, minigame, card, start_of_turn )
+                 if card == self then
+                    self.engine:PushPostHandler( function()
+                        self:NotifyTriggeredPre()
+                        local dominance = self.negotiator:AddModifier("DOMINANCE", 2, self)
+                        if dominance then
+                            dominance:ModifyResolve( 2, self )
+                        end
+                        self:AddXP(1)
+                        self:NotifyTriggeredPost()
+                    end )
+                end
+            end,
+        }
+    },
+
+    PC_ALAN_PAPERWORK = 
+    {
+        name = "Paperwork",
+        desc = "Whenever you play a basic card, reduce the cost of this card by 1 until played.",
+        icon = "negotiation/hard_facts.tex",
+        flavour = "'I've got a whole stack here, take your time reading.'",
+        cost = 6,
+        flags = CARD_FLAGS.DIPLOMACY,
+        rarity = CARD_RARITY.UNCOMMON,
+        min_persuasion = 6,
+        max_persuasion = 8,
+        max_xp = 3,
+        bonus = 0,
+        deck_handlers = ALL_DECKS,
+        OnPostResolve = function( self, minigame, targets )
+            self.bonus = 0
+        end,
+        event_handlers =
+        {
+            [ EVENT.POST_RESOLVE ] = function( self, minigame, card, targets )
+                if self.owner == card.owner then
+                    if card.rarity == CARD_RARITY.BASIC then
+                        self.bonus = self.bonus + 1
+                    end
+                end
+            end,
+
+            [ EVENT.CALC_ACTION_COST ] = function( self, acc, card, target )
+                if self.bonus and card == self then
+                    acc:AddValue(-self.bonus, self)
+                end
+            end
+        },
+    },
+
+    PC_ALAN_PAPERWORK_plus =
+    {
+        name = "Boosted Paperwork",
+        min_persuasion = 8,
+        max_persuasion = 10,
+    },
+
+    PC_ALAN_PAPERWORK_plus2 =
+    {
+        name = "Visionary Paperwork",
+        desc = "Whenever you play a basic card, reduce the cost of this card by 1 until played.\n<#UPGRADE>Draw a card</>.",
+        OnPostResolve = function( self, minigame, targets )
+            minigame:DrawCards(1)
+            self.bonus = 0
+        end,
+    },
+
+    PC_ALAN_STALL = 
+    {
+        name = "Stall",
+        desc = "On your next turn, shuffle your deck, then draw 2 cards and gain 2 actions.",
+        icon = "negotiation/buying_time.tex",
+        flavour = "'Oh, I'll explain it to you later.'",
+        cost = 2,
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 7,
+        OnPostResolve = function( self, minigame, targets )
+            self.negotiator:AddModifier("PA_STALL", 1, self)
+        end,
+    },
+
+    PC_ALAN_STALL_plus =
+    {
+        name = "Pale Stall",
+        cost = 1,
+    },
+
+    PC_ALAN_STALL_plus2 =
+    {
+        name = "Stone Stall",
+        desc = "<#UPGRADE>Gain {1} {COMPOSURE}</>.\nOn your next turn, shuffle your deck, then draw 2 cards and gain 2 actions.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self:CalculateComposureText( self.composure_amt ))
+        end,
+        composure_amt = 4,
+        OnPostResolve = function( self, minigame, targets )
+            self.negotiator:AddModifier("PA_STALL", 1, self)
+            self.negotiator:DeltaComposure( self.composure_amt, self )
+        end,
+    },
+
+    PC_ALAN_APPLAUSE = 
+    {
+        name = "Applause",
+        desc = "{PA_APPLAUSE|}Create: When you shuffle your deck, deal {1} damage to random argument, then destroy this argument.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.stacks)
+        end,
+        icon = "negotiation/praise.tex",
+        flavour = "'Perfect!'",
+        cost = 1,
+        flags = CARD_FLAGS.DIPLOMACY,
+        rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 9,
+        stacks = 7,
+        OnPostResolve = function( self, minigame, targets )
+            self.negotiator:CreateModifier("PA_APPLAUSE", self.stacks, self)
+        end,
+    },
+
+    PC_ALAN_APPLAUSE_plus =
+    {
+        name = "Visionary Applause",
+        desc = "{PA_APPLAUSE|}Gain: When you shuffle your deck, deal {1} damage to random argument, then destroy this argument.\n<#UPGRADE>Draw a card</>.",
+        OnPostResolve = function( self, minigame, targets )
+            self.negotiator:AddModifier("PA_APPLAUSE", self.stacks, self)
+            minigame:DrawCards(1)
+        end,
+    },
+
+    PC_ALAN_APPLAUSE_plus2 =
+    {
+        name = "Boosted Applause",
+        desc = "{PA_APPLAUSE|}Gain: When you shuffle your deck, deal <#UPGRADE>{1}</> damage to random argument, then destroy this argument.",
+        stacks = 10,
+    },
+
+    PC_ALAN_CATCHPHRASE = 
+    {
+        name = "Catchphrase",
+        desc = "For each turn, Whenever you draw a card after your initial hand for the first time, put this card back in your hand.",
+        icon = "negotiation/influencer.tex",
+        flavour = "'Anyway, that’s just how it is.'",
+        cost = 1,
+        flags = CARD_FLAGS.DIPLOMACY,
+        rarity = CARD_RARITY.UNCOMMON,
+        min_persuasion = 2,
+        max_persuasion = 4,
+        deck_handlers = { DECK_TYPE.DRAW, DECK_TYPE.DISCARDS },
+        max_xp = 10,
+        back_to_hand = false,
+        event_handlers =
+        {
+            [ EVENT.DRAW_CARD ] = function( self, minigame, card, start_of_turn )
+                if not start_of_turn and not self.back_to_hand then
+                    self:TransferCard( self.engine:GetHandDeck() )
+                    self.back_to_hand = true
+                end    
+            end,
+
+            [ EVENT.POST_RESOLVE ] = function(self, minigame, card)
+                if card.negotiator == self.negotiator and (card.id == "PC_ALAN_PLEAD" or card.id == "PC_ALAN_PLEAD_plus") and not self.back_to_hand then
+                    self:TransferCard( self.engine:GetHandDeck() )
+                    self.back_to_hand = true
+                end
+            end,
+
+            [ EVENT.END_TURN ] = function( self, minigame, negotiator )
+                if negotiator == self.negotiator then
+                    self.negotiator:RemoveModifier( self )
+                    self.back_to_hand = false
+                end
+            end,
+        },
+    },
+
+    PC_ALAN_CATCHPHRASE_plus =
+    {
+        name = "Boosted Catchphrase",
+        min_persuasion = 3,
+        max_persuasion = 5,
+    },
+
+    PC_ALAN_CATCHPHRASE_plus2 =
+    {
+        name = "Reckless Catchphrase",
+        desc = "<#UPGRADE>Whenever you</> <#DOWNGRADE>shuffle your deck</>, put this card back in your hand.",
+        min_persuasion = 3,
+        max_persuasion = 5,
+        event_handlers =
+        {
+            [ EVENT.DRAW_CARD ] = function( self, minigame, card, start_of_turn )
+                    
+            end,
+
+            [ EVENT.POST_RESOLVE ] = function(self, minigame, card)
+                
+            end,
+
+            [ EVENT.SHUFFLE_DISCARDS ] = function( self, num_cards )
+                self:TransferCard( self.engine:GetHandDeck() )
+            end,
+        },
+    },
+
+    PC_ALAN_FACEPALM = 
+    {
+        name = "Facepalm",
+        desc = "Draw 3 cards.\n{PREPARED}: This card costs 1 less.",
+        icon = "negotiation/dogged.tex",
+        flavour = "'Give me a second to process this.'",
+        cost = 2,
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.STICKY,
+        rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 7,
+        action_bonus = 1,
+        draw_count = 3,
+        PreReq = function( self, minigame )
+            return self:IsPrepared()
+        end,
+
+        OnPostResolve = function( self, minigame, targets )
+            minigame:DrawCards(self.draw_count)
+        end,
+
+        event_priorities =
+        {
+            [ EVENT.CALC_ACTION_COST ] = EVENT_PRIORITY_ADDITIVE,
+        },
+
+        event_handlers = 
+        {
+            [ EVENT.CALC_ACTION_COST ] = function( self, acc, card, target )
+                if card == self and self:IsPrepared() then
+                    acc:AddValue(-self.action_bonus, self)
+                end
+            end,
+        },
+    },
+
+    PC_ALAN_FACEPALM_plus =
+    {
+        name = "Visionary Argument",
+        desc = "Draw <#UPGRADE>4</> cards.\n{PREPARED}: This card costs 1 less.",
+        draw_count = 4,
+    },
+
+    PC_ALAN_FACEPALM_plus2 =
+    {
+        name = "Pale Argument",
+        desc = "Draw 3 cards.\n{PREPARED}: <#UPGRADE>This card costs 0</>.",
+        action_bonus = 999,
+    },
+    
+    PC_ALAN_ENDURANCE =
+    {
+        name = "Endurance",
+        icon = "negotiation/steamroll.tex",
+        desc = "When drawn, Add a copy of this card to your discards.\n{EVOKE}: Play a same-named cards.",
+        flavour = "'Don't push me!'",
+        cost = 1,
+        max_xp = 9,
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND | CARD_FLAGS.REPLENISH,
+        rarity = CARD_RARITY.UNCOMMON,
         min_persuasion = 2,
         max_persuasion = 2,
-        draw = 1,
-        enemy_need = 4,
-        OnPostResolve = function( self, minigame, targets )
-            local enemy = CountNegativeRelationsCNR(self)
-            if enemy >= self.enemy_need then
-                minigame:DrawCards(self.draw)
-            end
-        end,
+        evoke_max = 1,
+        deck_handlers = { DECK_TYPE.DRAW, DECK_TYPE.DISCARDS },
+        event_handlers = 
+        {
+            [ EVENT.DRAW_CARD ] = function( self, minigame, card, start_of_turn )
+                if self == card then
+                    self.engine:PushPostHandler( function()
+                        self:NotifyTriggeredPre()
+                        local copy = self:Duplicate()
+                        minigame:DealCard( copy, minigame:GetDiscardDeck() )
+                        self:NotifyTriggeredPost()
+                    end )
+                end
+            end,
+
+            [ EVENT.POST_RESOLVE ] = function( self, minigame, card )
+                if card.owner == self.owner then
+                    if card.id == "PC_ALAN_ENDURANCE" or card.base_id == "PC_ALAN_ENDURANCE" then
+                        self:Evoke( self.evoke_max )
+                    end
+                end
+            end,
+
+            [ EVENT.END_TURN ] = function( self, minigame, negotiator )
+                if negotiator == self.negotiator then
+                    self:ResetEvoke()
+                end
+            end,
+        },
     },
 
-    PC_ALAN_YANK_plus =
+    PC_ALAN_ENDURANCE_plus =
     {
-        name = "Boosted Yank",
-        desc = "{PA_VIOLENT} {1}: Draw <#UPGRADE>{2}</> cards.",
-        draw = 2,
+        name = "Boosted Endurance",
+        min_persuasion = 4,
+        max_persuasion = 4,
     },
 
-    PC_ALAN_YANK_plus2 =
+    PC_ALAN_ENDURANCE_plus2 =
     {
-        name = "Violent Yank",
-        desc = "{PA_VIOLENT} {1}: Draw {2} card.\n<#UPGRADE>{PA_VIOLENT} {3}: Add a copy of this card to your draw pile</>.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.enemy_need, self.draw, self.enemy_need_alt )
-        end,
-        enemy_need_alt = 7,
-        OnPostResolve = function( self, minigame, targets )
-            local enemy = CountNegativeRelationsCNR(self)
-            if enemy >= self.enemy_need then
-                minigame:DrawCards(self.draw)
-            end
-            if enemy >= self.enemy_need_alt then
-                local copy = self:Duplicate()
-                minigame:DealCard( copy, minigame:GetDeck( DECK_TYPE.DRAW ))
-            end
-        end,
+        name = "Enduring Endurance",
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.REPLENISH,
+        min_persuasion = 1,
+        max_persuasion = 1,
     },
 
-    PC_ALAN_FABRICATE =
+    PC_ALAN_TURN_THE_TABLES =
     {
-        name = "Fabricate",
-        icon = "negotiation/notion.tex",
-        desc = "Gain 1 {PC_ALAN_FALLACY} for each action available.",
-        flavour = "'That's all there is to it. Believe it or not, I don't care. If you don't, then just get lost.'",
-        cost = 0,
-        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.VARIABLE_COST,
+        name = "Turn the Tables",
+        icon = "negotiation/bulldoze.tex",
+        desc = "Until the end of this turn, whenever you play a card, deal 3 damage to a random opponent argument.",
+        flavour = "'You started it!'",
+        cost = 1,
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
         rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 10,
-        composure_amt = 0,
-        fallacy_amt = 0,
+        max_xp = 9,
         OnPostResolve = function( self, minigame, targets )
-            local actions = minigame:GetActionCount()
-            minigame:ModifyActionCount( -actions )
-            self.negotiator:AddModifier("PC_ALAN_FALLACY", (actions + self.fallacy_amt), self)
-            self.negotiator:DeltaComposure( (actions * self.composure_amt), self )
+            self.negotiator:AddModifier("PA_TURN_THE_TABLES", 1, self)
         end,
     },
 
-    PC_ALAN_FABRICATE_plus =
+    PC_ALAN_TURN_THE_TABLES_plus =
     {
-        name = "Boosted Fabricate",
-        desc = "Gain 1 {PC_ALAN_FALLACY}<#UPGRADE>+1</> for each action available.",
-        fallacy_amt = 1,
+        name = "Pale Turn the Tables",
+        cost = 0,
     },
 
-    PC_ALAN_FABRICATE_plus2 =
+    PC_ALAN_TURN_THE_TABLES_plus2 =
     {
-        name = "Stone Fabricate",
-        desc = "Gain 1 {PC_ALAN_FALLACY} and <#UPGRADE>2 {COMPOSURE}</> for each action available.",
-        composure_amt = 2,
+        name = "Enduring Turn the Tables",
+        cost = 2,
+        flags = CARD_FLAGS.HOSTILE,
     },
 
     PC_ALAN_HOT_COFFEE =
@@ -2550,7 +2476,7 @@ local CARDS =
         desc_fn = function( self, fmt_str )
             return loc.format( fmt_str, self.bonus_damage )
         end,
-        flavour = "'Still piping hot. Hope your face doesn’t have to test the temperature.'",
+        flavour = "'Still piping hot. Hope your face doesn’t need to feel it.'",
         cost = 0,
         flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.UNPLAYABLE,
         rarity = CARD_RARITY.UNCOMMON,
@@ -2591,278 +2517,648 @@ local CARDS =
         flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.UNPLAYABLE | CARD_FLAGS.REPLENISH,
     },
 
-    PC_ALAN_TURN_THE_TABLES =
+    PC_ALAN_DISTRACT_ATTENTION =
     {
-        name = "Turn the Tables",
-        icon = "negotiation/bulldoze.tex",
-        desc = "Until the end of this turn, whenever you play a card, gain 1 {PC_ALAN_FALLACY}.",
+        name = "Distract attention",
+        icon = "negotiation/raw.tex",
+        desc = "Move up to {1} cards from your draw pile to your discard.",
         desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.bonus_damage )
+            return loc.format( fmt_str, self.move_card_amt )
         end,
-        flavour = "'You started it!'",
+        flavour = "'Look, it's a coin!'",
+        cost = 1,
+        max_xp = 9,
+        flags = CARD_FLAGS.HOSTILE,
+        rarity = CARD_RARITY.UNCOMMON,
+        min_persuasion = 1,
+        max_persuasion = 4,
+        move_card_amt = 3,
+        OnPostResolve = function( self, minigame, targets )
+            local cards = ObtainWorkTable()
+                for i,card in minigame:GetDrawDeck():Cards() do
+                        table.insert(cards, card)
+                        if #cards >= self.move_card_amt then
+                            break
+                        end
+                    end
+            if #cards > 0 then
+                for i,card in ipairs(cards) do
+                    card:TransferCard(minigame:GetDiscardDeck())
+                end
+            end
+        end
+    },
+
+    PC_ALAN_DISTRACT_ATTENTION_plus =
+    {
+        name = "Boosted Distract attention",
+        desc = "Move up to <#UPGRADE>{1}</> cards from your draw pile to your discard.",
+        move_card_amt = 5,
+    },
+
+    PC_ALAN_DISTRACT_ATTENTION_plus2 =
+    {
+        name = "Initial Distract attention",
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.AMBUSH,
+    },
+
+    PC_ALAN_PUMP =
+    {
+        name = "Pump",
+        icon = "negotiation/bolstered.tex",
+        desc = "{PA_PUMP|}Create: Whenever you play a card, move up to {1} cards from your draw pile to your discard.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.stacks )
+        end,
+        flavour = "'The Admiralty playing bodyguard? Now that's a rare sight.'",
         cost = 1,
         flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
         rarity = CARD_RARITY.UNCOMMON,
         max_xp = 9,
+        stacks = 1,
         OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PA_TURN_THE_TABLES", 1, self)
+            self.negotiator:CreateModifier("PA_PUMP", self.stacks, self)
         end,
     },
 
-    PC_ALAN_TURN_THE_TABLES_plus =
+    PC_ALAN_PUMP_plus =
     {
-        name = "Pale Turn the Tables",
-        cost = 0,
+        name = "Boosted Pump",
+        desc = "{PA_PUMP|}Create: Whenever you play a card, move up to <#UPGRADE>{1}</> cards from your draw pile to your discard.",
+        stacks = 2,
     },
 
-    PC_ALAN_TURN_THE_TABLES_plus2 =
+    PC_ALAN_PUMP_plus2 =
     {
-        name = "Enduring Turn the Tables",
-        cost = 2,
-        flags = CARD_FLAGS.HOSTILE,
+        name = "Initial Pump",
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
     },
 
-    PC_ALAN_TRADE_DONE =
+    PC_ALAN_SOPHISTRY =
     {
-        name = "Trade Done",
-        icon = "negotiation/trade.tex",
-        desc = "For every arguments, bounties and inceptions that opponent have, gain 1 {PC_ALAN_FALLACY}.",
-        flavour = "'Hope you won’t regret it.'",
-        cost = 2,
-        flags = CARD_FLAGS.HOSTILE,
-        rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 7,
-        fallacy_amt = 0,
-        OnPostResolve = function( self, minigame, targets )
-            local count = 0
-            for i, modifier in self.anti_negotiator:Modifiers() do
-                if modifier:GetResolve() ~= nil and modifier.modifier_type ~= MODIFIER_TYPE.CORE then
-                    count = count + 1
-                end
-            end
-
-            self.negotiator:AddModifier("PC_ALAN_FALLACY", (count + self.fallacy_amt), self)
-        end
-    },
-
-    PC_ALAN_TRADE_DONE_plus =
-    {
-        name = "Pale Trade Done",
-        cost = 1,
-    },
-
-    PC_ALAN_TRADE_DONE_plus2 =
-    {
-        name = "Boosted Trade Done",
-        desc = "For every arguments, bounties and inceptions that opponent have, gain 1 {PC_ALAN_FALLACY}<#UPGRADE>+1</>.",
-        fallacy_amt = 1,
-    },
-
-    PC_ALAN_FLIP_THE_TABLE =
-    {
-        name = "Flip the Table",
-        icon = "negotiation/erupt.tex",
-        desc = "{PA_UNREASON}: When drawn, immediately play it free with a random target.\nDraw a card.",
-        flavour = "'Then there’s nothing more to talk about!'",
+        name = "Sophistry",
+        icon = "negotiation/bluster.tex",
+        desc = "{PA_UNIQUE}: Add 3 copies of this card to your discards.",
+        flavour = "'Stop changing the subject! Just admit that's how it is!'",
         cost = 1,
         flags = CARD_FLAGS.HOSTILE,
         rarity = CARD_RARITY.UNCOMMON,
         max_xp = 9,
-        min_persuasion = 1,
+        min_persuasion = 3,
         max_persuasion = 4,
-        draw = 1,
-        event_handlers =
+        count = 3,
+        OnPostResolve = function( self, minigame )
+            local is_unique = IsCardUnique(self)
+            if is_unique then
+                for i = 1, self.count do
+                local copy = self:Duplicate()
+                minigame:DealCard( copy, minigame:GetDeck( DECK_TYPE.DISCARDS ))
+                end
+            end
+        end,
+    },
+
+    PC_ALAN_SOPHISTRY_plus =
+    {
+        name = "Boosted Sophistry",
+        min_persuasion = 5,
+        max_persuasion = 6,
+    },
+
+    PC_ALAN_SOPHISTRY_plus2 =
+    {
+        name = "Fluent Sophistry",
+        desc = "{PA_UNIQUE}: Add <#DOWNGRADE>2</> copies of this card to your discards.\n<#UPGRADE>{EVOKE}: Play a same-named cards</>.",
+        count = 2,
+        evoke_max = 1,
+        deck_handlers = { DECK_TYPE.DRAW, DECK_TYPE.DISCARDS },
+        event_handlers = 
         {
-            [ EVENT.DRAW_CARD ] = function( self, minigame, card, start_of_turn )
-                if card == self then
-                    local mod_num = CountArguments(self)
-                        if mod_num == 0 then
-                        minigame:PlayCard(card)
+            [ EVENT.POST_RESOLVE ] = function( self, minigame, card )
+                if card.owner == self.owner then
+                    if card.id == "PC_ALAN_SOPHISTRY" or card.base_id == "PC_ALAN_SOPHISTRY" then
+                        self:Evoke( self.evoke_max )
                     end
                 end
             end,
+
+            [ EVENT.END_TURN ] = function( self, minigame, negotiator )
+                if negotiator == self.negotiator then
+                    self:ResetEvoke()
+                end
+            end,
         },
-        OnPostResolve = function( self, minigame, targets )
-            minigame:DrawCards(self.draw)
-        end
     },
 
-    PC_ALAN_FLIP_THE_TABLE_plus = 
+    PC_ALAN_ZINGER =
     {
-        name = "Rooted Flip the Table",
-        min_persuasion = 4,
-    },
-
-    PC_ALAN_FLIP_THE_TABLE_plus2 =
-    {
-        name = "Visionary Flip the Table",
-        desc = "{PA_UNREASON}: When drawn, immediately play it free with a random target.\nDraw <#UPGRADE>2</> cards.",
-        draw = 2,
-    },
-
-    PC_ALAN_ACCURE =
-    {
-        name = "Accuse",
-        icon = "negotiation/improvise_obtuse.tex",
-        desc = "{PA_UNREASON}: Gain {1} action and draw {2} card.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.action_bonus, self.draw )
-        end,
-        flavour = "'How much more of Hesh’s time must you waste?!'",
-        cost = 0,
-        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 10,
-        draw = 1,
-        action_bonus = 1,
-        OnPostResolve = function( self, minigame, targets )
-            local mod_num = CountArguments(self)
-            if mod_num == 0 then
-                minigame:DrawCards(self.draw)
-                minigame:ModifyActionCount(self.action_bonus)
-            end
-        end
-    },
-
-    PC_ALAN_ACCURE_plus =
-    {
-        name = "Visionary Accuse",
-        desc = "{PA_UNREASON}: Gain {1} action and draw <#UPGRADE>{2}</> cards.",
-        draw = 2,
-    },
-
-    PC_ALAN_ACCURE_plus2 =
-    {
-        name = "Boosted Accuse",
-        desc = "{PA_UNREASON}: Gain <#UPGRADE>{1}</> actions and draw {2} card.",
-        action_bonus = 2,
-    },
-
-    PC_ALAN_FOOLHARDY =
-    {
-        name = "Foolhardy",
-        icon = "negotiation/disregard.tex",
-        desc = "{PA_UNREASON}: {INCEPT} {1} {PC_ALAN_RUDE}.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.rude_amt )
-        end,
-        flavour = "'Either back down now—or go call the Admiralty, if you dare.'",
+        name = "Zinger",
+        icon = "negotiation/quip.tex",
+        desc = "Add 2 {silence} cards to your discard pile. \nCannot be played with {silence} in your hand.",
+        flavour = "'Seriously, have you considered taking a trip to Roaloch? Roaloch might have your family waiting.'",
+        loc_strings =
+        {
+            NO_INJURIES = "Cannot play with Silence in hand",
+        },
         cost = 1,
         flags = CARD_FLAGS.HOSTILE,
         rarity = CARD_RARITY.UNCOMMON,
         max_xp = 9,
+        min_persuasion = 7,
+        max_persuasion = 9,
+        count = 2,
+        CanPlayCard = function( self, card, engine, target )
+            local can_play = true
+            for i,card in self.engine:GetHandDeck():Cards() do
+                if card.id == "silence" then
+                    can_play = false
+                end
+            end
+            return can_play, self.def:GetLocalizedString( "NO_INJURIES" )
+        end,
+        OnPostResolve = function( self, minigame )
+            local cards = {}
+            for i=1, self.count do
+                local card = Negotiation.Card('silence', self.owner)
+                table.insert(cards, card)
+            end
+            minigame:DealCards( cards, minigame:GetDiscardDeck() )
+        end,
+    },
+
+    PC_ALAN_ZINGER_plus =
+    {
+        name = "Tactless Zinger",
+        desc = "Add <#DOWNGRADE>3</> {silence} cards to your discard pile. \nCannot be played with {silence} in your hand.",
+        min_persuasion = 10,
+        max_persuasion = 12,
+        count = 3,
+    },
+
+    PC_ALAN_ZINGER_plus2 =
+    {
+        name = "Rooted Zinger",
+        min_persuasion = 9,
+    },
+
+    PC_ALAN_INSULT =
+    {
+        name = "Insult",
+        icon = "negotiation/reckless_insults.tex",
+        desc = "Add a copy of this card to your discards. \n{PA_PRECURSUR} {1}: Draw a card.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.precursor_amt )
+        end,
+        flavour = "'Yo mama's so fat!'",
+        cost = 0,
+        flags = CARD_FLAGS.HOSTILE,
+        rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 10,
         min_persuasion = 2,
         max_persuasion = 2,
-        rude_amt = 1,
-        OnPostResolve = function( self, minigame, targets )
-            local mod_num = CountArguments(self)
-            if mod_num == 0 then
-                self.anti_negotiator:InceptModifier("PC_ALAN_RUDE", self.rude_amt, self)
-            end
-        end
-    },
-
-    PC_ALAN_FOOLHARDY_plus =
-    {
-        name = "Pale Foolhardy",
-        cost = 0,
-    },
-
-    PC_ALAN_FOOLHARDY_plus2 =
-    {
-        name = "Boosted Foolhardy",
-        desc = "{PA_UNREASON}: {INCEPT} <#UPGRADE>{1}</> {PC_ALAN_RUDE}.",
-        rude_amt = 2,
-    },
-
-    PC_ALAN_QUESTION =
-    {
-        name = "Question",
-        icon = "negotiation/seeds_of_doubt.tex",
-        desc = "If your opponent has any inception, draw {1} cards.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.draw )
-        end,
-        flavour = "'Be honest, man—those two question signs on your head aren’t gonna cause problems?'",
-        cost = 1,
-        flags = CARD_FLAGS.MANIPULATE,
-        rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 9,
-        draw = 3,
-        OnPostResolve = function( self, minigame, targets )
-            local draw_card = false
-            for i, modifier in self.anti_negotiator:Modifiers() do
-                if modifier.modifier_type == MODIFIER_TYPE.INCEPTION then
-                    draw_card = true
-                break
-            end
-        end
-            if draw_card == true then
-                minigame:DrawCards(self.draw)
-            end
-        end
-    },
-
-    PC_ALAN_QUESTION_plus =
-    {
-        name = "Boosted Question",
-        desc = "If your opponent has any inception, draw <#UPGRADE>{1}</> cards.",
-        draw = 4,
-    },
-
-    PC_ALAN_QUESTION_plus2 =
-    {
-        name = "Improvised Question",
-        desc = "If your opponent has any inception, <#UPGRADE>{IMPROVISE_PLUS}</> <#DOWNGRADE>{1}</> cards.",
-        draw = 2,
+        count = 1,
+        precursor_amt = 10,
         OnPostResolve = function( self, minigame )
-            local draw_card = false
-            for i, modifier in self.anti_negotiator:Modifiers() do
-                if modifier.modifier_type == MODIFIER_TYPE.INCEPTION then
-                    draw_card = true
-                break
+            for i=1, self.count do
+                local copy = self:Duplicate()
+                minigame:DealCard( copy, minigame:GetDeck( DECK_TYPE.DISCARDS ))
             end
-        end
-            if draw_card == true then
-                local cards = {}
-                if minigame:GetDrawDeck():CountCards() == 0 then
-                    minigame:ShuffleDiscardToDraw()
-                end
 
-                for i, card in minigame:GetDrawDeck():Cards() do
-                    table.insert(cards, card)
-                end
-                cards = table.multipick( cards, 5 )
-                minigame:ImproviseCards( cards, self.draw, nil, nil, nil, self )
+            local discards_count = DiscardPileCount(self)
+            if discards_count >= self.precursor_amt then
+                minigame:DrawCards(1)
             end
         end,
     },
 
-    PC_ALAN_INTERROGATE =
+    PC_ALAN_INSULT_plus =
     {
-        name = "Interrogate",
-        icon = "negotiation/flash_badge.tex",
-        desc = "{PA_INTERROGATE|}Create 1 {PA_INTERROGATE}.",
-        flavour = "'Hope you're just joking.'",
+        name = "Tactless Insult",
+        desc = "Add <#UPGRADE>2</> copy of this cards to your discards. \n{PA_PRECURSUR} <#DOWNGRADE>{1}</>: Draw a card.",
+        min_persuasion = 3,
+        max_persuasion = 3,
+        count = 2,
+        precursor_amt = 15,
+    },
+
+    PC_ALAN_INSULT_plus2 =
+    {
+        name = "Wide Insult",
+        desc = "Add a copy of this card to your discards. \n{PA_PRECURSUR} <#UPGRADE>{1}</>: Draw a card.",
+        precursor_amt = 7,
+    },
+
+    PC_ALAN_SUDDEN_OUTBURST =
+    {
+        name = "Sudden Outburst",
+        icon = "negotiation/brute.tex",
+        desc = "Deals {1} bonus damage for every {2} cards in discard pile.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.bonus_damage, self.count )
+        end,
+        flavour = "'Here, let me give you your f***ing reason!'",
+        cost = 0,
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND | CARD_FLAGS.STICKY,
+        rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 10,
+        min_persuasion = 0,
+        max_persuasion = 0,
+        bonus_damage = 4,
+        count = 4,
+        event_handlers =
+        {
+            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
+                if source == self then
+                    local discards_count = math.floor(DiscardPileCount(self) / self.count)
+                    persuasion:AddPersuasion( self.bonus_damage * discards_count  , self.bonus_damage * discards_count, self)
+                end
+            end,
+        },
+    },
+
+    PC_ALAN_SUDDEN_OUTBURST_plus =
+    {
+        name = "Softened Sudden Outburst",
+        desc = "Deals <#DOWNGRADE>{1}</> bonus damage for every <#UPGRADE>{2}</> cards in discard pile.",
+        bonus_damage = 1,
+        count = 1,
+    },
+
+    PC_ALAN_SUDDEN_OUTBURST_plus2 =
+    {
+        name = "Boosted Sudden Outburst",
+        desc = "Deals <#UPGRADE>{1}</> bonus damage for every 4 cards in discard pile.",
+        bonus_damage = 5,
+    },
+
+    PC_ALAN_BROKEN_RECORD =
+    {
+        name = "Broken Record",
+        icon = "negotiation/barrage.tex",
+        desc = "{PA_BROKEN_RECORD|}Create: For every 7 cards played, Add a copy of 7th card to your discards.",
+        flavour = "'Anyway, this is all you need to know. I can repeat it a hundred more times if I have to.'",
         cost = 2,
-        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
         rarity = CARD_RARITY.UNCOMMON,
         max_xp = 7,
         OnPostResolve = function( self, minigame, targets )
-            self.negotiator:CreateModifier("PA_INTERROGATE", 1, self)
+            self.negotiator:CreateModifier("PA_BROKEN_RECORD", 1, self)
+        end,
+    },
+
+    PC_ALAN_BROKEN_RECORD_plus =
+    {
+        name = "Pale Broken Record",
+        cost = 1,
+    },
+
+    PC_ALAN_BROKEN_RECORD_plus2 =
+    {
+        name = "Initial Broken Record",
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    },
+
+    PC_ALAN_BRINGING_UP_THE_PAST =
+    {
+        name = "Bringing Up the Past",
+        icon = "negotiation/wild_rant.tex",
+        desc = "For every {1} cards you have in your discard pile, play a random card in your discard pile.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.cards )
+        end,
+        flavour = "'That is NOT what you said two minutes ago!'",
+        cost = 3,
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 3,
+        cards = 4,
+        OnPostResolve = function( self, minigame )
+            local discards_count = DiscardPileCount(self)
+            local valid_cards = shallowcopy(self.engine:GetDiscardDeck().cards)
+            for i,card in ipairs(valid_cards) do
+                if card == self or card:IsFlagged( CARD_FLAGS.UNPLAYABLE ) then
+                    table.remove(valid_cards, i)
+                end
+            end
+
+            if #valid_cards > 0 then
+                local times = math.floor(discards_count / self.cards)
+                for i = 1, times do
+                    local picked_card = table.arraypick(valid_cards)
+                    picked_card:SetFlags(CARD_FLAGS.FREEBIE)
+                    self.engine:PlayCard(picked_card)
+                end
+            end
+        end,
+    },
+
+    PC_ALAN_BRINGING_UP_THE_PAST_plus =
+    {
+        name = "Enduring Bringing Up the Past",
+        desc = "For every <#DOWNGRADE>{1}</> cards you have in your discard pile, play a random card in your discard pile.",
+        flags = CARD_FLAGS.HOSTILE,
+        cards = 6,
+    },
+
+    PC_ALAN_BRINGING_UP_THE_PAST_plus2 =
+    {
+        name = "Pale Bringing Up the Past",
+        cost = 2,
+    },
+
+    PC_ALAN_SELF_PROCLAIMED_EXPERT =
+    {
+        name = "Self-Proclaimed Expert",
+        icon = "negotiation/notion.tex",
+        desc = "Add a copy of {PC_ALAN_BLUFF} to your hand for each action available. They cost 0 until played.",
+        flavour = "'You don’t know how? Well, that’s just perfect.'",
+        cost = 0,
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.VARIABLE_COST | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 10,
+        upgraded = false,
+        action_bonus = false,
+        OnPostResolve = function( self, minigame, targets )
+            local actions = minigame:GetActionCount()
+            local cards = {}
+            for i = 1, actions do
+                local card = Negotiation.Card( "PC_ALAN_BLUFF", self.owner )
+                if self.upgraded then
+                    card:UpgradeCard()
+                end
+                card:SetFlags( CARD_FLAGS.FREEBIE )
+                card:ClearXP()
+                card:MakeTemporary()
+                table.insert( cards, card )
+            end
+            minigame:DealCards( cards, minigame:GetHandDeck() )
+            minigame:ModifyActionCount( -actions )
+            if self.action_bonus then
+                minigame:ModifyActionCount( 1 )
+            end
+        end,
+    },
+
+    PC_ALAN_SELF_PROCLAIMED_EXPERT_plus =
+    {
+        name = "Pale Self-Proclaimed Expert",
+        desc = "Add a copy of {PC_ALAN_BLUFF} to your hand for each action available. They cost 0 until played.\n<#UPGRADE>Gain 1 action</>.",
+        action_bonus = true,
+    },
+
+    PC_ALAN_SELF_PROCLAIMED_EXPERT_plus2 =
+    {
+        name = "Boosted Self-Proclaimed Expert",
+        desc = "Add a copy of <#UPGRADE>randomly upgraded</> {PC_ALAN_BLUFF} to your hand for each action available. They cost 0 until played.",
+        upgraded = true,
+    },
+
+    PC_ALAN_MEMO =
+    {
+        name = "Memo",
+        icon = "negotiation/ransack.tex",
+        desc = "Draw {1} cards. Gain {2} {PA_BASIC_SKILLS} for each basic card drawn.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.draw_count, self.basic_amt)
+        end,
+        flavour = "'Give me some time to look at the memo.'",
+        cost = 1,
+        max_xp = 9,
+        flags = CARD_FLAGS.MANIPULATE,
+        rarity = CARD_RARITY.UNCOMMON,
+        draw_count = 2,
+        basic_amt = 1,
+        OnPostResolve = function( self, minigame )
+            local cards = minigame:DrawCards( self.draw_count )
+            local basic = 0
+            for i, card in ipairs( cards ) do
+                if card.rarity == CARD_RARITY.BASIC then
+                    basic = basic + 1
+                end
+            end
+            self.negotiator:AddModifier( "PA_BASIC_SKILLS", (self.basic_amt * basic), self )
+        end,
+    },
+
+    PC_ALAN_MEMO_plus =
+    {
+        name = "Visionary Memo",
+        desc = "Draw <#UPGRADE>{1}</> cards. Gain {2} {PA_BASIC_SKILLS} for each basic card drawn.",
+        draw_count = 3,
+    },
+
+    PC_ALAN_MEMO_plus2 =
+    {
+        name = "Boosted Memo",
+        desc = "Draw {1} cards. Gain <#UPGRADE>{2}</> {PA_BASIC_SKILLS} for each basic card drawn.",
+        basic_amt = 2,
+    },
+
+    PC_ALAN_HOLD_IT =
+    {
+        name = "Hold It",
+        icon = "negotiation/reconsider.tex",
+        desc = "Shuffle your deck, then draw {1} cards.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.draw_count)
+        end,
+        flavour = "'I need to regroup my thoughts.'",
+        cost = 1,
+        max_xp = 9,
+        flags = CARD_FLAGS.MANIPULATE,
+        rarity = CARD_RARITY.UNCOMMON,
+        draw_count = 3,
+        OnPostResolve = function( self, minigame )
+            minigame:ShuffleDiscardToDraw()
+            minigame:DrawCards( self.draw_count )
+        end,
+    },
+
+    PC_ALAN_HOLD_IT_plus =
+    {
+        name = "Visionary Hold It",
+        desc = "Shuffle your deck, then draw <#UPGRADE>{1}</> cards.",
+        draw_count = 4,
+    },
+
+    PC_ALAN_HOLD_IT_plus2 =
+    {
+        name = "Pale Hold It",
+        desc = "Shuffle your deck, then draw <#DOWNGRADE>{1}</> cards.",
+        cost = 0,
+        draw_count = 2,
+    },
+
+    PC_ALAN_CAUSE_AND_EFFECT =
+    {
+        name = "Cause and Effect",
+        icon = "negotiation/tactical_mind.tex",
+        desc = "{PA_CAUSE_AND_EFFECT|}Gain {1} {PA_CAUSE_AND_EFFECT}.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.count)
+        end,
+        flavour = "'Smith squinted again—after all, nothing pairs with a full stomach quite like a nap.'",
+        cost = 1,
+        rarity = CARD_RARITY.UNCOMMON,
+        flags = CARD_FLAGS.MANIPULATE,
+        max_xp = 9,
+        count = 3,
+        OnPostResolve = function( self, minigame, targets )
+            self.negotiator:AddModifier("PA_CAUSE_AND_EFFECT", self.count, self)
         end
     },
 
-    PC_ALAN_INTERROGATE_plus =
+    PC_ALAN_CAUSE_AND_EFFECT_plus =
     {
-        name = "Initial Interrogate",
-        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+        name = "Boosted Cause and Effect",
+        desc = "{PA_CAUSE_AND_EFFECT|}Gain <#UPGRADE>{1}</> {PA_CAUSE_AND_EFFECT}.",
+        count = 4,
     },
 
-    PC_ALAN_INTERROGATE_plus2 =
+    PC_ALAN_CAUSE_AND_EFFECT_plus2 =
     {
-        name = "Pale Interrogate",
+        name = "Mirrored Cause and Effect",
+        desc = "{PA_CAUSE_AND_EFFECT|}Gain <#UPGRADE>{1}</> {PA_CAUSE_AND_EFFECT}.",
+        cost = 2,
+        count = 7,
+    },
+
+    PC_ALAN_REDUNDANT_REMINDER =
+    {
+        name = "Redundant Reminder",
+        icon = "negotiation/nonsequitur.tex",
+        desc = "Deal 1 to 3 damage.\nShuffle your deck once per resolve lost.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.draw_count)
+        end,
+        flavour = "'So what exactly do you think the guns and blades are for? Or did you seriously think people go into the wild empty-handed?'",
         cost = 1,
+        max_xp = 9,
+        flags = CARD_FLAGS.MANIPULATE,
+        rarity = CARD_RARITY.UNCOMMON,
+        min = 1,
+        max = 3,
+        OnPostResolve = function( self, minigame, targets )
+            for i,target in ipairs(targets) do
+                minigame:ApplyPersuasion( self, target, self.min, self.max )
+            end
+
+            if self.damage_dealt then
+                for i = 1, self.damage_dealt do
+                    minigame:ShuffleDiscardToDraw()
+                end
+            end
+            self.damage_dealt = nil
+        end,
+        event_handlers =
+        {
+            [ EVENT.ATTACK_RESOLVE ] = function( self, source, target, damage, params, defended )
+                if source == self then
+                    self.damage_dealt = damage - defended
+                end
+            end,
+        }, 
+    },
+
+    PC_ALAN_REDUNDANT_REMINDER_plus =
+    {
+        name = "Tall Redundant Reminder",
+        desc = "Deal 1 to <#UPGRADE>5</> damage.\nShuffle your deck once per resolve lost.",
+        max = 5,
+    },
+
+    PC_ALAN_REDUNDANT_REMINDER_plus2 =
+    {
+        name = "Rooted Redundant Reminder",
+        desc = "Deal <#UPGRADE>3</> damage.\nShuffle your deck once per resolve lost.",
+        min = 3,
+    },
+
+    PC_ALAN_NONSENSE =
+    {
+        name = "Nonsense",
+        icon = "negotiation/gab.tex",
+        desc = "Apply {1} {COMPOSURE}.\nAdd a copy of this card to your discards.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self:CalculateComposureText(self.composure_amt) )
+        end,
+        flavour = "'We have been talking for about 60 seconds, which is a minute, and roughly the same amount of time we've been talking.'",
+        cost = 0,
+        flags = CARD_FLAGS.MANIPULATE,
+        rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 10,
+        composure_amt = 3,
+        target_self = TARGET_ANY_RESOLVE,
+        OnPostResolve = function( self, minigame, targets )
+            for i,target in ipairs(targets) do
+                target:DeltaComposure(self.composure_amt, self)
+            end
+            local copy = self:Duplicate()
+            minigame:DealCard( copy, minigame:GetDeck( DECK_TYPE.DISCARDS ))
+        end
+    },
+
+    PC_ALAN_NONSENSE_plus =
+    {
+        name = "Stone Nonsense",
+        desc = "Apply <#UPGRADE>{1}</> {COMPOSURE}.\nAdd a copy of this card to your discards.",
+        composure_amt = 5,
+    },
+
+    PC_ALAN_NONSENSE_plus2 =
+    {
+        name = "Twisted Nonsense",
+        desc = "Add a copy of this card to your discards.",
+        min_persuasion = 3,
+        max_persuasion = 5,
+        composure_amt = 0,
+        target_enemy = TARGET_ANY_RESOLVE,
+        OnPostResolve = function( self, minigame, targets )
+            local copy = self:Duplicate()
+            minigame:DealCard( copy, minigame:GetDeck( DECK_TYPE.DISCARDS ))
+        end
+    },
+
+    PC_ALAN_DEEP_BREATH =
+    {
+        name = "Deep Breath",
+        icon = "negotiation/second_wind.tex",
+        desc = "Remove one of your arguments, inceptions, or bounties.\nGain {1} {COMPOSURE}.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self:CalculateComposureText( self.composure_amt ))
+        end,
+        flavour = "'Just... give me a moment.'",
+        cost = 0,
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH | CARD_FLAGS.STICKY,
+        rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 10,
+        composure_amt = 3,
+        Reconsider = function( self, minigame, targets )
+            for i, target in ipairs( targets ) do
+                target:GetNegotiator():RemoveModifier( target )
+            end
+            self.negotiator:DeltaComposure( self.composure_amt, self )
+        end,
+        OnPostResolve = function( self, minigame, targets )
+            self:Reconsider(minigame, targets)
+        end,
+    },
+
+    PC_ALAN_DEEP_BREATH_plus =
+    {
+        name = "Visionary Deep Breath",
+        desc = "Remove one of your arguments, inceptions, or bounties.\nGain {1} {COMPOSURE}<#UPGRADE>and draw a card</>.",
+        OnPostResolve = function( self, minigame, targets )
+            self:Reconsider(minigame, targets)
+            minigame:DrawCards(1)
+        end,
+    },
+
+    PC_ALAN_DEEP_BREATH_plus2 =
+    {
+        name = "Stone Deep Breath",
+        desc = "Remove one of your arguments, inceptions, or bounties.\nGain <#UPGRADE>{1}</> {COMPOSURE}.",
+        composure_amt = 6,
     },
 
     PC_ALAN_PRAY =
@@ -2903,393 +3199,803 @@ local CARDS =
         composure_amt = 4,
     },
 
-    PC_ALAN_BUY_OFF = 
+    PC_ALAN_REITERATE =
     {
-        name = "Buy Off",
-        icon = "negotiation/improvise_bank.tex",
-        desc = "Insert {1} {hush_money} into your discard pile.",
-        desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.card_gain )
-        end,
-        flavour = "'Keep it under wraps!'",
-        cost = 1,
+        name = "Reiterate",
+        icon = "negotiation/recall.tex",
+        desc = "Play a random card in your trash deck.\n{PA_UNIQUE}: This card cost 3 less.",
+        flavour = "I’ve said this before, haven’t I? Do I need to repeat myself?",
+        cost = 4,
+        max_xp = 7,
+        num_cards = 1,
+        action_bonus = -3,
         flags = CARD_FLAGS.MANIPULATE,
         rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 9,
-        card_gain = 1,
-        OnPostResolve = function( self, minigame, targets )
-            local cards = {}
-                for i=1, self.card_gain do
-                    local card = Negotiation.Card("hush_money", self.owner)
-                    table.insert(cards, card)
+        OnPostResolve = function( self, minigame )
+            for j = 1, self.num_cards do
+                local valid_cards = shallowcopy(self.engine:GetTrashDeck().cards)
+                for i,card in ipairs(valid_cards) do
+                    if card == self or card:IsFlagged( CARD_FLAGS.UNPLAYABLE ) then
+                        table.remove(valid_cards, i)
+                    end
                 end
-            minigame:DealCards( cards, minigame:GetDiscardDeck() )
-        end
-    },
-
-    PC_ALAN_BUY_OFF_plus =
-    {
-        name = "Boosted Buy Off",
-        desc = "Insert <#UPGRADE>{1}</> {hush_money} into your discard pile.",
-        card_gain = 2,
-    },
-
-    PC_ALAN_BUY_OFF_plus2 =
-    {
-        name = "Swift Buy Off",
-        desc = "Insert {1} {hush_money} into your <#UPGRADE>hand</>.",
-        OnPostResolve = function( self, minigame, targets )
-            local cards = {}
-                for i=1, self.card_gain do
-                    local card = Negotiation.Card("hush_money", self.owner)
-                    table.insert(cards, card)
+                if #valid_cards > 0 then
+                    local card = table.arraypick(valid_cards)
+                    card:SetFlags(CARD_FLAGS.FREEBIE)
+                    self.engine:PlayCard(card)
                 end
-            minigame:DealCards( cards, minigame:GetHandDeck() )
-        end
+            end
+        end,
+        event_handlers =
+        {
+            [ EVENT.CALC_ACTION_COST ] = function( self, acc, card, target )
+            local is_unique = IsCardUnique(self)
+                if card == self and is_unique then
+                    acc:AddValue( self.action_bonus, self )
+                end
+            end,
+        },
     },
 
-    PC_ALAN_DEEP_BREATH =
+    PC_ALAN_REITERATE_plus =
     {
-        name = "Deep Breath",
-        icon = "negotiation/second_wind.tex",
-        desc = "All friendly arguments deal double damage for this turn.",
-        flavour = "'Just... give me a moment.'",
-        cost = 3,
+        name = "Clarity Reiterate",
+        desc = "Play <#UPGRADE>3 random cards</> in your trash deck.\n{PA_UNIQUE}: This card cost 3 less.",
         flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
+        num_cards = 3,
+    },
+
+    PC_ALAN_REITERATE_plus2 =
+    {
+        name = "Pale Reiterate",
+        desc = "Play a random card in your trash deck.\n{PA_UNIQUE}: This card cost <#UPGRADE>4</> less.",
+        action_bonus = -4,
+    },
+
+    PC_ALAN_WITNESS =
+    {
+        name = "Witness",
+        icon = "negotiation/placate.tex",
+        desc = "Choose a card from your hand, then add a copy of that card in your hand.\n{PA_UNIQUE}: the copy costs 0.",
+        loc_strings =
+        {
+            CHOOSE_CARD = "Choose a card to copy it" 
+        },
+        flavour = "'Don't touch that flower! It's the successor to the pigeon!'",
+        cost = 2,
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND | CARD_FLAGS.BURNOUT,
         rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 7,
+        num_cards = 1,
+        OnPostResolve = function( self, minigame, targets )
+            for i=1,self.num_cards do
+                local txt = loc.format( LOC"CARD_ENGINE.CHOOSE_MAX_CARDS_DUPLICATE", 1 )
+                local chosen_card = minigame:ChooseCard( nil, txt )
+
+                if chosen_card then
+                    local copy = chosen_card:Duplicate()
+                    copy.deck = nil
+                    
+                    local is_unique = IsCardUnique(self)
+                    if is_unique then
+                        copy.cost = 0
+                    else
+                        copy.cost = minigame:CalculateActionCost(chosen_card)
+                    end
+
+                    minigame:DealCard(copy, minigame:GetHandDeck())
+                end
+            end
+        end,
+    },
+
+    PC_ALAN_WITNESS_plus =
+    {
+        name = "Stable Witness",
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
+    },
+
+    PC_ALAN_WITNESS_plus2 =
+    {
+        name = "Wide Witness",
+        cost = 3,
+        desc = "Choose a card from your hand <#UPGRADE>twice</>, then add a copy of those cards in your hand.\n{PA_UNIQUE}: the copies costs 0.",
+        num_cards = 2,
+    },
+
+    PC_ALAN_SQUARE_TABLE_MEETING =
+    {
+        name = "Square Table Meeting",
+        icon = "negotiation/center_of_attention.tex",
+        desc = "{PA_SQUARE_TABLE_MEETING|}Create: Whenever you play {PC_ALAN_DISCUSS}, {EXPEND} it. At the end of your turn, play all {PC_ALAN_DISCUSS} in your trash deck.",
+        flavour = "'The more, the merrier!'",
+        cost = 3,
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.RARE,
         max_xp = 3,
         OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PA_DEEP_BREATH", 1, self)
-        end,
-    },
-
-    PC_ALAN_DEEP_BREATH_plus =
-    {
-        name = "Pale Deep Breath",
-        cost = 2,
-    },
-
-    PC_ALAN_DEEP_BREATH_plus2 =
-    {
-        name = "Twisted Deep Breath",
-        desc = "All <#UPGRADE>cards</> deal double damage for this turn.\n<#DOWNGRADE>Gain 1 {PC_ALAN_RUDE} and 1 {VULNERABILITY}</>.",
-        cost = 0,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:InceptModifier("PC_ALAN_RUDE", 1, self)
-            self.negotiator:InceptModifier("VULNERABILITY", 1, self)
-            self.negotiator:AddModifier("escalate", 1, self)
-        end,
-    },
-
-    PC_ALAN_UNITED_FRONT =
-    {
-        name = "United Front",
-        icon = "negotiation/take_supporters.tex",
-        desc = "Apply {1} {COMPOSURE} to a random friendly argument.\n{PA_REASON} X: Repeat X times.",
-        flavour = "'I’ve got my crew behind me.'",
-        desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self:CalculateComposureText(self.composure_amt))
-        end,
-        cost = 1,
-        rarity = CARD_RARITY.UNCOMMON,
-        flags = CARD_FLAGS.MANIPULATE,
-        target_self = TARGET_ANY_RESOLVE,
-        auto_target = true,
-        composure_amt = 2,
-        max_xp = 9,
-        OnPostResolve = function( self, minigame, targets )
-            local mod_num = CountArguments(self)
-            if mod_num > 0 then
-                for i=1, (mod_num + 1) do
-                    local target = minigame:CollectPrimaryTarget(self)
-                    target:DeltaComposure(self.composure_amt, self)
-                    self:ClearTarget()
-                end
-            end
-        end,
-    },
-
-    PC_ALAN_UNITED_FRONT_plus =
-    {
-        name = "Stone United Front",
-        desc = "Apply <#UPGRADE>{1}</> {COMPOSURE} to a random friendly argument.\n{PA_REASON} X: Repeat X times.",
-        composure_amt = 3,
-    },
-
-    PC_ALAN_UNITED_FRONT_plus2 =
-    {
-        name = "On my own",
-        desc = "Apply {1} {COMPOSURE} to a random friendly argument.\n{PA_REASON} X: Repeat X times.\n<#UPGRADE>{PA_UNREASON}: Gain 5 {COMPOSURE}</>.",
-        flavour = "'I’ve got my crew behind me... okay, I lied.'",
-        composure_bonus = 5,
-        OnPostResolve = function( self, minigame, targets )
-            local mod_num = CountArguments(self)
-            if mod_num > 0 then
-                for i=1, (mod_num + 1) do
-                    local target = minigame:CollectPrimaryTarget(self)
-                    target:DeltaComposure(self.composure_amt, self)
-                    self:ClearTarget()
-                end
-            end
-
-            if mod_num == 0 then 
-                self.negotiator:DeltaComposure( self.composure_bonus, self )
-            end
-        end,
-    },
-
-    PC_ALAN_GOSSIP =
-    {
-        name = "Gossip",
-        icon = "negotiation/ad_hominem.tex",
-        desc = "{PA_GOSSIP|}Gain: All friendly arguments deal 1 bonus damage.",
-        desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self:CalculateComposureText(self.composure_amt))
-        end,
-        flavour = "'Hey, you heard? Things haven’t been too quiet around here lately.'",
-        cost = 2,
-        rarity = CARD_RARITY.UNCOMMON,
-        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
-        max_xp = 7,
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PA_GOSSIP", 1, self)
+            self.negotiator:CreateModifier("PA_SQUARE_TABLE_MEETING", 1, self)
         end
     },
 
-    PC_ALAN_GOSSIP_plus =
+    PC_ALAN_SQUARE_TABLE_MEETING_plus =
     {
-        name = "Initial Gossip",
-        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+        name = "Initial Square Table Meeting",
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
     },
 
-    PC_ALAN_GOSSIP_plus2 =
+    PC_ALAN_SQUARE_TABLE_MEETING_plus2 =
     {
-        name = "Pale Gossip",
+        name = "Pale Square Table Meeting",
+        cost = 2,
+    },
+
+    PC_ALAN_WITNESS =
+    {
+        name = "Witness",
+        icon = "negotiation/placate.tex",
+        desc = "Choose a card from your hand, then add a copy of that card in your hand.\n{PA_UNIQUE}: the copy costs 0.",
+        loc_strings =
+        {
+            CHOOSE_CARD = "Choose a card to copy it" 
+        },
+        flavour = "'Don't touch that flower! It's the successor to the pigeon!'",
+        cost = 2,
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND | CARD_FLAGS.BURNOUT,
+        rarity = CARD_RARITY.UNCOMMON,
+        max_xp = 7,
+        num_cards = 1,
+        OnPostResolve = function( self, minigame, targets )
+            for i=1,self.num_cards do
+                local txt = loc.format( LOC"CARD_ENGINE.CHOOSE_MAX_CARDS_DUPLICATE", 1 )
+                local chosen_card = minigame:ChooseCard( nil, txt )
+
+                if chosen_card then
+                    local copy = chosen_card:Duplicate()
+                    copy.deck = nil
+                    
+                    local is_unique = IsCardUnique(self)
+                    if is_unique then
+                        copy.cost = 0
+                    else
+                        copy.cost = minigame:CalculateActionCost(chosen_card)
+                    end
+
+                    minigame:DealCard(copy, minigame:GetHandDeck())
+                end
+            end
+        end,
+    },
+
+    PC_ALAN_WITNESS_plus =
+    {
+        name = "Stable Witness",
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
+    },
+
+    PC_ALAN_WITNESS_plus2 =
+    {
+        name = "Wide Witness",
+        cost = 3,
+        desc = "Choose a card from your hand <#UPGRADE>twice</>, then add a copy of those cards in your hand.\n{PA_UNIQUE}: the copies costs 0.",
+        num_cards = 2,
+    },
+
+    PC_ALAN_SQUARE_TABLE_MEETING =
+    {
+        name = "Square Table Meeting",
+        icon = "negotiation/center_of_attention.tex",
+        desc = "{PA_SQUARE_TABLE_MEETING|}Create: Whenever you play {PC_ALAN_DISCUSS}, {EXPEND} it. At the end of your turn, play all {PC_ALAN_DISCUSS} in your trash deck.",
+        flavour = "'The more, the merrier!'",
+        cost = 3,
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.RARE,
+        max_xp = 3,
+        OnPostResolve = function( self, minigame, targets )
+            self.negotiator:CreateModifier("PA_SQUARE_TABLE_MEETING", 1, self)
+        end
+    },
+
+    PC_ALAN_SQUARE_TABLE_MEETING_plus =
+    {
+        name = "Initial Square Table Meeting",
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    },
+
+    PC_ALAN_SQUARE_TABLE_MEETING_plus2 =
+    {
+        name = "Pale Square Table Meeting",
+        cost = 2,
+    },
+
+    PC_ALAN_CONSENSUS =
+    {
+        name = "Consensus",
+        icon = "negotiation/compromise.tex",
+        desc = "{PA_TRUST|}Apply {1} {COMPOSURE}\n{PA_UNIQUE}: Gain 1 {PA_TRUST}.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self:CalculateComposureText(self.composure_amt) )
+        end,
+        flavour = "'Trust me, nothing is going to go wrong.'",
         cost = 1,
+        flags = CARD_FLAGS.DIPLOMACY,
+        rarity = CARD_RARITY.RARE,
+        target_self = TARGET_ANY_RESOLVE,
+        max_xp = 10,
+        composure_amt = 2,
+        OnPostResolve = function( self, minigame, targets )
+            for i,target in ipairs(targets) do
+                target:DeltaComposure(self.composure_amt, self)
+            end
+            local is_unique = IsCardUnique(self)
+            if is_unique then
+                self.negotiator:CreateModifier("PA_TRUST", 1, self)
+            end
+        end
     },
 
-    PC_ALAN_CAUSE_AND_EFFECT =
+    PC_ALAN_CONSENSUS_plus =
     {
-        name = "Cause and Effect",
-        icon = "negotiation/tactical_mind.tex",
-        desc = "{PA_CAUSE_AND_EFFECT|}Gain {1} {PA_CAUSE_AND_EFFECT}.",
+        name = "Stone Consensus",
+        desc = "{PA_TRUST|}Apply <#UPGRADE>{1}</> {COMPOSURE}\n{PA_UNIQUE}: Gain 1 {PA_TRUST}.",
+        composure_amt = 4,
+        
+    },
+
+    PC_ALAN_CONSENSUS_plus2 =
+    {
+        name = "Initial Consensus",
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.AMBUSH,
+    },
+
+    PC_ALAN_CHIME_IN =
+    {
+        name = "Chime In",
+        icon = "negotiation/ipso_facto.tex",
+        desc = "{PA_CHIME_IN|}Gain: Whenever you draw a basic card, gain {1} {COMPOSURE} and deal {1} damage to a random opponent argument.",
         desc_fn = function( self, fmt_str )
             return loc.format(fmt_str, self.count)
         end,
-        flavour = "'Smith squinted again—after all, nothing pairs with a full stomach quite like a nap.'",
+        flavour = "'Exactly!'",
         cost = 2,
-        rarity = CARD_RARITY.UNCOMMON,
-        flags = CARD_FLAGS.MANIPULATE,
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.RARE,
         max_xp = 7,
-        count = 3,
+        count = 1,
         OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PA_CAUSE_AND_EFFECT", self.count, self)
+            self.negotiator:AddModifier("PA_CHIME_IN", self.count, self)
         end
     },
 
-    PC_ALAN_CAUSE_AND_EFFECT_plus =
+    PC_ALAN_CHIME_IN_plus =
     {
-        name = "Boosted Cause and Effect",
-        desc = "{PA_CAUSE_AND_EFFECT|}Gain <#UPGRADE>{1}</> {PA_CAUSE_AND_EFFECT}.",
-        count = 4,
+        name = "Initial Chime In",
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
     },
 
-    PC_ALAN_CAUSE_AND_EFFECT_plus2 =
+    PC_ALAN_CHIME_IN_plus2 =
     {
-        name = "Pale Cause and Effect",
+        name = "Boosted Chime In",
+        desc = "{PA_CHIME_IN|}Gain: Whenever you draw a basic card, gain <#UPGRADE>{1}</> {COMPOSURE} and deal <#UPGRADE>{1}</> damage to a random opponent argument.",
+        count = 2,
+    },
+    
+    PC_ALAN_HYPE_UP =
+    {
+        name = "Hype Up",
+        icon = "negotiation/flatter.tex",
+        desc = "Gain {PA_SHUFFLE} twice to damage dealt by this card.",
+        flavour = "'Well said!'",
         cost = 1,
-    },
-
-    PC_ALAN_PROFANE_ARTIFACT =
-    {
-        name = "Profane Artifact",
-        icon = "negotiation/helmet.tex",
-        desc = "{bog_boil|}Destroy a chosen friendly argument, then create 1 {bog_boil}.",
-        flavour = "'This device contains the knowledge carried by a willing Bogger. Handle with care.'",
-        cost = 2,
-        rarity = CARD_RARITY.UNCOMMON,
-        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
-        max_xp = 7,
-        DestroyModifier = true,
-        target_self = TARGET_FLAG.ARGUMENT | TARGET_FLAG.BOUNTY,
-        auto_target = false,
-        CanTarget = function(self, target)
-            if self.DestroyModifier then
-                if not target or target.negotiator == self.anti_negotiator then
-                    return false, CARD_PLAY_REASONS.INVALID_TARGET
+        flags = CARD_FLAGS.DIPLOMACY,
+        rarity = CARD_RARITY.RARE,
+        min_persuasion = 1,
+        max_persuasion = 2,
+        max_xp = 9,
+        event_handlers =
+        {
+            [ EVENT.ATTACK_RESOLVE ] = function( self, source, target, damage, params, defended )
+                if source == self and damage > 0 then
+                    self.negotiator:AddModifier("PA_SHUFFLE", (2 * damage), self)
                 end
             end
-            return true
+        },
+    },
+
+    PC_ALAN_HYPE_UP_plus =
+    {
+        name = "Boosted Hype Up",
+        min_persuasion = 2,
+        max_persuasion = 3,
+    },
+
+    PC_ALAN_HYPE_UP_plus2 =
+    {
+        name = "Tentative Hype Up",
+        desc = "Gain {PA_SHUFFLE} twice to damage dealt by this card.\n<#UPGRADE>{PA_TENTATIVE} {1}: deal 2 bonus damage</>.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.tentative_amt)
         end,
-        OnPostResolve = function( self, minigame, targets )
-            if self.DestroyModifier and targets then
-                local destroyed = false
-                for _, target in ipairs(targets) do
-                    if target.modifier_type ~= MODIFIER_TYPE.CORE and target.negotiator ~= self.anti_negotiator then
-                        target.negotiator:DestroyModifier(target, self)
-                        destroyed = true
+        tentative_amt = 2,
+        event_handlers = 
+        {
+            [ EVENT.ATTACK_RESOLVE ] = function( self, source, target, damage, params, defended )
+                if source == self and damage > 0 then
+                    self.negotiator:AddModifier("PA_SHUFFLE", (2 * damage), self)
+                end
+            end,
+
+            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
+                if source == self and self.negotiator:GetModifierStacks("PA_DRAW_CARD") > self.tentative_amt then
+                    persuasion:AddPersuasion( 2, 2, self )
+                end
+            end,
+        },
+    },
+
+    PC_ALAN_CARDS_ON_THE_TABLE =
+    {
+        name = "Cards on the Table",
+        icon = "negotiation/airtight.tex",
+        desc = "Draw cards until your hand is full.",
+        flavour = "'Let me give it to you straight.'",
+        cost = 1,
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.RARE,
+        max_xp = 9,
+        OnPostResolve = function( self, minigame )
+            minigame:DrawCards( 10 - self.engine:GetHandDeck():CountCards() )
+        end,
+    },
+
+    PC_ALAN_CARDS_ON_THE_TABLE_plus =
+    {
+        name = "Sticky Cards on the Table",
+        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND | CARD_FLAGS.STICKY,
+    },
+
+    PC_ALAN_CARDS_ON_THE_TABLE_plus2 =
+    {
+        name = "Pale Cards on the Table",
+        cost = 0,
+    },
+
+    PC_ALAN_TAUNT =
+    {
+        name = "Taunt",
+        icon = "negotiation/degrade.tex",
+        desc = "Gain 1 {COMPOSURE} and deal an additional 1 damage for every 4 cards in discard pile.\nAdd a copy of this card to your discards.",
+        flavour = "'You're nothing but a loser.'",
+        cost = 1,
+        flags = CARD_FLAGS.HOSTILE,
+        rarity = CARD_RARITY.RARE,
+        max_xp = 10,
+        min_persuasion = 2,
+        max_persuasion = 4,
+        discard = false,
+        move_card = false,
+        OnPostResolve = function( self, minigame )
+            if self.discard then
+                minigame:DiscardCards(2, 2, self)
+            end
+
+            if self.move_card then
+                local cards = ObtainWorkTable()
+                for i,card in minigame:GetDrawDeck():Cards() do
+                    table.insert(cards, card)
+                    if #cards >= 3 then
+                        break
                     end
                 end
-
-                if destroyed then
-                    for i = 1, 1 do
-                        self.negotiator:CreateModifier("bog_boil", 1, self)
-                    end
-                end
-
-                else
-                    for i = 1, 1 do
-                        self.negotiator:CreateModifier("bog_boil", 1, self)
+                if #cards > 0 then
+                    for i,card in ipairs(cards) do
+                        card:TransferCard(minigame:GetDiscardDeck())
                     end
                 end
             end
+
+            local discards_count = math.floor(DiscardPileCount(self) / 4)
+            self.negotiator:DeltaComposure( discards_count, self )
+            minigame:ApplyPersuasion( self, nil, discards_count, discards_count )
+            local copy = self:Duplicate()
+            minigame:DealCard( copy, minigame:GetDeck( DECK_TYPE.DISCARDS ))
+        end,
     },
 
-    PC_ALAN_PROFANE_ARTIFACT_plus =
+    PC_ALAN_TAUNT_plus =
     {
-        name = "Pale Profane Artifact",
+        name = "Strained Taunt",
+        desc = "<#DOWNGRADE>Discard 2 cards</>.\nGain 1 {COMPOSURE} and deal an additional 1 damage for every 4 cards in discard pile.\nAdd a copy of this card to your discards.",
+        discard = true,
+        min_persuasion = 4,
+        max_persuasion = 6,
+    },
+
+    PC_ALAN_TAUNT_plus2 =
+    {
+        name = "Boosted Taunt",
+        desc = "<#UPGRADE>Move up to 3 cards from your draw pile to your discard</>.\nGain 1 {COMPOSURE} and deal an additional 1 damage for every 4 cards in discard pile.\nAdd a copy of this card to your discards.",
+        move_card = true,
+    },
+
+    PC_ALAN_TAKE_BACK =
+    {
+        name = "Take-Back",
+        icon = "negotiation/refusal.tex",
+        desc = "When this card is drawn, discard your hand and draw 5 cards, then {EXPEND}.",
+        flavour = "'That didn't count!'",
+        cost = 0,
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.UNPLAYABLE,
+        rarity = CARD_RARITY.RARE,
+        max_xp = 10,
+        event_handlers =
+        {
+            [ EVENT.DRAW_CARD ] = function( self, minigame, card, start_of_turn )
+                if card == self then
+                    self:NotifyTriggeredPre()
+
+                    local tbl = ObtainWorkTable()
+                    for i, card in minigame:GetHandDeck():Cards() do
+                        table.insert(tbl, card)
+                    end
+
+                    for i, card in ipairs(tbl) do
+                        minigame:DiscardCard(card)
+                    end
+
+                    ReleaseWorkTable(tbl)
+
+                    minigame:DrawCards(5)
+
+                    if self.tentative and self.negotiator:GetModifierStacks("PA_DRAW_CARD") > self.tentative_amt then
+                        minigame:DrawCards(2)
+                    end
+
+                    self:NotifyTriggeredPost()
+                    self:AddXP(1)
+                    minigame:ExpendCard( self )
+                end
+            end
+        },
+    },
+
+    PC_ALAN_TAKE_BACK_plus =
+    {
+        name = "Enduring Take-Back",
+        desc = "<#DOWNGRADE>Once per turn</>, when this card is drawn, discard your hand and draw 5 cards.",
+        active = true,
+        event_handlers =
+        {
+            [ EVENT.DRAW_CARD ] = function( self, minigame, card, start_of_turn )
+                if card == self and self.active then
+                    self:NotifyTriggeredPre()
+
+                    local tbl = ObtainWorkTable()
+                    for i, card in minigame:GetHandDeck():Cards() do
+                        table.insert(tbl, card)
+                    end
+
+                    for i, card in ipairs(tbl) do
+                        minigame:DiscardCard(card)
+                    end
+
+                    ReleaseWorkTable(tbl)
+
+                    minigame:DrawCards(5)
+
+                    self:NotifyTriggeredPost()
+
+                    self.active = false
+                end
+            end,
+
+            [ EVENT.END_TURN ] = function( self, minigame, negotiator )
+                if negotiator == self.negotiator then
+                    self.active = true
+                end
+            end,
+        },
+    },
+
+    PC_ALAN_TAKE_BACK_plus2 =
+    {
+        name = "Tentative Take-Back",
+        desc = "When this card is drawn, discard your hand and draw 5 cards, then {EXPEND}.\n<#UPGRADE>{PA_TENTATIVE} {1}: Draw additional 2 cards</>.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.tentative_amt)
+        end,
+        tentative = true,
+        tentative_amt = 1,
+    },
+
+    PC_ALAN_PROHIBIT =
+    {
+        name = "Prohibit",
+        icon = "negotiation/domain.tex",
+        desc = "Play this card twice.\n{BRAVADO}.",
+        flavour = "'Yotes—and you—are not allowed in!'",
         cost = 1,
+        flags = CARD_FLAGS.HOSTILE,
+        rarity = CARD_RARITY.RARE,
+        min_persuasion = 1,
+        max_persuasion = 2,
+        max_xp = 9,
+        deck_handlers = ALL_DECKS,
+        bonus_damage = 1,
+        OnPostResolve = function( self, minigame, targets )
+            if not self.ignore then
+                self.ignore = true
+                minigame:PlayCard(self)
+            else
+                self.ignore = false
+            end
+        end,
+        event_handlers = 
+        {
+            [ EVENT.END_RESOLVE ] = function( self, minigame, card )
+                if card.negotiator == self.negotiator then
+                    if CheckBits(card.flags, CARD_FLAGS.HOSTILE) then
+                        self.bonus = (self.bonus or 0) + self.bonus_damage
+                    else
+                        self.bonus = 0
+                    end
+                end
+            end,
+
+            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
+                if source == self and self.bonus and self.bonus > 0 then
+                    persuasion:AddPersuasion(self.bonus, self.bonus, self)
+                end
+            end,
+
+            [ EVENT.BEGIN_PLAYER_TURN ] = function( self, minigame )
+                self.bonus = 0
+            end,
+        },
     },
 
-    PC_ALAN_PROFANE_ARTIFACT_plus2 =
+    PC_ALAN_PROHIBIT_plus =
     {
-        name = "Softened Profane Artifact",
-        desc = "{bog_boil|}<#UPGRADE>Create 1 {bog_boil}</>.",
-        DestroyModifier = false,
-        auto_target = true,
+        name = "Sticky Prohibit",
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.STICKY,
     },
 
-    PC_ALAN_REPEAT =
+    PC_ALAN_PROHIBIT_plus2 =
     {
-        name = "Repeat",
-        icon = "negotiation/duplicity.tex",
-        desc = "Duplicate a chosen friendly argument.",
-        flavour = "'Now you get it, right?'",
-        cost = 2,
-        rarity = CARD_RARITY.UNCOMMON,
-        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
-        max_xp = 7,
-        target_self = TARGET_FLAG.ARGUMENT,
-        auto_target = false,
-        count = 1,
+        name = "Boosted Prohibit",
+        min_persuasion = 2,
+        max_persuasion = 3,
+    },
+
+    PC_ALAN_VICIOUS_WORDS =
+    {
+        name = "Vicious Words",
+        icon = "negotiation/improvise_mean.tex",
+        desc = "This card costs the absolute difference between its initial cost of this card and the number of cards in the discard pile.",
+        flavour = "'Brainless idiot!'",
+        cost = 13,
+        flags = CARD_FLAGS.HOSTILE,
+        rarity = CARD_RARITY.RARE,
+        min_persuasion = 13,
+        max_persuasion = 13,
+        max_xp = 3,
+        event_priorities =
+        {
+            [ EVENT.CALC_ACTION_COST ] = EVENT_PRIORITY_PRESETTOR
+        },
+        deck_handlers = ALL_DECKS,
+        event_handlers =
+        {
+            [ EVENT.CALC_ACTION_COST ] = function( self, cost_acc, card, target )
+                if card == self then
+                    local discards_count = DiscardPileCount(self)
+                    cost_acc:ModifyValue( math.abs(card.def.cost - discards_count), self )
+                end
+            end,
+        },
+    },
+
+    PC_ALAN_VICIOUS_WORDS_plus =
+    {
+        name = "Sticky Pressure",
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.STICKY,
+    },
+
+    PC_ALAN_VICIOUS_WORDS_plus2 =
+    {
+        name = "Pale Pressure",
+        cost = 7,
+    },
+
+    PC_ALAN_PRESSURE =
+    {
+        name = "Pressure",
+        icon = "negotiation/overbear.tex",
+        desc = "Gain {1} {DOMINANCE}.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.dominance_amt)
+        end,
+        flavour = "'You had better think twice.'",
+        cost = 0,
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+        rarity = CARD_RARITY.RARE,
+        max_xp = 10,
+        dominance_amt = 2,
+        draw_card = false,
+        OnPostResolve = function( self, minigame )
+            self.negotiator:AddModifier("DOMINANCE", self.dominance_amt, self)
+            if self.draw_card then
+                minigame:DrawCards(2)
+            end
+        end,
+    },
+
+    PC_ALAN_PRESSURE_plus =
+    {
+        name = "Boosted Pressure",
+        desc = "Gain <#UPGRADE>{1}</> {DOMINANCE}.",
+        dominance_amt = 3,
+    },
+
+    PC_ALAN_PRESSURE_plus2 =
+    {
+        name = "Visionary Pressure",
+        desc = "Gain {1} {DOMINANCE}.\n<#UPGRADE>Draw 2 cards</>.",
+        draw_card = true,
+    },
+
+    PC_ALAN_DEFLECTION =
+    {
+        name = "Deflection",
+        icon = "negotiation/deflection.tex",
+        desc = "Choose a friendly argument except core argument, {SHIELDED|Shield} it until the end of negotiation.",
         loc_strings =
         {
-            NO_DUPLICATE_CORE = "Cannot duplicate core argument",
+            AMNESTY_SHIELD_DESC = "{SHIELDED}. This argument is shielded!",
         },
-        CanPlayCard = function ( self, card, engine, target )
-            if is_instance( target, Negotiation.Modifier ) and target.modifier_type == MODIFIER_TYPE.CORE then
-                return false, self.def:GetLocalizedString( "NO_DUPLICATE_CORE" )
-            end
-            return true
-        end,
-        OnPostResolve = function( self, minigame, targets )
-            for i, target in ipairs( targets ) do
-                for j = 1, self.count do
-                    target:Duplicate()
-                end
-            end
-        end
-    },
-
-    PC_ALAN_REPEAT_plus =
-    {
-        name = "Wide Repeat",
-        desc = "Duplicate a <#DOWNGRADE>random</> friendly argument <#UPGRADE>twice</>.",
-        count = 2,
-        auto_target = true,
-    },
-
-    PC_ALAN_REPEAT_plus2 =
-    {
-        name = "Pale Repeat",
-        cost = 1,
-    },
-
-    PC_ALAN_CLARIFICATION =
-    {
-        name = "Clarification",
-        icon = "negotiation/setup.tex",
-        desc = "For every {PC_ALAN_TRUTH} you have, create 1 {PC_ALAN_TRUTH}.",
-        flavour = "'Alright, to be more precise...'",
-        cost = 2,
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
+        flavour = "'There's no need to discuss that point.'",
+        cost = 3,
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
         rarity = CARD_RARITY.RARE,
-        max_xp = 7,
+        max_xp = 3,
+        target_self = TARGET_FLAG.ARGUMENT | TARGET_FLAG.BOUNTY,
         OnPostResolve = function( self, minigame, targets )
-            local count = 0
-            for i, modifier in self.negotiator:Modifiers() do
-                if modifier.id == "PC_ALAN_TRUTH" then
-                    count = count + 1
-                end
-            end
-            for i=1, count do
-                local target = minigame:CollectPrimaryTarget(self)
-                target:DeltaComposure(self.stacks * 2, self)
-                self:ClearTarget()
+            for i,arg in ipairs(targets) do
+                arg:SetShieldStatus(true, self.def:GetLocalizedString("AMNESTY_SHIELD_DESC"))
             end
         end,
     },
 
-    PC_ALAN_CLARIFICATION_plus =
+    PC_ALAN_DEFLECTION_plus =
     {
-        name = "Pale Clarification",
-        cost = 1,
+        name = "Initial Deflection",
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
     },
 
-    PC_ALAN_CLARIFICATION_plus2 =
+    PC_ALAN_DEFLECTION_plus2 =
     {
-        name = "Boosted Clarification",
-        desc = "<#UPGRADE>Create 1 {PC_ALAN_TRUTH}</>, then for every {PC_ALAN_TRUTH} you have, create 1 {PC_ALAN_TRUTH}.",
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:CreateModifier("PC_ALAN_TRUTH", 1, self)
-            local count = 0
-            for i, modifier in self.negotiator:Modifiers() do
-                if modifier.id == "PC_ALAN_TRUTH" then
-                    count = count + 1
-                end
-            end
-            for i=1, count do
-                self.negotiator:CreateModifier("PC_ALAN_TRUTH", 1, self)
-            end
-        end,
+        name = "Visionary Deflection",
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND | CARD_FLAGS.REPLENISH,
     },
 
-    PC_ALAN_PLAYING_THE_FOOL =
+    PC_ALAN_POWER_MOVE =
     {
-        name = "Playing the fool",
-        icon = "negotiation/flatten.tex",
-        desc = "Fully restore resolve to the opponent's core argument. Gain 1 {PC_ALAN_GENUINE} for every {1} resolve restored this way.",
+        name = "Power Move",
+        icon = "negotiation/fallout.tex",
+        desc = "{INCEPT} {1} {FLUSTERED} and {VULNERABILITY}.",
         desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self.genuine_divided)
+            return loc.format(fmt_str, self.stacks)
         end,
-        flavour = "'Look, it's me — Smith “Turtle” Banquods'",
-        cost = 2,
-        flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.EXPEND,
+        flavour = "'Come on! Have a drink first!'",
+        cost = 1,
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
         rarity = CARD_RARITY.RARE,
-        max_xp = 7,
-        genuine_bonus = 0,
-        genuine_divided = 2,
-        OnPostResolve = function( self, minigame, targets )
-            local cur, max = self.anti_negotiator:GetResolve()
-            local genuine_amt = max - cur
-            self.anti_negotiator:RestoreResolve( genuine_amt, self )
-            self.negotiator:InceptModifier("PC_ALAN_GENUINE", math.floor(genuine_amt / self.genuine_divided) + self.genuine_bonus, self)
+        max_xp = 9,
+        stacks = 3,
+        OnPostResolve = function( self, minigame, card )
+            self.anti_negotiator:InceptModifier("FLUSTERED", self.stacks, self )
+            self.anti_negotiator:InceptModifier("VULNERABILITY", self.stacks, self )
         end,
     },
 
-    PC_ALAN_PLAYING_THE_FOOL_plus =
+    PC_ALAN_POWER_MOVE_plus =
     {
-        name = "Mirrored Playing the fool",
-        desc = "Fully restore resolve to the opponent's core argument. Gain 1 {PC_ALAN_GENUINE} for every <#UPGRADE>{1}</> resolve restored this way.",
-        cost = 4,
-        genuine_divided = 1,
+        name = "Boosted Power Move",
+        desc = "{INCEPT} <#UPGRADE>{1}</> {FLUSTERED} and {VULNERABILITY}.",
+        stacks = 5,
     },
 
-    PC_ALAN_PLAYING_THE_FOOL_plus2 =
+    PC_ALAN_POWER_MOVE_plus2 =
     {
-        name = "Boosted Playing the fool",
-        desc = "Fully restore resolve to the opponent's core argument. Gain 1 {PC_ALAN_GENUINE}<#UPGRADE>+4</> for every {1} resolve restored this way.",
-        genuine_bonus = 4,
+        name = "Initial Power Move",
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    },
+
+    PC_ALAN_ECHO =
+    {
+        name = "Echo",
+        icon = "negotiation/ditch.tex",
+        desc = "{PA_ECHO|}Gain {1} {PA_ECHO}.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.stacks)
+        end,
+        flavour = "'It’s like this, like this, this...'",
+        cost = 1,
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.RARE,
+        max_xp = 9,
+        stacks = 2,
+        OnPostResolve = function( self, minigame, card )
+            self.negotiator:CreateModifier("PA_ECHO", self.stacks, self)
+        end,
+    },
+
+    PC_ALAN_ECHO_plus =
+    {
+        name = "Enduring Echo",
+        desc = "{PA_ECHO|}Gain <#DOWNGRADE>{1}</> {PA_ECHO}.",
+        flags = CARD_FLAGS.MANIPULATE,
+        stacks = 1,
+    },
+
+    PC_ALAN_ECHO_plus2 =
+    {
+        name = "Initial Echo",
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    },
+
+    PC_ALAN_INSPIRATION =
+    {
+        name = "Inspiration",
+        icon = "negotiation/quick_thinking.tex",
+        desc = "Draw {1} cards and gain 1 action.\n{PA_UNIQUE}: Whenever you shuffle your deck, this card costs 1 less until played.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.draw_count)
+        end,
+        flavour = "'Wait, I think you got one thing wrong there.'",
+        cost = 3,
+        flags = CARD_FLAGS.MANIPULATE,
+        rarity = CARD_RARITY.RARE,
+        max_xp = 3,
+        draw_count = 2,
+        action_bonus = 0,
+        deck_handlers = ALL_DECKS,
+        OnPostResolve = function( self, minigame, card )
+            minigame:DrawCards(self.draw_count)
+            minigame:ModifyActionCount(1)
+            self.action_bonus = 0
+        end,
+        event_priorities =
+        {
+            [ EVENT.CALC_ACTION_COST ] = EVENT_PRIORITY_ADDITIVE,
+        },
+        event_handlers = 
+        {
+            [ EVENT.CALC_ACTION_COST ] = function( self, acc, card, target )
+                if card == self then
+                    acc:AddValue(-self.action_bonus, self)
+                end
+            end,
+
+            [ EVENT.SHUFFLE_DISCARDS ] = function( self, num_cards )
+                local is_unique = IsCardUnique(self)
+                if is_unique then
+                    self.action_bonus = self.action_bonus + 1
+                end
+            end
+        },
+    },
+
+    PC_ALAN_INSPIRATION_plus =
+    {
+        name = "Sticky Inspiration",
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.STICKY,
+    },
+
+    PC_ALAN_INSPIRATION_plus2 =
+    {
+        name = "Pale Inspiration",
+        cost = 2,
     },
 }
 
@@ -3300,28 +4006,22 @@ end
 
 local FEATURES =
 {
-    PA_REASON =
+    PA_TENTATIVE =
     {
-        name = "Reason",
-        desc = "If the amount of arguments (except core argument and inception) is <#HILITE>at least</> a certain amount before this card is played, an additional effect will be triggered.",
+        name = "Tentative",
+        desc = "Whenever the number of cards that you draw <#HILITE>after your initial hand</> reaches a certain amount , an additional effect will be triggered.",
     },
 
-    PA_UNREASON =
+    PA_UNIQUE =
     {
-        name = "Unreason",
-        desc = "If there are no arguments (except core argument and inception) before this card is played, an additional effect is triggered."
+        name = "Unique",
+        desc = "If the card is the <#HILITE>only same-named cards</> in the deck, it gains an additional effect when played.\nCards that are <#HILITE>not upgraded</>, are <#HILITE>upgraded with different options</>, or are <#HILITE>duplicated in negotiation</> will all <#HILITE>be counted as same-named cards</>."
     },
 
-    PA_FRIENDLY =
+    PA_PRECURSUR =
     {
-        name = "Friendly",
-        desc = "When the number of characters who <#HILITE>love</> or <#HILITE>like</> you reaches a certain amount , an additional effect will be triggered.",
-    },
-
-    PA_VIOLENT =
-    {
-        name = "Violent",
-        desc = "When the number of characters who <#HILITE>hate</> or <#HILITE>dislike</> you reaches a certain amount , an additional effect will be triggered.",
+        name = "Precursor",
+        desc = "Whenever the number of cards that in <#HILITE>discard pile</> reaches a certain amount , an additional effect will be triggered."
     },
 }
 
