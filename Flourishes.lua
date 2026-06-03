@@ -12,10 +12,169 @@ local RARITY_TABLE = {
 }
 
 local NEGOTIATION_FLOURISHES = 
-{}
+{
+		PC_ALAN_COMPOSURE =
+	{
+		name = "Composure",
+		desc = "Gain 1 {INFLUENCE} and 3 {DOMINANCE}.",
+		icon = "negotiation/weight.tex",
+		flavour = "'Calm down. Think about what's left to say, and what's left to do.'",
+		flags = NEGOTIATION_FLAGS.MANIPULATE,
+		series = "ALAN",
+		basic_flourish = true,
+		OnPostResolve = function( self, minigame, targets )
+			self.negotiator:AddModifier( "INFLUENCE", 1, self )
+			self.negotiator:AddModifier( "DOMINANCE", 3, self )
+		end,
+	},
+
+	PC_ALAN_TESTING =
+	{
+		name = "Testing",
+		desc = "Attack a random opponent argument once for every card in your hand.",
+		icon = "negotiation/just_the_facts.tex",
+		flavour = "'Is that so?'",
+		flags = NEGOTIATION_FLAGS.MANIPULATE,
+		series = "ALAN",
+		target_mod = TARGET_MOD.RANDOM1,
+        auto_target = true,
+        min_persuasion = 2,
+        max_persuasion = 2,
+		OnPostResolve = function( self, minigame, targets )
+			local count = minigame:GetHandDeck():CountCards()
+            if count > 0 then
+            	for i = 1, count do
+            		minigame:ApplyPersuasion( self )
+            		self:AssignTarget( nil )
+            	end
+            end
+		end,
+	},
+
+	PC_ALAN_TESTING_ii =
+	{
+		name = "Testing II",
+		desc = "Deal 3 damage to a random opponent argument for every card in your hand.",
+		flags = NEGOTIATION_FLAGS.MANIPULATE,
+		series = "ALAN",
+		target_mod = TARGET_MOD.RANDOM1,
+        auto_target = true,
+        min_persuasion = 3,
+        max_persuasion = 3,
+		OnPostResolve = function( self, minigame, targets )
+			local count = minigame:GetHandDeck():CountCards()
+            if count > 0 then
+            	for i = 1, count do
+            		minigame:ApplyPersuasion( self )
+            		self:AssignTarget( nil )
+            	end
+            end
+		end,
+	},
+
+	PC_ALAN_BRIDE =
+	{
+		name = "Bribe",
+		desc = "Add 4 copies of {hush_money} to your hand.",
+		icon = "negotiation/hush_money.tex",
+		flavour = "'Don't be shy, just take it.'",
+		flags = NEGOTIATION_FLAGS.MANIPULATE,
+		series = "ALAN",
+		OnPostResolve = function( self, minigame )
+			local cards = {}
+            for i = 1, 4 do
+                local card = Negotiation.Card( "hush_money", self.owner )
+                card:ClearXP()
+                card:MakeTemporary()
+                table.insert( cards, card )
+            end
+            minigame:DealCards( cards, minigame:GetHandDeck() )
+		end,
+	},
+
+	PC_ALAN_BRIDE_ii =
+	{
+		name = "Bribe II",
+		desc = "Add 6 copies of {hush_money} to your hand.",
+		flags = NEGOTIATION_FLAGS.MANIPULATE,
+		series = "ALAN",
+		OnPostResolve = function( self, minigame )
+			local cards = {}
+            for i = 1, 6 do
+                local card = Negotiation.Card( "hush_money", self.owner )
+                card:ClearXP()
+                card:MakeTemporary()
+                table.insert( cards, card )
+            end
+            minigame:DealCards( cards, minigame:GetHandDeck() )
+		end,
+	},
+
+	PC_ALAN_PREPARATION =
+	{
+		name = "Preparation",
+		desc = "Play all basic cards in your hand.",
+		icon = "negotiation/long_winded.tex",
+		flavour = "'Hope you're ready.'",
+		flags = NEGOTIATION_FLAGS.MANIPULATE,
+		series = "ALAN",
+		OnPostResolve = function( self, minigame, card )
+		    for i, card in self.engine:GetHandDeck():Cards() do
+		        if card.rarity == CARD_RARITY.BASIC then
+			        minigame:PlayCard( card, nil, 1.0)
+			    end
+		    end
+		end,
+	},
+
+	PC_ALAN_PREPARATION_ii =
+	{
+		name = "Preparation II",
+		desc = "Play all basic cards in your hand and draw pile.",
+		flags = NEGOTIATION_FLAGS.MANIPULATE,
+		series = "ALAN",
+		OnPostResolve = function( self, minigame, card )
+		    for i, card in self.engine:GetHandDeck():Cards() do
+		        if card.rarity == CARD_RARITY.BASIC then
+			        minigame:PlayCard( card, nil, 1.0)
+			    end
+		    end
+
+		    for i, card in self.engine:GetDrawDeck():Cards() do
+		        if card.rarity == CARD_RARITY.BASIC then
+			        minigame:PlayCard( card, nil, 1.0)
+			    end
+		    end
+		end,
+	},
+
+	PC_ALAN_WINDFALL =
+	{
+		name = "Windfall",
+		desc = "Gain 30 shills.",
+		icon = "negotiation/cash_out.tex",
+		flavour = "'Yes, I used my sheer charm to score this many shills.'",
+		flags = NEGOTIATION_FLAGS.MANIPULATE,
+		series = "ALAN",
+		OnPostResolve = function( self, minigame )
+			self.engine:ModifyMoney( 30 )
+		end,
+	},
+
+	PC_ALAN_WINDFALL_ii =
+	{
+		name = "Windfall II",
+		desc = "Gain 50 shills.",
+		flags = NEGOTIATION_FLAGS.MANIPULATE,
+		series = "ALAN",
+		OnPostResolve = function( self, minigame )
+			self.engine:ModifyMoney( 50 )
+		end,
+	},
+}
 
 for i, id, data in sorted_pairs( NEGOTIATION_FLOURISHES ) do
-	data.series = "SHEL"
+	data.series = "ALAN"
 	assert(data.series, loc.format("Series missing on {1}", data.name))
 	if id:match( "(.*)_ii.*$" ) then
 		data.base_id = id:match( "(.*)_ii.*$" )
@@ -45,6 +204,7 @@ local BATTLE_FLOURISHES =
 		anim = "shoot",
 		flavour = "'Still too slow!'",
 		flags = CARD_FLAGS.RANGED,
+		series = "ALAN",
 		basic_flourish = true,
 		target_type = TARGET_TYPE.ENEMY,
 		hit_count = 3,
@@ -60,6 +220,7 @@ local BATTLE_FLOURISHES =
 		anim = "attack3",
 		icon = "battle/final_blow.tex",
 		flags = CARD_FLAGS.MELEE,
+		series = "ALAN",
 		target_type = TARGET_TYPE.ENEMY,
 		target_mod = TARGET_MOD.TEAM,
         min_damage = 10,
@@ -72,6 +233,7 @@ local BATTLE_FLOURISHES =
 		desc = "Attack all enemies twice.",
 		anim = "attack3",
 		flags = CARD_FLAGS.MELEE,
+		series = "ALAN",
 		target_type = TARGET_TYPE.ENEMY,
 		hit_count = 2,
 	},
@@ -87,6 +249,7 @@ local BATTLE_FLOURISHES =
 		anim = "taunt",
 		icon = "battle/lumin_generator.tex",
 		flags = CARD_FLAGS.SKILL,
+		series = "ALAN",
 		target_type = TARGET_TYPE.SELF,
         lumin_res_amt = 5,
         eva_amt = 1,
@@ -101,6 +264,7 @@ local BATTLE_FLOURISHES =
 		name = "Lumin Bio-Accelerator II",
 		desc = "Gain {1} {LUMIN_RESERVE} and {2} {EVASION}.",
 		flags = CARD_FLAGS.SKILL,
+		series = "ALAN",
 		target_type = TARGET_TYPE.SELF,
         lumin_res_amt = 10,
         eva_amt = 3,
@@ -121,6 +285,7 @@ local BATTLE_FLOURISHES =
 		anim = "throw",
 		icon = "battle/spark_cannon.tex",
 		flags = CARD_FLAGS.RANGED,
+		series = "ALAN",
 		target_type = TARGET_TYPE.ENEMY,
 		spark_amt = 5,
         OnPostResolve = function( self, battle, attack )
@@ -136,6 +301,7 @@ local BATTLE_FLOURISHES =
             return loc.format( fmt_str, self.spark_amt )
         end,
 		flags = CARD_FLAGS.RANGED,
+		series = "ALAN",
 		target_type = TARGET_TYPE.ENEMY,
 		spark_amt = 10,
         OnPostResolve = function( self, battle, attack )
@@ -154,6 +320,7 @@ local BATTLE_FLOURISHES =
 		anim = "taunt",
 		icon = "battle/scrounge.tex",
 		flags = CARD_FLAGS.SKILL,
+		series = "ALAN",
 		target_type = TARGET_TYPE.SELF,
 		num_draw = 4,
         OnPostResolve = function( self, battle, attack )
@@ -170,6 +337,7 @@ local BATTLE_FLOURISHES =
             return loc.format( fmt_str, self.num_draw )
         end,
 		flags = CARD_FLAGS.SKILL,
+		series = "ALAN",
 		target_type = TARGET_TYPE.SELF,
 		num_draw = 8,
         OnPostResolve = function( self, battle, attack )
@@ -182,7 +350,7 @@ local BATTLE_FLOURISHES =
 
 
 for i, id, data in sorted_pairs( BATTLE_FLOURISHES ) do
-	data.series = "SHEL"
+	data.series = "ALAN"
 	assert(data.series, loc.format("Series missing on {1}", data.name))
 	if id:match( "(.*)_ii.*$" ) then
 		data.base_id = id:match( "(.*)_ii.*$" )
