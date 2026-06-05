@@ -2720,10 +2720,10 @@ local CARDS =
             return loc.format( fmt_str, self.bonus_damage, self.count )
         end,
         flavour = "'Here, let me give you your f***ing reason!'",
-        cost = 0,
-        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND | CARD_FLAGS.STICKY,
+        cost = 2,
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.STICKY,
         rarity = CARD_RARITY.UNCOMMON,
-        max_xp = 10,
+        max_xp = 7,
         min_persuasion = 0,
         max_persuasion = 0,
         bonus_damage = 4,
