@@ -3593,7 +3593,7 @@ local CARDS =
         max_xp = 10,
         event_handlers =
         {
-            [ EVENT.DRAW_CARD ] = function( self, minigame, card, start_of_turn )
+            [ EVENT.DRAW_CARD ] = function( self, minigame, card )
                 if card == self then
                     self:NotifyTriggeredPre()
 
@@ -3629,7 +3629,7 @@ local CARDS =
         active = true,
         event_handlers =
         {
-            [ EVENT.DRAW_CARD ] = function( self, minigame, card, start_of_turn )
+            [ EVENT.DRAW_CARD ] = function( self, minigame, card )
                 if card == self and self.active then
                     self:NotifyTriggeredPre()
 
