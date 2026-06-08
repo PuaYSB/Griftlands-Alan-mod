@@ -476,7 +476,7 @@ local MODIFIERS =
         {
             [ EVENT.END_TURN ] = function( self, minigame, agent )
                 local trust = self.negotiator:GetModifierStacks("PA_TRUST")
-                if genuine >= 10 then
+                if trust >= 10 then
                     minigame:Win()
                 end
             end
