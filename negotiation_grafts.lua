@@ -204,44 +204,6 @@ local GRAFTS =
         basic_amt = 2,
     },
 
-    PC_ALAN_NECKLACE =
-    {
-        name = "Necklace",
-        flavour = "'This effect feels incredibly familiar, though I have no clue why.'",
-        desc = "When you have at least 3 friendly argument, all cards deal 2 bonus damage.",
-        img = engine.asset.Texture("icons/items/graft_clan_chain.tex"),
-        rarity = CARD_RARITY.UNCOMMON,
-        bonus_damage = 2,
-        negotiation_modifier = 
-        {
-            hidden = true,
-            event_handlers =
-            {
-                [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-                    if source.owner == self.owner and is_instance( source, Negotiation.Card ) and source:IsAttack() then
-                        local count = 0
-                        for i, modifier in self.negotiator:Modifiers() do
-                            if modifier.modifier_type == MODIFIER_TYPE.BOUNTY or modifier.modifier_type == MODIFIER_TYPE.ARGUMENT then
-                                count = count + 1
-                            end
-                        end
-                        if count >= 3 then
-                            persuasion:AddPersuasion( self.graft:GetDef().bonus_damage, self.graft:GetDef().bonus_damage, self )
-                        end
-                    end
-                end,
-            }
-        },
-    },
-
-    PC_ALAN_NECKLACE_plus =
-    {
-        name = "Boosted Necklace",
-        icon_override = "clan_chain_plus",
-        desc = "When you have at least 3 friendly argument, all cards deal <#UPGRADE>3</> bonus damage.",
-        bonus_damage = 3,
-    },
-
     PC_ALAN_HEADPHONES =
     {
         name = "Headphones",
@@ -358,7 +320,7 @@ local GRAFTS =
 
     PC_ALAN_REAL_TIME_TRANSLATOR_plus =
     {
-        name = "Boosted Prosthetic Tongue",
+        name = "Wide Prosthetic Tongue",
         icon_override = "scan_code_plus",
         desc = "<#UPGRADE>4</> times per turn, whenever you play a basic card, gain 1 {PA_OBSERVATION_RECORD}.",
         streak_count = 4,
@@ -438,6 +400,85 @@ local GRAFTS =
         count = 2,
     },
 
+    PC_ALAN_STICK =
+    {
+        name = "Stick",
+        flavour = "'Extremely simple and straightforward, just like the time it came from.'",
+        desc = "When you have at least  card on your hand, discard any number of cards, then apply 1 {COMPOSURE} to a random argument that many cards.",
+        img = engine.asset.Texture("icons/items/graft_truncheon.tex"),
+        rarity = CARD_RARITY.UNCOMMON,
+        limit = 8,
+        negotiation_modifier =
+        {
+            hidden = true,
+            event_handlers =
+            {
+                [ EVENT.DRAW_CARD ] = function( self, minigame, card)
+                    local count = minigame:GetHandDeck():CountCards() or 0
+                    if count >= self.graft:GetDef().limit then
+                        self:NotifyTriggered()
+                        local cards = minigame:DiscardCards(nil, nil, self)
+                        if #cards > 0 then
+                            for i = 1, #cards do
+                                local targets = self.engine:CollectAlliedTargets(self.negotiator)
+                                if #targets > 0 then
+                                    local target = targets[math.random(#targets)]
+                                    target:DeltaComposure(1, self)
+                                end
+                            end
+                        end
+                    end
+                end,
+            },
+        },
+    },
+
+    PC_ALAN_STICK_plus =
+    {
+        name = "Wide Gang Badge",
+        icon_override = "truncheon_plus",
+        desc = "When you have at least <#UPGRADE>7</> card on your hand, discard any number of cards, then apply 1 {COMPOSURE} to a random argument that many cards.",
+        limit = 7,
+    },
+
+    PC_ALAN_NECKLACE =
+    {
+        name = "Necklace",
+        flavour = "'This effect feels incredibly familiar, though I have no clue why.'",
+        desc = "When you have at least 3 friendly argument, all cards deal 2 bonus damage.",
+        img = engine.asset.Texture("icons/items/graft_clan_chain.tex"),
+        rarity = CARD_RARITY.RARE,
+        bonus_damage = 2,
+        negotiation_modifier = 
+        {
+            hidden = true,
+            event_handlers =
+            {
+                [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
+                    if source.owner == self.owner and is_instance( source, Negotiation.Card ) and source:IsAttack() then
+                        local count = 0
+                        for i, modifier in self.negotiator:Modifiers() do
+                            if modifier.modifier_type == MODIFIER_TYPE.BOUNTY or modifier.modifier_type == MODIFIER_TYPE.ARGUMENT then
+                                count = count + 1
+                            end
+                        end
+                        if count >= 3 then
+                            persuasion:AddPersuasion( self.graft:GetDef().bonus_damage, self.graft:GetDef().bonus_damage, self )
+                        end
+                    end
+                end,
+            }
+        },
+    },
+
+    PC_ALAN_NECKLACE_plus =
+    {
+        name = "Boosted Necklace",
+        icon_override = "clan_chain_plus",
+        desc = "When you have at least 3 friendly argument, all cards deal <#UPGRADE>3</> bonus damage.",
+        bonus_damage = 3,
+    },
+
     PC_ALAN_AMULET =
     {
         name = "Amulet",
@@ -509,44 +550,6 @@ local GRAFTS =
         icon_override = "gang_pendant_plus",
         desc = "At the end of each negotiation, insert <#UPGRADE>2 {card.known_thug} cards</> with replenish into your draw pile.",
         count = 2,
-    },
-
-    PC_ALAN_STICK =
-    {
-        name = "Stick",
-        flavour = "'Extremely simple and straightforward, just like the time it came from.'",
-        desc = "While you have at most 1 argument, all your card deal 50% bonus damage.",
-        img = engine.asset.Texture("icons/items/graft_truncheon.tex"),
-        rarity = CARD_RARITY.RARE,
-        max = 1,
-        negotiation_modifier =
-        {
-            hidden = true,
-            event_handlers =
-            {
-                [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
-                    if source.owner == self.owner and is_instance( source, Negotiation.Card ) and source:IsAttack() then
-                        local count = 0
-                        for i, modifier in self.negotiator:Modifiers() do
-                            if modifier.modifier_type == MODIFIER_TYPE.BOUNTY or modifier.modifier_type == MODIFIER_TYPE.ARGUMENT then
-                                count = count + 1
-                            end
-                        end
-                        if count <= self.graft:GetDef().max then
-                            persuasion:ModifyPersuasion( math.round(persuasion.min_persuasion * 1.50), math.round(persuasion.max_persuasion * 1.50), self)
-                        end
-                    end
-                end,
-            },
-        },
-    },
-
-    PC_ALAN_STICK_plus =
-    {
-        name = "Boosted Gang Badge",
-        icon_override = "truncheon_plus",
-        desc = "At the end of each negotiation, insert <#UPGRADE>2 {card.known_thug} cards</> with replenish into your draw pile.",
-        max = 2,
     },
 
     PC_ALAN_NEURAL_BRAID =

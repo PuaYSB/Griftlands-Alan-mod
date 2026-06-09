@@ -72,9 +72,9 @@ local MODIFIERS =
         },
     },
 
-    PA_BASIC_SKILLS = 
+    PA_OBSERVATION_RECORD = 
     {
-        name = "Basic skills",
+        name = "Observation Record",
         desc = "Basic cards deal <#HILITE>{1}</> bonus damage and apply additional <#HILITE>{2}</> {COMPOSURE}.\nThe latter increases by 1 every 3 stacks.",
         desc_fn = function( self, fmt_str )
             return loc.format( fmt_str, self.stacks, math.floor(self.stacks / 3) )
@@ -220,20 +220,20 @@ local MODIFIERS =
         },
     },
 
-    PA_ANTI_BASIC_SKILLS =
+    PA_ANTI_OBSERVATION_RECORD =
     {
         name = "Snap out of it",
         max_resolve = 2,
         sound = "event:/sfx/battle/cards/neg/create_argument/setup",
         icon = "negotiation/modifiers/go_between.tex",
-        desc = "At the end of your turn, lose {1} {PA_BASIC_SKILLS}, then remove this argument.",
+        desc = "At the end of your turn, lose {1} {PA_OBSERVATION_RECORD}, then remove this argument.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.stacks or 1)
         end,
         event_handlers =
         {
             [ EVENT.END_PLAYER_TURN ] = function( self, minigame )
-                self.negotiator:RemoveModifier("PA_BASIC_SKILLS", self.stacks, self)
+                self.negotiator:RemoveModifier("PA_OBSERVATION_RECORD", self.stacks, self)
                 self.negotiator:RemoveModifier( self )
             end,
         },
@@ -771,57 +771,57 @@ local CARDS =
         
     },
 
-    PC_ALAN_BASIC_SKILLS =
+    PC_ALAN_OBSERVATION_RECORD =
     {
-        name = "Basic skills",
+        name = "Observation Record",
         icon = "negotiation/negotiation_wild.tex",
-        desc = "Gain {1} {PA_BASIC_SKILLS}.",
+        desc = "Gain {1} {PA_OBSERVATION_RECORD}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.basic_amt)
         end,
-        flavour = "'Wanna win a negotiation? It’s all about the hand you play.'",
+        flavour = "'Wanna win a negotiation? It’s all about the hand you play, and what cards the enemy can play.'",
         flags = CARD_FLAGS.MANIPULATE,
         rarity = CARD_RARITY.BASIC,
         max_xp = 6,
         cost = 1,
         basic_amt = 1,
         OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PA_BASIC_SKILLS", self.basic_amt, self)
+            self.negotiator:AddModifier("PA_OBSERVATION_RECORD", self.basic_amt, self)
         end,
     },
 
-    PC_ALAN_BASIC_SKILLS_plus =
+    PC_ALAN_OBSERVATION_RECORD_plus =
     {
-        name = "Stone Basic skills",
-        desc = "Gain {1} {PA_BASIC_SKILLS}.\n<#UPGRADE>Apply {2} {COMPOSURE}</>.",
+        name = "Stone Observation Record",
+        desc = "Gain {1} {PA_OBSERVATION_RECORD}.\n<#UPGRADE>Apply {2} {COMPOSURE}</>.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.basic_amt, self:CalculateComposureText( self.composure_amt ))
         end,
         composure_amt = 3,
         target_self = TARGET_ANY_RESOLVE,
         OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PA_BASIC_SKILLS", self.basic_amt, self)
+            self.negotiator:AddModifier("PA_OBSERVATION_RECORD", self.basic_amt, self)
             for i,target in ipairs(targets) do
                 target:DeltaComposure(self.composure_amt, self)
             end
         end,
     },
 
-    PC_ALAN_BASIC_SKILLS_plus2 =
+    PC_ALAN_OBSERVATION_RECORD_plus2 =
     {
-        name = "Only Basic skills",
-        desc = "Gain {1} {PA_BASIC_SKILLS}.\n<#UPGRADE>{PA_UNIQUE}: Gain additional {2} {PA_BASIC_SKILLS}</>.",
+        name = "Only Observation Record",
+        desc = "Gain {1} {PA_OBSERVATION_RECORD}.\n<#UPGRADE>{PA_UNIQUE}: Gain additional {2} {PA_OBSERVATION_RECORD}</>.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.basic_amt, self.alt_basic_amt)
         end,
         alt_basic_amt = 2,
         deck_handlers = { DECK_TYPE.DRAW, DECK_TYPE.DISCARDS, DECK_TYPE.RESOLVE, DECK_TYPE.IN_HAND },
         OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PA_BASIC_SKILLS", self.basic_amt, self)
+            self.negotiator:AddModifier("PA_OBSERVATION_RECORD", self.basic_amt, self)
             
             local is_unique = IsCardUnique(self)
             if is_unique then
-                self.negotiator:AddModifier("PA_BASIC_SKILLS", self.alt_basic_amt, self)
+                self.negotiator:AddModifier("PA_OBSERVATION_RECORD", self.alt_basic_amt, self)
             end
         end,
     },
@@ -1802,7 +1802,7 @@ local CARDS =
     PC_ALAN_CONTRACT = 
     {
         name = "Contract",
-        desc = "Double your {PA_BASIC_SKILLS}.\nAt the end of your turn, lose those {PA_BASIC_SKILLS} that gain by this card.",
+        desc = "Double your {PA_OBSERVATION_RECORD}.\nAt the end of your turn, lose those {PA_OBSERVATION_RECORD} that gain by this card.",
         icon = "negotiation/compel.tex",
         flavour = "'Just a very simple contract and no catches inside.'",
         cost = 1,
@@ -1810,22 +1810,22 @@ local CARDS =
         rarity = CARD_RARITY.UNCOMMON,
         max_xp = 9,
         OnPostResolve = function( self, minigame, targets )
-            local stacks = self.negotiator:GetModifierStacks("PA_BASIC_SKILLS")
-            self.negotiator:AddModifier("PA_BASIC_SKILLS", stacks, self)
-            self.negotiator:AddModifier("PA_ANTI_BASIC_SKILLS", stacks, self)
+            local stacks = self.negotiator:GetModifierStacks("PA_OBSERVATION_RECORD")
+            self.negotiator:AddModifier("PA_OBSERVATION_RECORD", stacks, self)
+            self.negotiator:AddModifier("PA_ANTI_OBSERVATION_RECORD", stacks, self)
         end,
     },
 
     PC_ALAN_CONTRACT_plus =
     {
         name = "Boosted Argument",
-        desc = "<#UPGRADE>Gain 1 {PA_BASIC_SKILLS}, then</> Double your {PA_BASIC_SKILLS}.\nAt the end of your turn, lose those {PA_BASIC_SKILLS} that gain by this card.",
+        desc = "<#UPGRADE>Gain 2 {PA_OBSERVATION_RECORD}, then</> Double your {PA_OBSERVATION_RECORD}.\nAt the end of your turn, lose those {PA_OBSERVATION_RECORD} that gain by this card.",
         OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PA_BASIC_SKILLS", 1, self)
-            self.negotiator:AddModifier("PA_ANTI_BASIC_SKILLS", 1, self)
-            local stacks = self.negotiator:GetModifierStacks("PA_BASIC_SKILLS")
-            self.negotiator:AddModifier("PA_BASIC_SKILLS", stacks, self)
-            self.negotiator:AddModifier("PA_ANTI_BASIC_SKILLS", stacks, self)
+            self.negotiator:AddModifier("PA_OBSERVATION_RECORD", 2, self)
+            self.negotiator:AddModifier("PA_ANTI_OBSERVATION_RECORD", 2, self)
+            local stacks = self.negotiator:GetModifierStacks("PA_OBSERVATION_RECORD")
+            self.negotiator:AddModifier("PA_OBSERVATION_RECORD", stacks, self)
+            self.negotiator:AddModifier("PA_ANTI_OBSERVATION_RECORD", stacks, self)
         end,
     },
 
@@ -1885,7 +1885,7 @@ local CARDS =
     PC_ALAN_NOTES = 
     {
         name = "Notes",
-        desc = "Gain {PA_BASIC_SKILLS} equal to damage dealt by this card.",
+        desc = "Gain {PA_OBSERVATION_RECORD} equal to damage dealt by this card.",
         icon = "negotiation/contacts.tex",
         flavour = "'Hold on, let me write this down!'",
         cost = 1,
@@ -1898,7 +1898,7 @@ local CARDS =
         {
             [ EVENT.ATTACK_RESOLVE ] = function( self, source, target, damage, params, defended )
                 if source == self and damage > 0 then
-                    self.negotiator:AddModifier("PA_BASIC_SKILLS", damage, self)
+                    self.negotiator:AddModifier("PA_OBSERVATION_RECORD", damage, self)
                 end
             end
         },
@@ -1914,14 +1914,14 @@ local CARDS =
     PC_ALAN_NOTES_plus2 =
     {
         name = "Only Notes",
-        desc = "Gain {PA_BASIC_SKILLS} equal to damage dealt by this card.\n<#DOWNGRADE>{PA_UNIQUE}: This card is able to deal damage</>.",
+        desc = "Gain {PA_OBSERVATION_RECORD} equal to damage dealt by this card.\n<#DOWNGRADE>{PA_UNIQUE}: This card is able to deal damage</>.",
         min_persuasion = 2,
         max_persuasion = 4,
         event_handlers =
         {
             [ EVENT.ATTACK_RESOLVE ] = function( self, source, target, damage, params, defended )
                 if source == self and damage > 0 then
-                    self.negotiator:AddModifier("PA_BASIC_SKILLS", damage, self)
+                    self.negotiator:AddModifier("PA_OBSERVATION_RECORD", damage, self)
                 end
             end,
 
@@ -2880,7 +2880,7 @@ local CARDS =
     {
         name = "Memo",
         icon = "negotiation/ransack.tex",
-        desc = "Draw {1} cards. Gain {2} {PA_BASIC_SKILLS} for each basic card drawn.",
+        desc = "Draw {1} cards. Gain {2} {PA_OBSERVATION_RECORD} for each basic card drawn.",
         desc_fn = function( self, fmt_str )
             return loc.format( fmt_str, self.draw_count, self.basic_amt)
         end,
@@ -2899,21 +2899,21 @@ local CARDS =
                     basic = basic + 1
                 end
             end
-            self.negotiator:AddModifier( "PA_BASIC_SKILLS", (self.basic_amt * basic), self )
+            self.negotiator:AddModifier( "PA_OBSERVATION_RECORD", (self.basic_amt * basic), self )
         end,
     },
 
     PC_ALAN_MEMO_plus =
     {
         name = "Visionary Memo",
-        desc = "Draw <#UPGRADE>{1}</> cards. Gain {2} {PA_BASIC_SKILLS} for each basic card drawn.",
+        desc = "Draw <#UPGRADE>{1}</> cards. Gain {2} {PA_OBSERVATION_RECORD} for each basic card drawn.",
         draw_count = 3,
     },
 
     PC_ALAN_MEMO_plus2 =
     {
         name = "Boosted Memo",
-        desc = "Draw {1} cards. Gain <#UPGRADE>{2}</> {PA_BASIC_SKILLS} for each basic card drawn.",
+        desc = "Draw {1} cards. Gain <#UPGRADE>{2}</> {PA_OBSERVATION_RECORD} for each basic card drawn.",
         basic_amt = 2,
     },
 
