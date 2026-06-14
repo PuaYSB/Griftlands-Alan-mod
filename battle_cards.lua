@@ -73,7 +73,7 @@ local CONDITIONS =
     LUMIN_RESERVE =
     {
         name = "Lumin Reserve",
-        desc = "Your next attack applies <#HILITE>{1} {lumin_burnt}</> and <#HILITE>{2} {DEFEND}</> to the target.\nThe latter increases by 1 every 5 stacks.",
+        desc = "Your next attack applies <#HILITE>{1} {lumin_burnt}</> and <#HILITE>{2} {DEFEND}</> to the target.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.stacks, math.ceil(self.stacks / 5))
         end,
@@ -379,17 +379,27 @@ local CONDITIONS =
     {
         name = "Power Surge",
         icon = "battle/conditions/furor.tex",        
-        desc = "Whenever you play a card that have cost at least 2, Play it again.",
+        desc = "Whenever you play a card that have cost at least 2, Play it again.\nThis ability cannot be stacked.",
         max_stacks = 1,
+        OnApply = function( self )
+            self.ignore = {}
+        end,
         event_handlers =
         {
             [ BATTLE_EVENT.START_RESOLVE ] = function(self, battle, card, attack)
-            if card and card.owner == self.owner and card.cost and card.cost >= 2 then
-                if not card.surge_played then
-                    card.surge_played = true  
-                    battle:PlayCard(card) 
+                if card and card.owner == self.owner and card.cost and card.cost >= 2 then
+                    if not table.contains(self.ignore, card) then
+                        table.insert(self.ignore, card)
+                        battle:PlayCard(card) 
+                    else
+                        for i, v in ipairs(self.ignore) do
+                            if v == card then
+                                table.remove(self.ignore, i)
+                                break
+                            end
+                        end
+                    end
                 end
-            end
             end,
         }
     },
@@ -483,6 +493,7 @@ local CARDS =
     {
         name = "Spark Punch",
         flags = CARD_FLAGS.MELEE,
+        hit_tags = {"spark"},
         desc = "<#UPGRADE>Apply {1} {SPARK_RESERVE}</>.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, CalculateConditionText( self, "SPARK_RESERVE", self.spark_amt ))
@@ -508,13 +519,16 @@ local CARDS =
         min_damage = 2,
         max_damage = 5,
         defend_amount = 3,
+        OnPostResolve = function(self, battle, attack)
+            self.owner:AddCondition( "DEFEND", self.defend_amount, self )
+        end,
     },
 
     PC_ALAN_THROW_BOTTLE =
     {
         name = "Throw Bottle",
         icon = "battle/right_in_the_face.tex",
-        anim = "throw",
+        anim = "bottle_throw",
         flavour = "'I'd better prepare more bottles, whether for storing or throwing.'",
         rarity = CARD_RARITY.BASIC,
         flags = CARD_FLAGS.RANGED,
@@ -566,6 +580,7 @@ local CARDS =
     {
         name = "Throw Lumin Bottle",
         flags = CARD_FLAGS.RANGED ,
+        hit_tags = { "lumin" },
         desc = "<#UPGRADE>Apply {1} {lumin_burnt}</>.",
         min_damage = 3,
         max_damage = 3,
@@ -581,7 +596,7 @@ local CARDS =
     PC_ALAN_THROW_BOTTLE_plus2f =
     {
         name = "Weighted Throw Bottle",
-        flags = CARD_FLAGS.RANGED ,
+        flags = CARD_FLAGS.RANGED,
         desc = "<#UPGRADE>{PC_ALAN_WEIGHTED}{1}: Deal bonus damage double to the cost of the most expensive card in your hand</>.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.weight_thresh)
@@ -629,7 +644,7 @@ local CARDS =
         cost = 1,
         max_xp = 8,
         OnPostResolve = function( self, battle, attack )
-            self.owner:AddCondition( "DEFEND", self.defend_amount, self )
+            attack.target:AddCondition("DEFEND", self.defend_amount, self)
         end
     },
 
@@ -648,8 +663,8 @@ local CARDS =
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
         eva_amt = 1,
         OnPostResolve = function( self, battle, attack )
-            attack:AddCondition( "DEFEND", self.defend_amount, self )
-            self.owner:AddCondition("EVASION", self.eva_amt, self)
+            attack.target:AddCondition("DEFEND", self.defend_amount, self)
+            attack.target:AddCondition("EVASION", self.eva_amt, self)
         end,
     },
 
@@ -662,8 +677,8 @@ local CARDS =
         end,        
         flags = CARD_FLAGS.SKILL,
         OnPostResolve = function(self, battle, attack)
-            attack:AddCondition("DEFEND", self.defend_amount, self)
-            attack:AddCondition("LUMIN_RESERVE", self.lumin_res_amt, self)
+            attack.target:AddCondition("DEFEND", self.defend_amount, self)
+            self.owner:AddCondition("LUMIN_RESERVE", self.lumin_res_amt, self)
         end,
         lumin_res_amt = 3,
     },
@@ -683,7 +698,7 @@ local CARDS =
                 self.defend_amount = 8
             end
 
-            self.owner:AddCondition("DEFEND", self.defend_amount, self)
+            attack.target:AddCondition("DEFEND", self.defend_amount, self)
             self.owner:AddCondition("SPARK_RESERVE", self.spark_amt, self)
         end,
         spark_amt = 2,
@@ -751,7 +766,6 @@ local CARDS =
     {
         name = "Lumin",
         icon = "battle/lumin_canister.tex",
-        anim = "taunt",
         flavour = "'Lumin, discovered by the Cult of Hesh during their search for Hesh, is relatively stable but still highly dangerous.'",
         desc = "Gain {1} {LUMIN_RESERVE}.",
         desc_fn = function(self, fmt_str)
@@ -773,6 +787,7 @@ local CARDS =
         icon = "battle/sparkys_oppressor_cell.tex",
         flavour = "'Spark, first discovered around Lakespit, is of unknown flammability but is certainly highly explosive.'",
         anim = "throw",
+        hit_tags = {"spark"},
         desc = "Apply {1} {SPARK_RESERVE}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, CalculateConditionText( self, "SPARK_RESERVE", self.spark_amt ))
@@ -782,7 +797,7 @@ local CARDS =
         spark_amt = 2,
         cost = 0,
         rarity = CARD_RARITY.UNIQUE,
-        flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND,
+        flags = CARD_FLAGS.RANGED | CARD_FLAGS.EXPEND,
         target_type = TARGET_TYPE.ENEMY,
         OnPostResolve = function(self, battle, attack)
             if attack and attack.target then
@@ -819,8 +834,8 @@ local CARDS =
         flavour = "'Apply it to your weapon, give the enemy a light scrape, and then watch them start begging for mercy.'",
         desc = "Gain {1} {LUMIN_RESERVE} and {2} {DEFEND}.",
         desc_fn = function(self, fmt_str)
-        return loc.format(fmt_str, CalculateConditionText(self, "LUMIN_RESERVE", self.lumin_res_amt), self:CalculateDefendText(self.defend_amount))
-    end,
+            return loc.format(fmt_str, CalculateConditionText(self, "LUMIN_RESERVE", self.lumin_res_amt), self:CalculateDefendText(self.defend_amount))
+        end,
         lumin_res_amt = 3,
         defend_amount = 4,
         cost = 0,
@@ -839,6 +854,7 @@ local CARDS =
         icon = "battle/status_lumin_burn.tex",
         flavour = "'Or, if you find it troublesome, just throw it over instead.'",
         anim = "throw",
+        hit_tags = { "lumin" },
         desc = "Apply {1} {lumin_burnt}.",
         desc_fn = function( self, fmt_str )
             return loc.format( fmt_str, self.lumin_burnt_amt )
@@ -859,7 +875,6 @@ local CARDS =
     {
         name = "Spark Reserve",
         icon = "battle/sparkys_oppressor_cell.tex",
-        anim = "taunt",
         flavour = "'Better stick with Spark—my equipment isn’t that well-sealed.'",
         desc = "Insert <#UPGRADE>{PC_ALAN_SPARK_2a}</> or <#UPGRADE>{PC_ALAN_SPARK_2b}</> into your hand.",
         rarity = CARD_RARITY.BASIC,
@@ -882,6 +897,7 @@ local CARDS =
         name = "Spark Throw",
         icon = "battle/twist.tex",
         anim = "throw",
+        hit_tags = {"spark"},
         flavour = "'Just toss it over and wait for the boom.'",
         desc = "Gain {1} {SPARK_RESERVE}.\nApply {2} {SPARK_RESERVE}.",
         desc_fn = function(self, fmt_str)
@@ -906,7 +922,7 @@ local CARDS =
     {
         name = "Spark Boost",
         icon = "battle/overloaded_spark_hammer_hatch.tex",
-        anim = "throw",
+        anim = "gut_shot",
         flavour = "'It’s best to use Spark right away—leave too much together for too long, and it might react.'",
         desc = "Spend 1 {SPARK_RESERVE}: Deal 4 bonus damage.",
         rarity = CARD_RARITY.UNIQUE,
@@ -1079,7 +1095,7 @@ local CARDS =
         flavour = "'At least now it can be taken multiple times a day.'",
         cost = 1,
         max_xp = 0,       
-        anim = "taunt",
+        anim = "drink",
         target_type = TARGET_TYPE.SELF,
 
         rarity = CARD_RARITY.UNIQUE,
@@ -1096,7 +1112,7 @@ local CARDS =
         name = "Pale Diluted Tincture",
         icon = "battle/tincture.tex",
         cost = 0,
-        anim = "taunt",
+        anim = "drink",
         target_type = TARGET_TYPE.SELF,
         rarity = CARD_RARITY.UNIQUE,
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
@@ -1111,7 +1127,7 @@ local CARDS =
     {
         name = "Trash",
         icon = "battle/flekfis_junk.tex",
-        anim = "taunt",
+        anim = "throw",
         flavour = "'…Sorry, I forgot to throw this away. Here, you can have it.'",
         target_type = TARGET_TYPE.SELF,
 
@@ -1130,7 +1146,7 @@ local CARDS =
     {
         name = "Heavy Trash",
         icon = "battle/flekfis_junk.tex",
-        anim = "taunt",
+        anim = "throw",
         target_type = TARGET_TYPE.SELF,
 
         rarity = CARD_RARITY.UNIQUE,
@@ -1231,7 +1247,8 @@ local CARDS =
     {
         name = "Diluted Lumin Grenade",
         icon = "battle/lumin_grenade.tex",
-        anim = "throw",
+        anim = "bottle_throw",
+        hit_tags = {"lumin"},
         desc = "Apply {1} {lumin_burnt}.",
         desc_fn = function(self, fmt_str)
         return loc.format(fmt_str, CalculateConditionText(self, "lumin_burnt", self.lumin_burnt_amt))
@@ -1251,7 +1268,8 @@ local CARDS =
     {
         name = "Better Diluted Lumin Grenade",
         icon = "battle/lumin_grenade.tex",
-        anim = "throw",
+        anim = "bottle_throw",
+        hit_tags = {"lumin"},
         rarity = CARD_RARITY.UNIQUE,
         cost = 0,
         flags = CARD_FLAGS.EXPEND | CARD_FLAGS.RANGED,
@@ -1263,6 +1281,7 @@ local CARDS =
         name = "Spark Mixture",
         icon = "battle/spark_grenade.tex",
         anim = "throw",
+        hit_tags = {"spark"},
         desc = "Gain {1} {SPARK_RESERVE}.\nApply {1} {SPARK_RESERVE}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, CalculateConditionText(self, "SPARK_RESERVE", self.spark_amt))
@@ -1286,6 +1305,7 @@ local CARDS =
         name = "Boosted Spark Mixture",
         icon = "battle/spark_grenade.tex",
         anim = "throw",
+        hit_tags = {"spark"},
         rarity = CARD_RARITY.UNIQUE,
         cost = 0,
         flags = CARD_FLAGS.EXPEND | CARD_FLAGS.RANGED,
@@ -1296,7 +1316,8 @@ local CARDS =
     {
         name = "Inertial Impact",
         icon = "battle/brazen_attack.tex",
-        anim = "punch",
+        anim = "back_hamm",
+        hit_tags = {"critical"},
         desc = "Gain {1} {DEFEND}.\n{PC_ALAN_WEIGHTED} {2}: Gain 1 Action.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str,self:CalculateDefendText( self.defend_amount ),self.weight_thresh)
@@ -1343,7 +1364,7 @@ local CARDS =
     {
         name = "Lumin Dagger",
         icon = "battle/makeshift_dagger.tex",
-        anim = "punch",
+        anim = "stab",
         desc = "Deal 3 bonus damage if you have any {LUMIN_RESERVE}.",
         flavour = "'A simple knife coated with Lumin. The craftsmanship is crude—worse than the daggers used by Luminitiates.'",
         rarity = CARD_RARITY.COMMON,
@@ -1380,6 +1401,7 @@ local CARDS =
     {
         name = "Lumin Dagger of the Mirror",
         desc = "Deal 3 bonus damage and <#UPGRADE>Attack twice.</> if you have any {LUMIN_RESERVE}.",
+        hit_anim = true,
         min_damage = 1,
         max_damage = 3,
         event_handlers =
@@ -1401,7 +1423,8 @@ local CARDS =
     {
         name = "Spark Propulsion",
         icon = "battle/spark_shot.tex",
-        anim = "throw",
+        anim = "shoot",
+        anims = { "anim/weapon_blaster_stungun.zip"},
         desc = "Spend 1 {SPARK_RESERVE}: This card costs 0.",
         flavour = "'Once you understand the principle, it’s actually quite simple.'",
         rarity = CARD_RARITY.COMMON,
@@ -1454,7 +1477,9 @@ local CARDS =
     {
         name = "Spark Bullet",
         icon = "battle/improvise_tracer.tex",
-        anim = "throw",
+        anim = "shoot",
+        hit_tags = {"spark"},
+        anims = { "anim/weapon_blaster_stungun.zip"},
         desc = "Apply {1} {SPARK_RESERVE}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, CalculateConditionText(self, "SPARK_RESERVE", self.spark_amt))
@@ -1505,6 +1530,7 @@ local CARDS =
         name = "Lumin Bomb",
         icon = "battle/clear_shot.tex",
         anim = "throw",
+        hit_tags = {"lumin"},
         desc = "Apply {1} {lumin_burnt}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, CalculateConditionText(self, "lumin_burnt", self.lumin_burnt_amt))
@@ -1608,6 +1634,7 @@ local CARDS =
         name = "Splash Lumin",
         icon = "battle/reversal.tex",
         anim = "throw",
+        hit_tags = {"lumin"},
         desc = "Apply {lumin_burnt} equal to the damage dealt by this card.",
         flavour = "'Throw it and run—the area’s off-limits for a while..'",
         rarity = CARD_RARITY.COMMON,
@@ -1643,7 +1670,7 @@ local CARDS =
     {
         name = "Trip",
         icon = "battle/trip.tex",
-        anim = "punch",
+        anim = "trip",
         desc = "Apply 1 {WOUND}",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, CalculateConditionText( self, "WOUND", self.wou_amt ))
@@ -1668,8 +1695,8 @@ local CARDS =
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str,self.light_thresh,self.wou_amt)
         end,
-        light_thresh = 3,
-        wou_amt = 3,
+        light_thresh = 2,
+        wou_amt = 2,
         OnPostResolve = function(self, battle, attack)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost <= self.light_thresh then
@@ -1744,7 +1771,8 @@ local CARDS =
     {
         name = "Heavy Suppression",
         icon = "battle/boulder_rush.tex",
-        anim = "punch",
+        anim = "smash",
+        hit_tags = {"critical"},
         desc = "{PC_ALAN_WEIGHTED}{1}: Gain 2 actions.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.weight_thresh)
@@ -1790,7 +1818,7 @@ local CARDS =
     {
         name = "Disruptive Attack",
         icon = "battle/kidney_shot.tex",
-        anim = "punch",
+        anim = "knee",
         desc = "{PC_ALAN_LIGHTWEIGHT}{1}: Deal 3 bonus damage and lose 1 action.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.light_thresh)
@@ -1853,6 +1881,7 @@ local CARDS =
     {
         name = "Twisted Disruptive Attack",
         desc = "<#DOWNGRADE>{PC_ALAN_WEIGHTED}{1}</>: <#UPGRADE>Gain 2 {ADRENALINE}</>.",
+        hit_tags = {"critical"},
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.weight_thresh)
         end,
@@ -1868,7 +1897,9 @@ local CARDS =
     {
         name = "Aim",
         icon = "battle/crackle.tex",
-        anim = "punch",
+        anim = "shoot",
+        hit_tags = {"spark"},
+        anims = { "anim/weapon_blaster_stungun.zip"},
         desc = "If target have any {SPARK_RESERVE}, Apply {1} {SPARK_RESERVE}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, CalculateConditionText( self, "SPARK_RESERVE", self.spark_amt ))
@@ -1912,6 +1943,7 @@ local CARDS =
         name = "Catalyst",
         icon = "battle/affliction.tex",
         anim = "throw",
+        hit_tags = { "acid" },
         desc = "If the target have {lumin_burnt}, Apply {1} {WOUND} and {1} {EXPOSED}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, CalculateConditionText( self, "WOUND", self.wou_amt ),CalculateConditionText( self, "EXPOSED", self.exo_amt ))
@@ -1994,7 +2026,8 @@ local CARDS =
     {
         name = "Double Fists",
         icon = "battle/kiss_the_fists.tex",
-        anim = "punch",
+        anim = "gut_shot",
+        hit_anim = true,
         desc = "Attack twice.",
         flavour = "'What do you do after throwing one punch? Throw another, of course!'",
         rarity = CARD_RARITY.COMMON,
@@ -2025,7 +2058,6 @@ local CARDS =
     {
         name = "Lumin Infusion",
         icon = "battle/sals_daggers_bleed.tex",
-        anim = "taunt",
         desc = "Gain {1} {LUMIN_RESERVE}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, CalculateConditionText( self, "LUMIN_RESERVE", self.lumin_res_amt ))
@@ -2063,6 +2095,8 @@ local CARDS =
             return loc.format(fmt_str, CalculateConditionText( self, "SPARK_RESERVE", self.spark_amt ))
         end,
         target_type = TARGET_TYPE.ENEMY,
+        hit_tags = {"spark"},
+        anim = "stun",
         spark_amt = 3,
         OnPostResolve = function(self, battle, attack)
             self.owner:AddCondition("SPARK_RESERVE", self.spark_amt, self)
@@ -2074,7 +2108,7 @@ local CARDS =
     {
         name = "Plan",
         icon = "battle/footwork.tex",
-        anim = "taunt",
+        anim = "moxie_low",
         desc = "{IMPROVISE} a card from your draw pile.",
         flavour = "'Whether it’s an attack route or an escape route, it’s best to plan ahead.'",
         rarity = CARD_RARITY.COMMON,
@@ -2112,7 +2146,7 @@ local CARDS =
     {
         name = "Warm-up",
         icon = "battle/lever.tex",
-        anim = "taunt",
+        anim = "moxie_high",
         desc = "Gain 3 {ADRENALINE} at the start of your next turn.",
         flavour = "'Can’t help it—that’s just how the old models are. Take it or leave it.'",
         rarity = CARD_RARITY.COMMON,
@@ -2162,14 +2196,18 @@ local CARDS =
     {
         name = "Plate Armor",
         icon = "battle/bolstered_plating.tex",
-        anim = "taunt",
-        desc = "Gain {1} {DEFEND} per card in your hand.\n(Gain {2} {DEFEND}).",
-        desc_fn = function(self, fmt_str)
+        anim = "chest_pound",
+        desc = "Gain 1 {DEFEND} per card in your hand.",
+        loc_strings =
+        {
+            ALT_DESC = "Gain 1 {DEFEND} per card in your hand.\n(Gain {1} {DEFEND}).",
+        },
+        desc_fn = function( self, fmt_str )
             if self.engine then
                 local defend_amount = self:CalcDefend()
-                return loc.format(fmt_str, self.defend_amount, defend_amount)
+                return loc.format( self.def:GetLocalizedString( "ALT_DESC" ), self:CalculateDefendText(defend_amount) )
             else
-            return loc.format(fmt_str, self.defend_amount, 0) 
+                return fmt_str
             end
         end,
         flavour = "'Freshly stocked plate armor—personally demonstrated by yours truly!'",
@@ -2185,7 +2223,7 @@ local CARDS =
         end,
 
         OnPostResolve = function( self, battle, attack )
-             local defend_amount = self:CalcDefend() + self.defend_amount
+            local defend_amount = self:CalcDefend() + self.defend_amount
             self.owner:AddCondition("DEFEND", defend_amount, self)
         end,
     },
@@ -2193,8 +2231,12 @@ local CARDS =
     PC_ALAN_PLATE_ARMOR_plus =
     {
         name = "Boosted Plate Armor",
-        desc = "Gain <#UPGRADE>{1}</> {DEFEND} per card in your hand.\n(Gain {2} {DEFEND}).",
-        defend_amount = 2
+        desc = "Gain <#UPGRADE>2</> {DEFEND} per card in your hand.",
+        loc_strings =
+        {
+            ALT_DESC = "Gain 2 {DEFEND} per card in your hand.\n(Gain {1} {DEFEND}).",
+        },
+        defend_amount = 2,
     },
 
     PC_ALAN_PLATE_ARMOR_plus2 =
@@ -2207,7 +2249,7 @@ local CARDS =
     {
         name = "Goods",
         icon = "battle/packrat.tex",
-        anim = "taunt",
+        anim = "throwdust",
         desc = "Apply {1} {DEFEND}.\nThe cost of this card is equal to the cost of the most expensive card in your hand while turn start.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self:CalculateDefendText( self.defend_amount ))
@@ -2265,13 +2307,17 @@ local CARDS =
         name = "Shoddy Shield",
         icon = "battle/bouldering_charge.tex",
         anim = "taunt",
-        desc = "Gain {1} {DEFEND}. Increase by {2} for each card played this turn.\n({3} cards played).",
-        desc_fn = function(self, fmt_str)
+        desc = "Gain 0 {DEFEND}, Increase by 2 for each card played this turn.",
+        loc_strings =
+        {
+            ALT_DESC = "({1} cards played).\n(Gain {2} {DEFEND}).\nGain 0 {DEFEND}, Increase by 2 for each card played this turn.",
+        },
+        desc_fn = function( self, fmt_str )
             if self.engine then
                 local total_defend = self.defend_amount + (self.defend_bonus * self.engine:CountCardsPlayed())
-                return loc.format(fmt_str, total_defend, self.defend_bonus, self.engine:CountCardsPlayed())
+                return loc.format( self.def:GetLocalizedString( "ALT_DESC" ), self.engine:CountCardsPlayed(),  self:CalculateDefendText(total_defend))
             else
-                return loc.format(fmt_str, self.defend_amount, self.defend_bonus, 0)
+                return fmt_str
             end
         end,
         flavour = "'Far weaker than the real deal, but the low cost makes up for it.'",
@@ -2290,20 +2336,28 @@ local CARDS =
     PC_ALAN_SHODDY_SHIELD_plus =
     {
         name = "Shoddy Stone Shield",
-        desc = "Gain {1} {DEFEND}. Increase by <#UPGRADE>{2}</> for each card played this turn.\n({3} cards played).",
+        desc = "Gain 0 {DEFEND}, Increase by <#UPGRADE>3</> for each card played this turn.",
+        loc_strings =
+        {
+            ALT_DESC = "({1} cards played).\n(Gain {2} {DEFEND}).\nGain 0 {DEFEND}, Increase by 3 for each card played this turn.",
+        },
         defend_bonus = 3,
     },
 
     PC_ALAN_SHODDY_SHIELD_plus2 =
     {
         name = "Shoddy Spiked Shield",
-        desc = "Gain {1} {DEFEND} and <#UPGRADE>{1} {RIPOSTE}</> . Increase by {2} for each card played this turn.\n({3} cards played).",
-        desc_fn = function(self, fmt_str)
+        desc = "Gain 0 {DEFEND} and <#UPGRADE>0 {RIPOSTE}</>, Increase by 2 for each card played this turn.",
+        loc_strings =
+        {
+            ALT_DESC = "({1} cards played).\n(Gain {2} {DEFEND} and {3} {RIPOSTE})\nGain 0 {DEFEND} and 0 {RIPOSTE}, Increase by 2 for each card played this turn.",
+        },
+        desc_fn = function( self, fmt_str )
             if self.engine then
                 local total_defend = self.defend_amount + (self.defend_bonus * self.engine:CountCardsPlayed())
-                return loc.format(fmt_str, total_defend, self.defend_bonus, self.engine:CountCardsPlayed())
+                return loc.format( self.def:GetLocalizedString( "ALT_DESC" ), self.engine:CountCardsPlayed(),  self:CalculateDefendText(total_defend), self:CalculateDefendText(total_defend))
             else
-                return loc.format(fmt_str, self.defend_amount, self.defend_bonus, 0)
+                return fmt_str
             end
         end,
         OnPostResolve = function( self, battle, attack)
@@ -2414,7 +2468,7 @@ local CARDS =
     {
         name = "Quick Throw",
         icon = "battle/blade_flash.tex",
-        anim = "taunt",
+        anim = "targetpractice2",
         desc = "Increase the damage of all cards with the same name by 1 for this combat.",
         flavour = "One Slash, Two Slashes, Three Slashes.",
         rarity = CARD_RARITY.UNIQUE,
@@ -2444,7 +2498,7 @@ local CARDS =
     {
         name = "Be Prepared",
         icon = "battle/tracer.tex",
-        anim = "taunt",
+        anim = "moxie_low",
         desc = "Apply {1} {tracer}",
         desc_fn = function( self, fmt_str )
             return loc.format(fmt_str, self.tracer_amt)
@@ -2585,7 +2639,7 @@ local CARDS =
     {
         name = "Seize the Initiative",
         icon = "battle/haste.tex",
-        anim = "taunt",
+        anim = "moxie_low",
         desc = "Gain 2 actions at next turn.",
         flavour = "'Some things need to be dealt with quickly.'",
         rarity = CARD_RARITY.COMMON,
@@ -2629,7 +2683,6 @@ local CARDS =
     {
         name = "Explosive Cargo",
         icon = "battle/suitcase_grenades.tex",
-        anim = "taunt",
         desc = "Apply {1} {DEFEND} and {2} {SPARK_RESERVE}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str,self:CalculateDefendText( self.defend_amount ),CalculateConditionText(self, "SPARK_RESERVE", self.spark_amt))
@@ -2667,7 +2720,7 @@ local CARDS =
     {
         name = "Rapid Throw",
         icon = "battle/dagger_throw.tex",
-        anim = "throw",
+        anim = "targetpractice2",
         desc = "{PC_ALAN_LIGHTWEIGHT}{1}: Deals double damages.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.light_thresh)
@@ -2713,6 +2766,7 @@ local CARDS =
     PC_ALAN_RAPID_THROW_plus2 =
     {
         name = "Mirror Rapid Throw",
+        hit_anim = true,
         desc = "{PC_ALAN_LIGHTWEIGHT}{1}: <#UPGRADE>Attack twice</>.",
         event_handlers =
         {
@@ -2736,6 +2790,7 @@ local CARDS =
         name = "Spark Launcher",
         icon = "battle/mantle.tex",
         anim = "throw",
+        hit_tags = {"spark"},
         desc = "Hits all enemies and apply {1} {SPARK_RESERVE}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, CalculateConditionText(self, "SPARK_RESERVE", self.spark_amt))
@@ -2781,6 +2836,7 @@ local CARDS =
         name = "Spark Storm",
         icon = "battle/firestorm.tex",
         anim = "throw",
+        hit_tags = {"spark"},
         desc = "Spend all {SPARK_RESERVE}: Attack one for each two {SPARK_RESERVE}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, CalculateConditionText(self, "SPARK_RESERVE", self.spark_amt))
@@ -2824,9 +2880,9 @@ local CARDS =
     {
         name = "Sweeping Strike",
         icon = "battle/target_practice.tex",
-        anim = "throw",
+        anim = "back_hamm",
         desc = "Hits all enemies.",
-        flavour = "'This lets you throw more at once—just don’t overdo it, or things might go wrong.'",
+        flavour = "'I'll knock all of you flat!'",
         rarity = CARD_RARITY.UNCOMMON,
         flags = CARD_FLAGS.MELEE,
         target_mod = TARGET_MOD.TEAM,
@@ -2865,7 +2921,8 @@ local CARDS =
     {
         name = "Repeated Punches",
         icon = "battle/knuckle_down.tex",
-        anim = "punch",
+        anim = "gut_shot",
+        hit_anim = true,
         desc = "Attack bonus time equal to the cost of the most expensive card in your hand.",
         flavour = "'Come on, say hello to my fists!'",
         rarity = CARD_RARITY.UNCOMMON,
@@ -2916,7 +2973,8 @@ local CARDS =
     {
         name = "Hammer Swing",
         icon = "battle/hammer_swing.tex",
-        anim = "punch",
+        anim = "back_hamm",
+        hit_tags = {"critical"},
         desc = "{PC_ALAN_WEIGHTED}{1}: Gain 2 Actions.\n{CHAIN}{PC_ALAN_HAMMER_SWING_II|}",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.weight_thresh)
@@ -2948,7 +3006,8 @@ local CARDS =
     {
         name = "Hammer Swing II",
         icon = "battle/hammer_swing.tex",
-        anim = "punch",
+        anim = "back_hamm",
+        hit_tags = {"critical"},
         desc = "{PC_ALAN_WEIGHTED}{1}: Gain 2 Actions.\n{CHAIN}{PC_ALAN_HAMMER_SWING_III|}",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.weight_thresh)
@@ -2991,7 +3050,8 @@ local CARDS =
     {
         name = "Hammer Swing III",
         icon = "battle/hammer_swing.tex",
-        anim = "punch",
+        anim = "back_hamm",
+        hit_tags = {"critical"},
         desc = "{PC_ALAN_WEIGHTED}{1}: Draw a card.\n{CHAIN}{PC_ALAN_HAMMER_SWING_IV|}",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.weight_thresh)
@@ -3031,8 +3091,8 @@ local CARDS =
     {
         name = "Hammer Swing IV",
         icon = "battle/hammer_swing.tex",
-        anim = "punch",
-        hit_anim = true,
+        anim = "back_hamm",
+        hit_tags = {"critical"},
         desc = "{PC_ALAN_WEIGHTED}{1}: Draw a card.\n{CHAIN}",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.weight_thresh)
@@ -3072,7 +3132,7 @@ local CARDS =
     {
         name = "Finale",
         icon = "battle/body_blow.tex",
-        anim = "punch",
+        anim = "dropkick",
         desc = "Deal {1} bonus damage for each cards played this turn.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.bonus_damage)
@@ -3115,7 +3175,7 @@ local CARDS =
     {
         name = "Dirty Tactics",
         icon = "battle/shortcut.tex",
-        anim = "punch",
+        anim = "trip",
         desc = "Apply {1} {WOUND}, {1} {IMPAIR} and {1} {EXPOSED}.",
         desc_fn = function( self, fmt_str )
             return loc.format( fmt_str, self.dirty_amt )
@@ -3159,6 +3219,8 @@ local CARDS =
         name = "Lumin Darts",
         icon = "battle/lumin_darts.tex",
         anim = "throw",
+        hit_tags = {"lumin"},
+        anims = {"anim/weapon_knife_thrown.zip"},
         desc = "This card deal bonus damage equal to your {LUMIN_RESERVE}.",
         flavour = "'The second-hand products from the Cult of Hesh. Its supply stability mainly depends on the Zealots' aim—or the number of guards watching the warehouse.'",
         rarity = CARD_RARITY.UNCOMMON,
@@ -3167,6 +3229,8 @@ local CARDS =
         max_xp = 9,
         min_damage = 4,
         max_damage = 6,   
+        OnPreResolve = function( self, battle, attack )
+        end,
         event_handlers =
         {
             [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
@@ -3204,7 +3268,8 @@ local CARDS =
     {
         name = "Sudden Strike",
         icon = "battle/direct_hit.tex",
-        anim = "throw",
+        anim = "shoot",
+        anims = { "anim/weapon_blaster_bogblaster.zip"},
         desc = "Increase 1 cost for each card played this turn.",
         flavour = "'Sometimes, you need to remind your enemies what you’ve got.'",
         rarity = CARD_RARITY.UNCOMMON,
@@ -3275,7 +3340,8 @@ local CARDS =
     {
         name = "React Again",
         icon = "battle/current.tex",
-        anim = "throw",
+        anim = "stun",
+        hit_tags = {"electric"},
         desc = "If the target have {lumin_burnt}, Apply {1} {DEFEND}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str,self:CalculateDefendText( self.defend_amount ))
@@ -3334,7 +3400,7 @@ local CARDS =
     {
         name = "Deep Cut",
         icon = "battle/gash.tex",
-        anim = "punch",
+        anim = "attack1",
         desc = "This card deal bonus damage equal to target's {lumin_burnt}.",
         flavour = "'Not my problem to cover the medical bills.'",
         rarity = CARD_RARITY.UNCOMMON,
@@ -3357,7 +3423,8 @@ local CARDS =
 
     PC_ALAN_DEEP_CUT_plus =
     {
-        name = "Double Deep Cut",
+        name = "Mirror Deep Cut",
+        hit_anim = true,
         desc = "This card deal bonus damage equal to target's {lumin_burnt}.\n<#UPGRADE>Attack twice</>.",
         cost = 2,
         hit_count = 2,
@@ -3374,7 +3441,7 @@ local CARDS =
     {
         name = "Freighter",
         icon = "battle/freighter.tex",
-        anim = "punch",
+        anim = "elbow_strike",
         desc = "Deal bonus damage equal to twice the total cost of all cards at your hand.",
         flavour = "'Just charge in like a runaway freighter.'",
         rarity = CARD_RARITY.UNCOMMON,
@@ -3431,7 +3498,7 @@ local CARDS =
     {
         name = "Reckless Swing",
         icon = "battle/over_extension.tex",
-        anim = "punch",
+        anim = "smash",
         desc = "Gain {1} {SPARK_RESERVE}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, CalculateConditionText( self, "SPARK_RESERVE", self.spark_amt ))
@@ -3469,7 +3536,8 @@ local CARDS =
     {
         name = "Signature Uppercut",
         icon = "battle/uppercut.tex",
-        anim = "punch",
+        anim = "uppercut",
+        hit_tags = {"critical"},
         desc = "Only can use while doesn’t have others attack card on hand.",
         flavour = "'Don't ask why I'm throwing an uppercut while holding a dagger.'",
         rarity = CARD_RARITY.UNCOMMON,
@@ -3524,7 +3592,7 @@ local CARDS =
     {
         name = "Combo Strike",
         icon = "battle/silent_shiv.tex",
-        anim = "punch",
+        anim = "attack1",
         desc = "Insert {PC_ALAN_QUICK_THROW} equal to damage dealt by this card.",
         flavour = "'I’ve got plenty more—this is nothing.'",
         rarity = CARD_RARITY.UNCOMMON,
@@ -3574,7 +3642,8 @@ local CARDS =
     {
         name = "Spark Barrage",
         icon = "battle/one_one_one.tex",
-        anim = "punch",
+        anim = "elbow_strike",
+        hit_anim = true,
         desc = "This card will attack twice and each hits deal 3 bonus damage if you have any {SPARK_RESERVE}.",
         flavour = "'Finish hitting, then remember to run.'",
         rarity = CARD_RARITY.UNCOMMON,
@@ -3641,7 +3710,9 @@ local CARDS =
     {
         name = "Limit Reaction",
         icon = "battle/overloaded_spark_hammer.tex",
-        anim = "punch",
+        anim = "melee_item",
+        anims = { "anim/weapon_melee_spark_hammer.zip"},
+        hit_tags = { "spark" },
         desc = "Apply and Gain {SPARK_RESERVE} equal to the damage dealt by this card.",
         flavour = "'This is already pushing the limit—any further, and things might go wrong.'",
         rarity = CARD_RARITY.UNCOMMON,
@@ -3688,6 +3759,7 @@ local CARDS =
         name = "Reuse",
         icon = "battle/combination.tex",
         anim = "punch",
+        hit_tags = {"lumin"},
         desc = "This card will regain the {LUMIN_RESERVE} consumed after being played.",
         flavour = "'What’s worse than getting doused in Lumin once? Getting doused twice.'",
         rarity = CARD_RARITY.UNCOMMON,
@@ -3734,7 +3806,8 @@ local CARDS =
     {
         name = "Heavy Hammer",
         icon = "battle/cross.tex",
-        anim = "punch",
+        anim = "back_hamm",
+        hit_tags = {"critical"},
         desc = "{PC_ALAN_WEIGHTED}{1}: Gain 3 {ADRENALINE} and {2} action.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str,self.weight_thresh, self.action_bonus)
@@ -3784,7 +3857,8 @@ local CARDS =
     {
         name = "Suppressive Strike",
         icon = "battle/crusher.tex",
-        anim = "punch",
+        anim = "stomp",
+        hit_tags = {"critical"},
         desc = "{PC_ALAN_WEIGHTED}{1}: Gain 3 actions and draw 2 cards.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str,self.weight_thresh )
@@ -3838,7 +3912,8 @@ local CARDS =
     {
         name = "Lumin Disc",
         icon = "battle/charged_disc.tex",
-        anims = "punch",
+        anims = "throw",
+        anims = { "anim/weapon_grenade_disc.zip"},
         desc = "Attack all enemies.\nApply {1} {lumin_burnt}.",
         desc_fn = function( self, fmt_str )
             return loc.format( fmt_str, self.lumin_burnt_amt )
@@ -3881,7 +3956,7 @@ local CARDS =
     {
         name = "Cargo Spill",
         icon = "battle/entire_supply.tex",
-        anims = "punch",
+        anim = "punch",
         desc = "At the end of your turn, if this card is still in your hand, increase its damage by 3 until played.",
         flavour = "'Wait—That’s my cargo!'",
         rarity = CARD_RARITY.UNCOMMON,
@@ -3926,7 +4001,8 @@ local CARDS =
     {
         name = "Toss It Over",
         icon = "battle/efficient_disposal.tex",
-        anim = "taunt",
+        anim = "throw",
+        hit_tags = {"spark"},
         flavour = "'What? It’s about to blow? Hesh damn it, throw it away—now!'",
         desc = "Remove all stacks of {SPARK_RESERVE} and apply same amount to target.",
         rarity = CARD_RARITY.UNCOMMON,
@@ -3963,7 +4039,7 @@ local CARDS =
     {
         name = "Hauling Cargo",
         icon = "battle/deepstance.tex",
-        anim = "taunt",
+        anim = "moxie_high",
         desc = "{PC_ALAN_WEIGHTED}{1}: Play this card automatically.\n{ABILITY}: Whenever you play a card that have cost at least 2, Gain 3 {DEFEND}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.weight_thresh)
@@ -4009,7 +4085,6 @@ local CARDS =
     {
         name = "Throwing Knife Replicator",
         icon = "battle/replicator.tex",
-        anim = "taunt",
         desc = "{ABILITY}: At turn start, insert 1 {PC_ALAN_QUICK_THROW} into your hand.",
         flavour = "'It can only replicate throwing knives, and the quality isn’t great.'",
         cost = 1,
@@ -4043,7 +4118,7 @@ local CARDS =
         icon = "battle/crank.tex",
         anim = "taunt",
         desc = "Double your {LUMIN_RESERVE}.",
-        flavour = "'This helps remove some of the impurities in Lumin..'",
+        flavour = "'This helps remove some of the impurities in Lumin.'",
         cost = 1,
         max_xp = 9,
         rarity = CARD_RARITY.UNCOMMON,
@@ -4070,11 +4145,11 @@ local CARDS =
     {
         name = "Full Refund",
         icon = "battle/shrewd.tex",
-        anim = "taunt",
+        anim = "moxie_low",
         desc = "Gain {DEFEND} and {RIPOSTE} equal to the damage of your target's next attack.",
         flavour = "'But not now.'",
-        cost = 1,
-        max_xp = 9,
+        cost = 2,
+        max_xp = 7,
         rarity = CARD_RARITY.UNCOMMON,
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.BURNOUT,
         target_type = TARGET_TYPE.ENEMY,
@@ -4130,14 +4205,14 @@ local CARDS =
                 self.owner:AddCondition("DEFEND", defend_amt, self)
                 self.owner:AddCondition("RIPOSTE", defend_amt, self) 
             end
-            end,
+        end,
     },
 
     PC_ALAN_BOTTLED_LUMIN =
     {
         name = "Bottled Lumin",
         icon = "battle/the_pinto_pour.tex",
-        anim = "taunt",
+        anim = "bottle_flourish2",
         desc = "Gain {1} {LUMIN_RESERVE} and {2} {POWER}.",
         desc_fn = function( self, fmt_str )
             return loc.format( fmt_str, self.lumin_res_amt, self.pwr_amt )
@@ -4203,7 +4278,7 @@ local CARDS =
     {
         name = "Spark Tonic",
         icon = "battle/fire_breather.tex",
-        anim = "taunt",
+        anim = "drink",
         desc = "Spend all {SPARK_RESERVE} and {HEAL} {1} for every {SPARK_RESERVE} spent.",
         desc_fn = function( self, fmt_str )
             return loc.format(fmt_str, self.heal_amt)
@@ -4239,7 +4314,7 @@ local CARDS =
     {
         name = "Lumin Shield Generator",
         icon = "battle/emergency_shield_generator.tex",
-        anim = "taunt",
+        anim = "chest_pound",
         desc = "{ABILITY}: At turn end, Gain the {DEFEND} equal to the {LUMIN_RESERVE}.",
         flavour = "'I tweaked the internal circuits—now it can stay active for longer.'",
         cost = 1,
@@ -4277,9 +4352,18 @@ local CARDS =
         name = "Confirm Target",
         icon = "battle/fixed.tex",
         anim = "taunt",
-        desc = "For every 0-cost card on hand, Apply 1 {tracer}\n(Apply {1} {tracer}).",
+        desc = "For every 0-cost card on hand, Apply 1 {tracer}.",
+        loc_strings =
+        {
+            ALT_DESC = "For every 0-cost card on hand, Apply 1 {tracer}\n(Apply {1} {tracer}).",
+        },
         desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self.tracer_amt)
+            if self.engine then
+                local tracer_amt = self:CalcDefend() 
+                return loc.format( self.def:GetLocalizedString( "ALT_DESC" ), tracer_amt )
+            else
+                return fmt_str
+            end
         end,
         flavour = "'You're the one!'",
         cost = 1,
@@ -4314,7 +4398,11 @@ local CARDS =
     PC_ALAN_CONFIRM_TARGET_plus2 =
     {
         name = "Visionary Confirm Target",
-        desc = "<#UPGRADE>Draw a card</>\nFor every 0-cost card on hand, Apply 1 {tracer}\n(Apply {1} {tracer}).",
+        desc = "<#UPGRADE>Draw a card</>.\nFor every 0-cost card on hand, Apply 1 {tracer}.",
+        loc_strings =
+        {
+            ALT_DESC = "Draw a card.\nFor every 0-cost card on hand, Apply 1 {tracer}\n(Apply {1} {tracer}).",
+        },
         OnPostResolve = function( self, battle, attack )
             local tracer_amt = self:CalcDefend() 
             attack:AddCondition("tracer", tracer_amt, self)
@@ -4369,7 +4457,7 @@ local CARDS =
     {
         name = "Performance",
         icon = "battle/exertion.tex",
-        anim = "taunt",
+        anim = "moxie_low",
         desc = "Draw a card and play them for free.",
         flavour = "'Keep fighting, and you might just learn something new.'",
         cost = 1,
@@ -4450,11 +4538,11 @@ local CARDS =
     PC_ALAN_FOCUS_plus2 =
     {
         name = "Enduring Focus",
-        desc = "Draw <#DOWNGRADE>3</> cards.",
+        desc = "Draw <#DOWNGRADE>4</> cards.",
         cost = 1,
         flags = CARD_FLAGS.SKILL,
         OnPostResolve = function( self, battle, attack)
-            battle:DrawCards(3)
+            battle:DrawCards(4)
         end,
     }, 
 
@@ -4599,7 +4687,7 @@ local CARDS =
     {
         name = "Stay Alert",
         icon = "battle/thieves_instinct.tex",
-        anim = "taunt",
+        anim = "moxie_low",
         desc = "Apply {1} {DEFEND}\nAt the end of your turn, if this card is still in your hand, increase the Defense applied by this card by {2} until played.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self:CalculateDefendText( self.defend_amount ), self.defend_bonus)
@@ -4753,7 +4841,7 @@ local CARDS =
     {
         name = "Unyielding",
         icon = "battle/sentinel.tex",
-        anim = "taunt",
+        anim = "chest_pound",
         desc = "Can only be played if you haven't played any card in this turn.\nGain {1} {DEFEND} and {2} {POWER}.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self:CalculateDefendText( self.defend_amount ), self.pwr_amt)
@@ -4762,7 +4850,7 @@ local CARDS =
         cost = 2,
         max_xp = 7,
         rarity = CARD_RARITY.UNCOMMON,
-        flags = CARD_FLAGS.SKILL,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.STICKY,
         target_type = TARGET_TYPE.SELF,
         defend_amount = 6,
         pwr_amt = 1,
@@ -4804,7 +4892,7 @@ local CARDS =
         anim = "punch",
         desc = "Put all 0-cost card into your hand.",
         flavour = "'Took me a while to find this—rumor has it, it came from an ancient tower.'",
-        cost = 0,
+        cost = 1,
         max_xp = 9,
         rarity = CARD_RARITY.RARE,
         flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND,
@@ -4849,14 +4937,14 @@ local CARDS =
     {
         name = "Enduring All for One",
         flags = CARD_FLAGS.MELEE,
-        cost = 2,
+        cost = 3,
     },
 
     PC_ALAN_SUPREME_STRIKE =
     {
         name = "Supreme Strike",
         icon = "battle/crushing_blow.tex",
-        anim = "punch",
+        anim = "stomp",
         desc = "At the end of your turn, if this card is still in your hand, decrease the cost by 1 until played.",
         flavour = "'Meet the Hesh!'",
         cost = 3,
@@ -4899,7 +4987,8 @@ local CARDS =
     {
         name = "Warning Shot",
         icon = "battle/cataclysm.tex",
-        anim = "throw",
+        anim = "shoot",
+        anims = { "anim/weapon_blaster_stungun.zip"},
         desc = "If either you or the target has {SPARK_RESERVE}, Double the damage.\nIf both have {SPARK_RESERVE}, Double damage again.",
         flavour = "'You dare step closer? Huh?!'",
         cost = 1,
@@ -4939,6 +5028,8 @@ local CARDS =
         name = "Lumin Explosive",
         icon = "battle/high_yield_lumin_bomb.tex",
         anim = "throw",
+        anims = { "anim/weapon_grenade_lumin.zip"},
+        hit_tags = { "lumin" },
         desc = "Attack all enemies.\nApply {1} {lumin_burnt}.\nOnce per turn, whenever you get hit, play this card for free.",
         desc_fn = function( self, fmt_str )
             return loc.format( fmt_str, self.lumin_burnt_amt)
@@ -5033,7 +5124,6 @@ local CARDS =
     {
         name = "Second-Hand Scanner",
         icon = "battle/scanner.tex",
-        anim = "taunt",
         flavour = "'A discarded unit from the Aerostat, but with some repairs, it still works.'",
         desc = "Apply {1} {SCANNED} to a random enemy.",
         desc_fn = function( self, fmt_str )
@@ -5157,7 +5247,7 @@ local CARDS =
     {
         name = "Convert",
         icon = "battle/mettle.tex",
-        anim = "taunt",
+        anim = "moxie_high",
         desc = "At the end of your turn, if this card is on hand, play it.\nConvert all {ADRENALINE} into {POWER}.",
         flavour = "'The amount is a bit low, but it’ll do.'",
         cost = 0,
@@ -5213,7 +5303,6 @@ local CARDS =
     {
         name = "First Aid",
         icon = "battle/triage.tex",
-        anim = "taunt",
         desc = "{1} {HEAL}.",
         desc_fn = function( self, fmt_str )
             return loc.format(fmt_str, self.heal_amt)
@@ -5309,8 +5398,8 @@ local CARDS =
     {
         name = "Power Surge",
         icon = "battle/raw_power.tex",
-        anim = "taunt",
-        desc = "{PC_ALAN_WEIGHTED}{1}: Play this card automatically.\n{ABILITY}: Whenever you play a card that have cost at least 2, Play it again.",
+        anim = "moxie_high",
+        desc = "{PC_ALAN_WEIGHTED}{1}: Play this card automatically.\n{ABILITY}: Whenever you play a card that have cost at least 2, Play it again.\nThis ability cannot be stacked.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.weight_thresh)
         end,
@@ -5418,47 +5507,11 @@ local CARDS =
         desc = "Increases the target's {SURRENDER} meter by <#UPGRADE>{1}</>.",        
         sur_amt = 20,
     },
-
-
-    --------------------------------------------------------------------------------------
-    --
-    
-    spices =
-    {
-        name = "Spices",
-        desc = "{COMMODITY}",
-        icon = "LOSTPASSAGE:textures/spices.png",
-
-        rarity = CARD_RARITY.UNCOMMON,
-        flags = CARD_FLAGS.ITEM | CARD_FLAGS.UNPLAYABLE,
-        shop_price = 150,
-    },
-
-    oshnu_mucus =
-    {
-        name = "Oshnu Mucus",
-        desc = "{COMMODITY}",
-        icon = "LOSTPASSAGE:textures/oshnu_mucus.png",
-
-        rarity = CARD_RARITY.COMMON,
-        flags = CARD_FLAGS.ITEM | CARD_FLAGS.UNPLAYABLE | CARD_FLAGS.STICKY,
-        shop_price = 80,
-    },
-
-    spollop =
-    {
-        name = "Spollop Fungus",
-        desc = "{COMMODITY}",
-        icon = "LOSTPASSAGE:textures/spollop.png",
-
-        rarity = CARD_RARITY.RARE,
-        flags = CARD_FLAGS.ITEM | CARD_FLAGS.UNPLAYABLE | CARD_FLAGS.BURNOUT,
-        shop_price = 300,
-    },
 }
 
+
 for i, id, carddef in sorted_pairs( CARDS ) do
-    carddef.series = carddef.series or "SHEL"
+    carddef.series = carddef.series or "ALAN"
     Content.AddBattleCard( id, carddef )
 end
 

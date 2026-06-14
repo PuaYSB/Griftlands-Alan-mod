@@ -259,7 +259,7 @@ msgstr "岩石拳打"
 #. ATTACK.PC_ALAN_PUNCH_PLUS2G.DESC 
 msgctxt "ATTACK.PC_ALAN_PUNCH_PLUS2G.DESC" 
 msgid "" 
-msgstr "<#UPGRADE>施加{1}{DEFEND}</>。" 
+msgstr "<#UPGRADE>获得{1}{DEFEND}</>。" 
 
 #. ATTACK.PC_ALAN_PUNCH_PLUS2G.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_PUNCH_PLUS2G.FLAVOUR" 
@@ -2889,7 +2889,7 @@ msgstr "连掷"
 #. ATTACK.PC_ALAN_COMBO_STRIKE.DESC 
 msgctxt "ATTACK.PC_ALAN_COMBO_STRIKE.DESC" 
 msgid "" 
-msgstr "这张牌造成多少伤害，就获得1多少张{PC_ALAN_QUICK_THROW}。" 
+msgstr "这张牌造成多少伤害，就获得多少张{PC_ALAN_QUICK_THROW}。" 
 
 #. ATTACK.PC_ALAN_COMBO_STRIKE.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_COMBO_STRIKE.FLAVOUR" 
@@ -9930,3 +9930,343 @@ msgstr "回合开始时获得1行动点<#UPGRADE>并抽1张牌</>，协商开始
 msgctxt "GRAFT.PC_ALAN_HARD_LIQUOR_PLUS.FLAVOUR"
 msgid ""
 msgstr "'刚入口可能会有点难以忍受，不过喝多了就能够感受其美味了。'"
+
+#. CHARACTER.PC_ALAN.NAME
+msgctxt "CHARACTER.PC_ALAN.NAME"
+msgid ""
+msgstr "艾伦"
+
+#. PLAYER_ACT.ALAN_BRAWL.DESC
+msgctxt "PLAYER_ACT.ALAN_BRAWL.DESC"
+msgid ""
+msgstr "完成一系列难度逐渐增加的任务。"
+
+#. PLAYER_ACT.ALAN_BRAWL.NAME
+msgctxt "PLAYER_ACT.ALAN_BRAWL.NAME"
+msgid ""
+msgstr "打斗"
+
+#. PLAYER_BACKGROUND.ALAN.NAME
+msgctxt "PLAYER_BACKGROUND.ALAN.NAME"
+msgid ""
+msgstr "艾伦"
+
+#. PLAYER_BACKGROUND.ALAN.TITLE
+msgctxt "PLAYER_BACKGROUND.ALAN.TITLE"
+msgid ""
+msgstr "走私犯"
+
+#. PLAYER_BACKGROUND.ALAN.DESC
+msgctxt "PLAYER_BACKGROUND.ALAN.DESC"
+msgid ""
+msgstr "在一场群殴现场捡漏后，准备当个燃料二道贩子。"
+
+#. CONVO.ALAN_BRAWL.CONF.OPT_BATTLE_GRAFT
+msgctxt "CONVO.ALAN_BRAWL.CONF.OPT_BATTLE_GRAFT"
+msgid "Choose a Battle Graft"
+msgstr "选择1个战斗移植物"
+
+#. CONVO.ALAN_BRAWL.CONF.OPT_DO_DRAFT
+msgctxt "CONVO.ALAN_BRAWL.CONF.OPT_DO_DRAFT"
+msgid "Starting Draft"
+msgstr "起始卡牌"
+
+#. CONVO.ALAN_BRAWL.CONF.OPT_NEGOTIATION_GRAFT
+msgctxt "CONVO.ALAN_BRAWL.CONF.OPT_NEGOTIATION_GRAFT"
+msgid "Choose a Negotiation Graft"
+msgstr "选择1个协商移植物"
+
+#. CONVO.ALAN_BRAWL.CONF.OPT_SKIP
+msgctxt "CONVO.ALAN_BRAWL.CONF.OPT_SKIP"
+msgid "Skip"
+msgstr "跳过"
+
+#. CONVO.ALAN_BRAWL_10.OPT_FIGHT_BOSS
+msgctxt "CONVO.ALAN_BRAWL_10.OPT_FIGHT_BOSS"
+msgid "Fight a boss!"
+msgstr "与头目战斗！"
+
+#. CONVO.ALAN_BRAWL_10.OPT_FIND_WORK
+msgctxt "CONVO.ALAN_BRAWL_10.OPT_FIND_WORK"
+msgid "Venture forth! {1#quest}"
+msgstr "继续前进！{1#quest}"
+
+#. CONVO.ALAN_BRAWL_10.OPT_PICK_JOB
+msgctxt "CONVO.ALAN_BRAWL_10.OPT_PICK_JOB"
+msgid "<#QUEST>{1#quest}</>"
+msgstr "<#QUEST>{1#quest}</>"
+
+#. CONVO.ALAN_BRAWL_11.OPT_GO_SLEEP
+msgctxt "CONVO.ALAN_BRAWL_11.OPT_GO_SLEEP"
+msgid "Go to Sleep"
+msgstr "睡觉"
+
+#. CONVO.ALAN_BRAWL_12.DIALOG_BUY_PET
+msgctxt "CONVO.ALAN_BRAWL_12.DIALOG_BUY_PET"
+msgid "player:\nI'll take {1}!"
+msgstr "player:\n我要{1}！"
+
+#. CONVO.ALAN_BRAWL_12.DIALOG_HEAL_PET
+msgctxt "CONVO.ALAN_BRAWL_12.DIALOG_HEAL_PET"
+msgid "* {pet} healed for {1} HP."
+msgstr "*{pet}恢复了{1}点生命值。"
+
+#. CONVO.ALAN_BRAWL_12.DIALOG_SELL_PET
+msgctxt "CONVO.ALAN_BRAWL_12.DIALOG_SELL_PET"
+msgid "agent:\n!right\n!happy\nI'm always looking for spare parts!"
+msgstr "agent:\n!right\n!happy\n我收零件！"
+
+#. CONVO.ALAN_BRAWL_12.DIALOG_UPGRADE_PET
+msgctxt "CONVO.ALAN_BRAWL_12.DIALOG_UPGRADE_PET"
+msgid "* {pet} upgraded."
+msgstr "*{pet}已升级。"
+
+#. CONVO.ALAN_BRAWL_12.OPT_BUY_PET
+msgctxt "CONVO.ALAN_BRAWL_12.OPT_BUY_PET"
+msgid "Buy {1#agent}"
+msgstr "购买{1#agent}"
+
+#. CONVO.ALAN_BRAWL_12.OPT_HEAL_PET
+msgctxt "CONVO.ALAN_BRAWL_12.OPT_HEAL_PET"
+msgid "Heal {1#agent}"
+msgstr "治疗{1#agent}"
+
+#. CONVO.ALAN_BRAWL_12.OPT_SELL_PET
+msgctxt "CONVO.ALAN_BRAWL_12.OPT_SELL_PET"
+msgid "Sell {1#agent}"
+msgstr "卖{1#agent}"
+
+#. CONVO.ALAN_BRAWL_12.OPT_UPGRADE_PET
+msgctxt "CONVO.ALAN_BRAWL_12.OPT_UPGRADE_PET"
+msgid "Upgrade {1#agent}"
+msgstr "升级{1#agent}"
+
+#. CONVO.ALAN_BRAWL_12.REQ_AT_FULL_HEALTH
+msgctxt "CONVO.ALAN_BRAWL_12.REQ_AT_FULL_HEALTH"
+msgid "Your pet is at full health already"
+msgstr "你的宠物已经是最大生命值"
+
+#. CONVO.ALAN_BRAWL_13.DIALOG_BUY_METTLE
+msgctxt "CONVO.ALAN_BRAWL_13.DIALOG_BUY_METTLE"
+msgid "* You gain {1} Mettle.\nagent:\nAlmost feels like cheating, doesn't it?"
+msgstr "* 你获得了{1}点气概。\nagent:\n有点像是在作弊，对不对？"
+
+#. CONVO.ALAN_BRAWL_13.DIALOG_FLOURISHES
+msgctxt "CONVO.ALAN_BRAWL_13.DIALOG_FLOURISHES"
+msgid "player:\nI want to learn something new."
+msgstr "player:\n我想学点新东西。"
+
+#. CONVO.ALAN_BRAWL_13.DIALOG_POST_FLOURISHES
+msgctxt "CONVO.ALAN_BRAWL_13.DIALOG_POST_FLOURISHES"
+msgid "agent:\nIt's important to end things well."
+msgstr "agent:\n做好收尾工作很重要。"
+
+#. CONVO.ALAN_BRAWL_13.DIALOG_POST_SHOP
+msgctxt "CONVO.ALAN_BRAWL_13.DIALOG_POST_SHOP"
+msgid "agent:\nFeel any stronger?"
+msgstr "agent:\n感觉到强壮一点没？"
+
+#. CONVO.ALAN_BRAWL_13.OPT_BUY_METTLE
+msgctxt "CONVO.ALAN_BRAWL_13.OPT_BUY_METTLE"
+msgid "Buy {1} Mettle"
+msgstr "买{1}点气概"
+
+#. CONVO.ALAN_BRAWL_13.OPT_FLOURISHES
+msgctxt "CONVO.ALAN_BRAWL_13.OPT_FLOURISHES"
+msgid "Unlock Flourishes"
+msgstr "解锁繁荣"
+
+#. CONVO.ALAN_BRAWL_13.OPT_SHOP
+msgctxt "CONVO.ALAN_BRAWL_13.OPT_SHOP"
+msgid "Spend Mettle"
+msgstr "使用气概"
+
+#. CONVO.ALAN_BRAWL_13.TT_BUY_METTLE_ALREADY
+msgctxt "CONVO.ALAN_BRAWL_13.TT_BUY_METTLE_ALREADY"
+msgid "You already bought mettle this run!"
+msgstr "你已经在本次轮回里买过气概！"
+
+#. CONVO.ALAN_BRAWL_14.DIALOG_BUY_FOOD
+msgctxt "CONVO.ALAN_BRAWL_14.DIALOG_BUY_FOOD"
+msgid "player:\n$neutralResigned\nI'm hurt, {agent}.\nagent:\n!give\n$happyGreeting\nHere. Eat this."
+msgstr "player:\n$neutralResigned\n我受伤了，{agent}。\nagent:\n!give\n$happyGreeting\n给你。把这个吃了。"
+
+#. CONVO.ALAN_BRAWL_14.OPT_BUY_FOOD
+msgctxt "CONVO.ALAN_BRAWL_14.OPT_BUY_FOOD"
+msgid "Buy some food"
+msgstr "购买食物"
+
+#. CONVO.ALAN_BRAWL_14.REQ_TOO_FULL
+msgctxt "CONVO.ALAN_BRAWL_14.REQ_TOO_FULL"
+msgid "You have too many {1#card} cards in your deck already!"
+msgstr "你的牌组里有太多的 {1#card}！"
+
+#. CONVO.ALAN_BRAWL_14.TT_CAKES
+msgctxt "CONVO.ALAN_BRAWL_14.TT_CAKES"
+msgid "Restore {1} health.\nInsert {2#card} to your battle deck."
+msgstr "回复 {1} 生命值。\n在你的战斗牌组中加入 {2#card}。"
+
+#. CONVO.ALAN_BRAWL_15.DIALOG_HIRED
+msgctxt "CONVO.ALAN_BRAWL_15.DIALOG_HIRED"
+msgid "player:\n!permit\n$miscAlluring\nI'm hiring, if you're not afraid of trouble."
+msgstr "player:\n!permit\n$miscAlluring\n如果你不怕麻烦的话，我请人。"
+
+#. CONVO.ALAN_BRAWL_15.OPT_HIRE_MERC
+msgctxt "CONVO.ALAN_BRAWL_15.OPT_HIRE_MERC"
+msgid "Hire {agent} for your next job"
+msgstr "雇{agent}替你干活"
+
+#. CONVO.ALAN_BRAWL_16.CONF.DIALOG_BONUS_MONEY
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.DIALOG_BONUS_MONEY"
+msgid "* You get {1#money}."
+msgstr "* 你获得了{1#money}。"
+
+#. CONVO.ALAN_BRAWL_16.CONF.DIALOG_INTRO
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.DIALOG_INTRO"
+msgid "* {bartender} pulls you aside.\n{player_sal?\nbartender:\n!happy\nI've got a little something for you, kid. \nGo ahead, pick one:\n}\n{player_rook?\nbartender:\n!happy\nI'm contractually obliged to help you out.\nDon't get used to it.\n\n}\n{player_smith?\nbartender:\n!sigh\nI don't have much, but I could spare this.\nPlease put it to good use.\n}"
+msgstr "* {bartender}把你拉到了一边。\n{player_sal?\nbartender:\n!happy\n我有点东西要给你，孩子。 \n来，选一件吧：\n}\n{player_rook?\nbartender:\n!happy\n我是履行合同义务才帮你的。\n别习以为常了。\n\n}\n{player_smith?\nbartender:\n!sigh\n我手头也不宽裕，只能给你这个。\n务必用好它。\n}"
+
+#. CONVO.ALAN_BRAWL_16.CONF.DIALOG_SKIP
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.DIALOG_SKIP"
+msgid "player:\nNo thanks!"
+msgstr "player:\n不用了，谢谢!"
+
+#. CONVO.ALAN_BRAWL_16.CONF.DIAL_REMOVE_CARD
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.DIAL_REMOVE_CARD"
+msgid "agent:\nFeels lighter, doesn't it?"
+msgstr "agent:\n感觉身上轻了不少吧？"
+
+#. CONVO.ALAN_BRAWL_16.CONF.OPT_BONUS_MONEY
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.OPT_BONUS_MONEY"
+msgid "Take money"
+msgstr "获得金钱"
+
+#. CONVO.ALAN_BRAWL_16.CONF.OPT_DRAFT_BATTLE_CARD
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.OPT_DRAFT_BATTLE_CARD"
+msgid "Draft 2 battle cards"
+msgstr "挑选2张战斗牌"
+
+#. CONVO.ALAN_BRAWL_16.CONF.OPT_DRAFT_NEGOTIATION_CARD
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.OPT_DRAFT_NEGOTIATION_CARD"
+msgid "Draft 2 negotiation cards"
+msgstr "挑选2张协商牌"
+
+#. CONVO.ALAN_BRAWL_16.CONF.OPT_GAIN_ITEMS
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.OPT_GAIN_ITEMS"
+msgid "Get {1#card_list}"
+msgstr "选择{1#card_list}"
+
+#. CONVO.ALAN_BRAWL_16.CONF.OPT_GAIN_MAX_HEALTH
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.OPT_GAIN_MAX_HEALTH"
+msgid "Increase max health by {1}"
+msgstr "增加{1}最大生命值"
+
+#. CONVO.ALAN_BRAWL_16.CONF.OPT_GAIN_MAX_RESOLVE
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.OPT_GAIN_MAX_RESOLVE"
+msgid "Increase max resolve by {1}"
+msgstr "增加{1}最大意志值"
+
+#. CONVO.ALAN_BRAWL_16.CONF.OPT_HEAL_HEALTH
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.OPT_HEAL_HEALTH"
+msgid "Restore <#HEALTH>{1} Health</>"
+msgstr "恢复 <#HEALTH>{1} 生命值</>"
+
+#. CONVO.ALAN_BRAWL_16.CONF.OPT_HEAL_RESOLVE
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.OPT_HEAL_RESOLVE"
+msgid "Restore <#TITLE>{1} Resolve</>"
+msgstr "恢复<#TITLE>{1}意志值</>"
+
+#. CONVO.ALAN_BRAWL_16.CONF.OPT_SKIP
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.OPT_SKIP"
+msgid "Skip {bartender}'s gift"
+msgstr "跳过{bartender}的礼物"
+
+#. CONVO.ALAN_BRAWL_16.CONF.REQ_AT_FULL_HEALTH
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.REQ_AT_FULL_HEALTH"
+msgid "At full health"
+msgstr "生命值已满"
+
+#. CONVO.ALAN_BRAWL_16.CONF.REQ_AT_FULL_RESOLVE
+msgctxt "CONVO.ALAN_BRAWL_16.CONF.REQ_AT_FULL_RESOLVE"
+msgid "At full resolve"
+msgstr "意志值已满"
+
+#. CONVO.ALAN_BRAWL_2.STATE_ATTRACT.DIAL_TXT
+msgctxt "CONVO.ALAN_BRAWL_2.STATE_ATTRACT.DIAL_TXT"
+msgid "agent:\n!cruel\nNeed some adjustments?"
+msgstr "agent:\n!cruel\n需要调整一下吗？"
+
+#. CONVO.ALAN_BRAWL_3.DIALOG_ADD_SLOT_1
+msgctxt "CONVO.ALAN_BRAWL_3.DIALOG_ADD_SLOT_1"
+msgid "agent:\nThis is going to sting a little.\n!exit\nplayer:\n!exit"
+msgstr "agent:\n可能有点刺痛。\n!exit\nplayer:\n!exit"
+
+#. CONVO.ALAN_BRAWL_3.DIALOG_ADD_SLOT_2
+msgctxt "CONVO.ALAN_BRAWL_3.DIALOG_ADD_SLOT_2"
+msgid "agent:\n!right\nplayer:\n!left\nagent:\nGood as new!"
+msgstr "agent:\n!right\nplayer:\n!left\nagent:\n焕然一新!"
+
+#. CONVO.ALAN_BRAWL_3.DIALOG_GET_MORE_SLOTS
+msgctxt "CONVO.ALAN_BRAWL_3.DIALOG_GET_MORE_SLOTS"
+msgid "agent:\nI can drill you a new slot, but I'm not going to lie:\n!interest\nIt's going to hurt like hell."
+msgstr "agent:\n我可以为你钻一个新槽，但是我不想瞒你：\n!interest\n会疼的像地狱一样。"
+
+#. CONVO.ALAN_BRAWL_3.DIALOG_SELL_GRAFT
+msgctxt "CONVO.ALAN_BRAWL_3.DIALOG_SELL_GRAFT"
+msgid "agent:\n$happyThanks\nGood choice. You won't regret it."
+msgstr "agent:\n$happyThanks\n选的好。你不会后悔的。"
+
+#. CONVO.ALAN_BRAWL_3.OPT_GET_MORE_SLOTS
+msgctxt "CONVO.ALAN_BRAWL_3.OPT_GET_MORE_SLOTS"
+msgid "Add more graft slots..."
+msgstr "增加更多移植物槽……"
+
+#. CONVO.ALAN_BRAWL_3.OPT_SEE_COMBAT_GRAFTS
+msgctxt "CONVO.ALAN_BRAWL_3.OPT_SEE_COMBAT_GRAFTS"
+msgid "Buy battle grafts..."
+msgstr "购买战斗移植物……"
+
+#. CONVO.ALAN_BRAWL_3.OPT_SEE_NEGOTIATION_GRAFTS
+msgctxt "CONVO.ALAN_BRAWL_3.OPT_SEE_NEGOTIATION_GRAFTS"
+msgid "Buy negotiation grafts..."
+msgstr "购买协商移植物……"
+
+#. CONVO.ALAN_BRAWL_3.OPT_SELL_GRAFT
+msgctxt "CONVO.ALAN_BRAWL_3.OPT_SELL_GRAFT"
+msgid "Purchase {1#graft}"
+msgstr "购买{1#graft}"
+
+#. CONVO.ALAN_BRAWL_3.REQ_FULL
+msgctxt "CONVO.ALAN_BRAWL_3.REQ_FULL"
+msgid "You have too many grafts of this type"
+msgstr "你有太多该类型的移植物"
+
+#. CONVO.ALAN_BRAWL_4.STATE_ATTRACT.DIAL_TXT
+msgctxt "CONVO.ALAN_BRAWL_4.STATE_ATTRACT.DIAL_TXT"
+msgid "agent:\nToday's a good day to fight!"
+msgstr "agent:\n今天是个战斗的好日子!"
+
+#. CONVO.ALAN_BRAWL_5.DIAL_REMOVE_CARD
+msgctxt "CONVO.ALAN_BRAWL_5.DIAL_REMOVE_CARD"
+msgid "agent:\nIt's easy to forget!"
+msgstr "agent:\n很容易就忘记!"
+
+#. CONVO.ALAN_BRAWL_5.OPT_SHOP
+msgctxt "CONVO.ALAN_BRAWL_5.OPT_SHOP"
+msgid "Buy Battle Cards..."
+msgstr "购买战斗牌……"
+
+#. CONVO.ALAN_BRAWL_8.STATE_ATTRACT.DIAL_TXT
+msgctxt "CONVO.ALAN_BRAWL_8.STATE_ATTRACT.DIAL_TXT"
+msgid "agent:\nToday's a good day to fight!"
+msgstr "agent:\n今天是个战斗的好日子!"
+
+#. CONVO.ALAN_BRAWL_9.DIAL_REMOVE_CARD
+msgctxt "CONVO.ALAN_BRAWL_9.DIAL_REMOVE_CARD"
+msgid "agent:\nLet Hesh touch your mind..."
+msgstr "agent:\n让黑石触摸你的思想吧……"
+
+#. CONVO.ALAN_BRAWL_9.OPT_SHOP
+msgctxt "CONVO.ALAN_BRAWL_9.OPT_SHOP"
+msgid "Buy Negotiation Cards..."
+msgstr "购买协商牌……"

@@ -132,6 +132,8 @@ local BATTLE_GRAFTS =
         rarity = CARD_RARITY.COMMON,
         img = engine.asset.Texture("icons/items/graft_dark_cowl.tex"),
         defend_amt = 6,
+        pwr_amt = 1,
+        update = false,
         battle_condition =
         {
             hidden = true,
@@ -140,6 +142,9 @@ local BATTLE_GRAFTS =
                 [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
                     if not self.owner:HasCondition("DEFEND") then
                         self.owner:AddCondition("DEFEND", self.graft:GetDef().defend_amt, self)
+                        if update then
+                            self.owner:AddCondition( "POWER", self.graft:GetDef().pwr_amt, self )
+                        end
                         battle:BroadcastEvent( BATTLE_EVENT.GRAFT_TRIGGERED, self.graft )
                     end
                 end
@@ -149,10 +154,10 @@ local BATTLE_GRAFTS =
 
     PC_ALAN_CLOAK_plus =
     {
-        name = "Stone Cloak",
+        name = "Boosted Cloak",
         icon_override = "dark_cowl_plus",
-        desc = "At the end of your turn, gain <#UPGRADE>10</> {DEFEND} if you have not any {DEFEND}.",
-        defend_amt = 10,
+        desc = "At the end of your turn, gain 6 {DEFEND} <#UPGRADE>and 1 {POWER}</> if you have not any {DEFEND}.",
+        update = true,
     },
 
     PC_ALAN_SPARK_POUCH =
@@ -802,6 +807,6 @@ local BATTLE_GRAFTS =
 for i, id, graft in sorted_pairs( BATTLE_GRAFTS ) do
     graft.card_defs = battle_defs
     graft.type = GRAFT_TYPE.COMBAT
-    graft.series = graft.series or "SHEL"
+    graft.series = graft.series or "ALAN"
     Content.AddGraft( id, graft )
 end

@@ -393,7 +393,7 @@ local MODIFIERS =
 
         event_handlers = 
         {
-            [ EVENT.POST_RESOLVE ] = function( self, minigame, card )
+            [ EVENT.PRE_RESOLVE ] = function( self, minigame, card )
                 if self.owner == card.owner then
                     minigame:DrawCards(1)
                     self.negotiator:RemoveModifier( "PA_CAUSE_AND_EFFECT", 1 )
@@ -747,6 +747,9 @@ local CARDS =
         name = "Visionary Guidance",
         desc = "Apply {1} {COMPOSURE}.\n<#UPGRADE>Draw a card</>.",
         OnPostResolve = function( self, minigame, targets )
+            for i,target in ipairs(targets) do
+                target:DeltaComposure(self.composure_amt, self)
+            end
             minigame:DrawCards(1)
         end,
     },

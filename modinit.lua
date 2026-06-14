@@ -3,13 +3,13 @@ local filepath = require "util/filepath"
 -- OnNewGame is called whenever a new game is started.
 local function OnNewGame( mod, game_state )
     -- Require this Mod to be installed to launch this save game.
-    if game_state:GetCurrentActID() == "SHELS_ADVENTURE" then
+    if game_state:GetCurrentActID() == "ALAN_BRAWL" then
         game_state:RequireMod( mod )
     end
 end
 
 local function OnPreLoad()
-    for k, filepath in ipairs( filepath.list_files( "LOSTPASSAGE:loc", "*.po", true )) do
+    for k, filepath in ipairs( filepath.list_files( "ALANMOD:loc", "*.po", true )) do
         if filepath:match( "(.+)[.]po$" ) then
             Content.AddPOFileToLocalization( filepath:match("([^/]+)[.]po$"), filepath )
         end
@@ -28,33 +28,15 @@ local function OnLoad( mod )
     ------------------------------------------------------------------------------------------
     -- These additional names are available for randomly generated characters across all campaigns.
 
-    Content.ExtendNamePool( "NAMES", "LOSTPASSAGE:custom_names.txt" )
-
-    Content.AddStringTable( mod.id, { LOST_PASSAGE = "Lost Passage" } )
-    Content.AddStringTable( "COMMON", { CONVO_COMMON = { OPT_FOOBAR = "Foobar" }})
-
-    Content.AddPlaxData( "INT_ShelsEstate", "LOSTPASSAGE:plax/INT_ShelsEstate" )
-
-    local codex = Codex()
-    codex:AddFilename( "LOSTPASSAGE:shel_codex.yaml" )
-    Content.AddCodex( codex )
-
-    local quips = QuipDatabase()
-    quips:AddFilename( "LOSTPASSAGE:shel_quips.yaml" )
-    Content.AddQuips( quips )
-
-    Content.AddSlideShow( "shel_slideshow", require "LOSTPASSAGE:slides/shel_slideshow" )
     
     ------------------------------------------------------------------------------------------
     -- Aspects
 
-    require "LOSTPASSAGE:bounty_target"
-    require "LOSTPASSAGE:trader"
 
     ------------------------------------------------------------------------------------------
     -- Player backgrounds
 
-    require "LOSTPASSAGE:shels_adventure"
+    require "ALANMOD:alan_background"
     
     ------------------------------------------------------------------------------------------
     -- Factions
@@ -65,42 +47,37 @@ local function OnLoad( mod )
     ------------------------------------------------------------------------------------------
     -- Cards / Grafts
 
-    require "LOSTPASSAGE:negotiation_cards"
-    require "LOSTPASSAGE:negotiation_grafts"
-    require "LOSTPASSAGE:battle_cards"
-    require "LOSTPASSAGE:battle_grafts"
-    require "LOSTPASSAGE:Flourishes"
-    require "LOSTPASSAGE:shel_shops"
+    require "ALANMOD:negotiation_cards"
+    require "ALANMOD:negotiation_grafts"
+    require "ALANMOD:battle_cards"
+    require "ALANMOD:battle_grafts"
+    require "ALANMOD:Flourishes"
 
     ------------------------------------------------------------------------------------------
     -- Characters
 
-    require "LOSTPASSAGE:shel"
+    require "ALANMOD:alan"
 
     ------------------------------------------------------------------------------------------
     -- Convos / Quests
 
-    require "LOSTPASSAGE:shel_story"
+    require "ALANMOD:alan_brawl"
 
-    for k, filepath in ipairs( filepath.list_files( "LOSTPASSAGE:conversations", "*.lua", true )) do
-        filepath = filepath:match( "^(.+)[.]lua$")
-        require( filepath )
+    if not TheGame:GetGameProfile().values["unlocked_flourishes"]["PC_ALAN"] then
+        TheGame:GetGameProfile().values["unlocked_flourishes"]["PC_ALAN"] = {BATTLE = {},NEGOTIATION = {},}
     end
-
-    for k, filepath in ipairs( filepath.list_files( "LOSTPASSAGE:events", "*.lua", true )) do
-        filepath = filepath:match( "^(.+)[.]lua$")
-        require( filepath )
+    
+    if not TheGame:GetGameProfile():HasMettleUnlocked("PC_ALAN") then
+        TheGame:GetGameProfile():UnlockMettle("PC_ALAN")
     end
 
     ------------------------------------------------------------------------------------------
     -- Locations
 
-    require "LOSTPASSAGE:shel_locations"
-
     return PostLoad
 end
 
-local MOD_OPTIONS =
+--[[local MOD_OPTIONS =
 {
     -- Access this value from the user's settings by calling:
     -- Content.GetModSetting( <mod_id>, "resolve_per_day" )
@@ -138,15 +115,15 @@ local MOD_OPTIONS =
         key = "button",
         on_click = function() print( "CLICK" ) end,
     }
-}
+}]]--
 
 return
 {
     -- [optional] version is a string specifying the major, minor, and patch version of this mod.
-    version = "0.1.1",
+    version = "1.0.0",
 
     -- Pathnames to files within this mod can be resolved using this alias.
-    alias = "LOSTPASSAGE",
+    alias = "ALANMOD",
     
     -- Mod API hooks.
     OnPreLoad = OnPreLoad,
@@ -154,19 +131,19 @@ return
     OnNewGame = OnNewGame,
     OnGameStart = OnGameStart,
 
-    load_after = { "HAVARIAN" }, -- Ensure this mod comes after the Havarian mod in the sort order.
-    load_before = { "SOME_OTHER_MOD" }, -- Ensure this mod comes before SOME_OTHER_MOD in the sort order.
+    --load_after = { "HAVARIAN" },  Ensure this mod comes after the Havarian mod in the sort order.
+    --load_before = { "SOME_OTHER_MOD" },  Ensure this mod comes before SOME_OTHER_MOD in the sort order.
     
-    mod_options = MOD_OPTIONS,
+    --mod_options = MOD_OPTIONS,
 
     -- UI information about this mod.
-    title = "Shel's Adventure",
+    title = "New Character Alan",
 
     -- You can embed this mod's descriptive text directly...
     -- description = "Play as Shel and guide her to riches and discover the mysterious Lost Passage!",
 
     -- or look it up in an external file.
-    description_file = "LOSTPASSAGE:about.txt",
+    description_file = "ALANMOD:about.txt",
 
     -- This preview image is uploaded if this mod is integrated with Steam Workshop.
     previewImagePath = "preview.png",

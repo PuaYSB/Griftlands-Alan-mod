@@ -1,0 +1,39 @@
+花了一年多（虽然这其中有一大段时间处于放弃的状态）做的一位新可玩角色以及相应带来的新卡组
+
+有约莫160+张新牌，其中大约90+张牌是战斗牌，70+张牌是协商牌
+
+有30+个全新移植物
+
+目前只有打斗，可能会在未来做一个剧情战役
+
+注：目前里面内含各种弱智DIY（无论是强的还是弱的），因此如有平衡建议请告诉我，谢谢各位大佬
+
+------
+
+Spent over a year making this new playable character and their accompanying card pool (though, to be fair, the project sat abandoned for quite a while during that time)
+
+Features roughly 160+ new cards, including 90+ combat cards and 70+ negotiation cards
+
+Also includes 30+ brand-new grafts
+
+Currently, the mod only features a Brawl campaign. 
+The Story campaign may be added in the future, though no plans have been finalized yet.
+
+Note: This mod is still full of some pretty dumb DIY ideas—some are probably too strong, while others are probably too weak. If you have any balance suggestions, feel free to let me know. Thanks in advance!
+
+------
+
+致谢名单/Acknowledgments
+-qwerty吃小庄（提供了代码上的帮助和指导）
+
+-Fgdfgfthgr（提供了代码上的帮助和指导，且给出了部分牌的平衡建议，与此同时也是我创作mod时的主要参考对象之一）
+
+-沉默阴燃（提供了代码上的帮助和指导）
+
+-Sweet Moreef's strongest soldier (Provided coding support and guidance, and one of the primary inspirations and references for the development of this mod.)
+
+-RageLeague (Provided coding support and guidance)
+
+-The Monstre King (Provided coding support and guidance, and contributed balance recommendations for selected cards)
+
+-Newbiespud (One of the primary inspirations and references for the development of this mod.)
