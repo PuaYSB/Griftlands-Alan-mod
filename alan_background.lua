@@ -55,7 +55,7 @@ GetPlayerBackground( "ROOK" ):AddClonedAct( act, "ROOKS_ADVENTURE" )
 
 local decks = 
 {
-    NegotiationDeck("negotiation_basic", "PC_SHEL")
+    NegotiationDeck("negotiation_basic", "PC_ALAN")
         :AddCards{ 
             PC_ALAN_DISCUSS = 3,
             PC_ALAN_BLUFF = 3,
@@ -64,7 +64,7 @@ local decks =
             PC_ALAN_BRAINSTORM = 1,
         },
     
-    BattleDeck("battle_basic", "PC_SHEL")
+    BattleDeck("battle_basic", "PC_ALAN")
         :AddCards{ 
             PC_ALAN_PUNCH = 3,
             PC_ALAN_THROW_BOTTLE = 2,

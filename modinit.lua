@@ -120,7 +120,7 @@ end
 return
 {
     -- [optional] version is a string specifying the major, minor, and patch version of this mod.
-    version = "1.0.0",
+    version = "1.1.0",
 
     -- Pathnames to files within this mod can be resolved using this alias.
     alias = "ALANMOD",

@@ -99,7 +99,7 @@ local GRAFTS =
     {
         name = "Disposable Slider",
         flavour = "'Your free trial has expired. Please proceed to the nearest corporate counter to renew your subscription to continue usage.'",
-        desc = "At the start of each negotiation, {IMPROVISE} a card from your draw pile.",
+        desc = "At the start of every negotiation, {IMPROVISE} a card from your draw pile.",
         img = engine.asset.Texture("icons/items/graft_slider.tex"),
         rarity = CARD_RARITY.COMMON,
         pool_size = 3,
@@ -136,7 +136,7 @@ local GRAFTS =
     {
         name = "Spray Bottle",
         flavour = "'Give the area a quick spritz before you start. It helps distract everyone else, too.'",
-        desc = "At the start of each negotiation, move up to 3 cards from your draw pile to your discard.",
+        desc = "At the start of every negotiation, move up to 3 cards from your draw pile to your discard.",
         img = engine.asset.Texture("icons/items/graft_cranial_coolant.tex"),
         rarity = CARD_RARITY.COMMON,
         move_card_amt = 3,
@@ -169,7 +169,7 @@ local GRAFTS =
     {
         name = "Boosted Disposable Slider",
         icon_override = "cranial_coolant_plus",
-        desc = "At the start of each negotiation, move up to <#UPGRADE>5</> cards from your draw pile to your discard.",
+        desc = "At the start of every negotiation, move up to <#UPGRADE>5</> cards from your draw pile to your discard.",
         move_card_amt = 5,
     },
 
@@ -208,27 +208,45 @@ local GRAFTS =
     {
         name = "Headphones",
         flavour = "'Helps block out a bit of the outside noise.'",
-        desc = "At the start of each negotiation, Create 2 {PA_BREEZY}.",
+        desc = "At the start of every negotiation, Create 2 {PA_BREEZY}.",
         img = engine.asset.Texture("icons/items/graft_easy_listening.tex"),
         rarity = CARD_RARITY.UNCOMMON,
-        OnStartNegotiation = function(self, minigame)
-            for i=1,2 do
-                self.negotiator:CreateModifier("PA_BREEZY", 1, self)
-            end
-        end,
+        negotiation_modifier =
+        {
+            hidden = true,
+            event_handlers =
+            {
+                [ EVENT.HAND_DRAWN ] = function( self, minigame )
+                    for i=1,2 do
+                        self.negotiator:CreateModifier("PA_BREEZY", 1)
+                    end
+                    minigame:BroadcastEvent( EVENT.GRAFT_TRIGGERED, self )
+                    self.negotiator:RemoveModifier(self, self.stacks, self)
+                end
+            },
+        },
     },
 
     PC_ALAN_HEADPHONES_plus =
     {
         name = "Visionary Headphones",
         icon_override = "easy_listening_plus",
-        desc = "At the start of each negotiation, Create 2 {PA_BREEZY} <#UPGRADE>and gain 3 {PA_CAUSE_AND_EFFECT}</>.",
-        OnStartNegotiation = function(self, minigame)
-            for i=1,2 do
-                self.negotiator:CreateModifier("PA_BREEZY", 1, self)
-            end
-            self.negotiator:AddModifier("PA_CAUSE_AND_EFFECT", 3, self)
-        end,
+        desc = "At the start of every negotiation, Create 2 {PA_BREEZY} <#UPGRADE>and gain 3 {PA_CAUSE_AND_EFFECT}</>.",
+        negotiation_modifier =
+        {
+            hidden = true,
+            event_handlers =
+            {
+                [ EVENT.HAND_DRAWN ] = function( self, minigame )
+                    for i=1,2 do
+                        self.negotiator:CreateModifier("PA_BREEZY", 1)
+                    end
+                    self.negotiator:AddModifier("PA_CAUSE_AND_EFFECT", 3)
+                    minigame:BroadcastEvent( EVENT.GRAFT_TRIGGERED, self )
+                    self.negotiator:RemoveModifier(self, self.stacks, self)
+                end
+            },
+        },
     },
 
     PC_ALAN_PROSTHETIC_TONGUE =
@@ -330,7 +348,7 @@ local GRAFTS =
     {
         name = "Two Bottles",
         flavour = "'Chugging two bottles at once yields the best results. I mean, it tastes great.'",
-        desc = "At the start of each negotiation, if your deck have card that have 'Evoke: Play a same-named cards', add a copy of that card to your discard.",
+        desc = "At the start of every negotiation, if your deck have card that have 'Evoke: Play a same-named cards', add a copy of that card to your discard.",
         img = engine.asset.Texture("icons/items/graft_two_fisted.tex"),
         rarity = CARD_RARITY.UNCOMMON,
         count = 1,
@@ -396,7 +414,7 @@ local GRAFTS =
     {
         name = "Boosted Two Bottles",
         icon_override = "two_fisted_plus",
-        desc = "At the start of each negotiation, if your deck have card that have 'Evoke: Play a same-named cards', add <#UPGRADE>2 copies</> of that card to your discard.",
+        desc = "At the start of every negotiation, if your deck have card that have 'Evoke: Play a same-named cards', add <#UPGRADE>2 copies</> of that card to your discard.",
         count = 2,
     },
 
@@ -404,7 +422,7 @@ local GRAFTS =
     {
         name = "Stick",
         flavour = "'Extremely simple and straightforward, just like the time it came from.'",
-        desc = "When you have at least  card on your hand, discard any number of cards, then apply 1 {COMPOSURE} to a random argument that many cards.",
+        desc = "When you have at least card on your hand, discard any number of cards, then apply 1 {COMPOSURE} to a random argument that many cards.",
         img = engine.asset.Texture("icons/items/graft_truncheon.tex"),
         rarity = CARD_RARITY.UNCOMMON,
         limit = 8,
@@ -502,7 +520,7 @@ local GRAFTS =
     {
         name = "Boosted Amulet",
         icon_override = "finely_crafted_amulet_plus",
-        desc = "At the end of each turn, gain 1 {PA_TRUST}.\n<#UPGRADE>At the start of each negotiation, gain 1 {PA_TRUST}</>.",
+        desc = "At the end of each turn, gain 1 {PA_TRUST}.\n<#UPGRADE>At the start of every negotiation, gain 1 {PA_TRUST}</>.",
         negotiation_modifier =
         {
             hidden = true,

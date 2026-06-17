@@ -223,22 +223,6 @@ local CONDITIONS =
         }
     },
 
-    PA_DEEP_POCKETS =
-    {
-        name = "Deep Pockets",
-        icon = "battle/conditions/combat_analysis.tex",        
-        desc = "At turn start, draw <#HILITE>{1}</> card.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, self.stacks )
-        end,
-        event_handlers =
-        {
-            [ BATTLE_EVENT.BEGIN_PLAYER_TURN ] = function( self, battle )
-            battle:DrawCards(self.stacks or 1)
-            end
-        }
-    },
-
     PA_IMPROVEMENT =
     {
         name = "Improvement",
@@ -333,16 +317,24 @@ local CONDITIONS =
     {
         name = "Overloaded Core",
         icon = "battle/conditions/charged_strikes.tex",        
-        desc = "Gain {POWER} equal to your {SPARK_RESERVE}. When the amount of {SPARK_RESERVE} changes, the amount of {POWER} will also change.",
-        max_stacks = 1,
+        desc = "Gain {POWER} equal to {1} times your {SPARK_RESERVE}. When the amount of {SPARK_RESERVE} changes, the amount of {POWER} will also change.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self.stacks )
+        end,
+        max_stacks = 99,
         event_handlers =
         {
             [ BATTLE_EVENT.CONDITION_ADDED ] = function(self, owner, condition, stacks, source)
+            if owner == self.owner and condition.id == self.id then
+                self.spark_reserve = self.owner:GetConditionStacks("SPARK_RESERVE") or 0
+                self.owner:AddCondition("POWER", self.spark_reserve, self)
+            end
+
             if owner == self.owner and condition.id == "SPARK_RESERVE" then
                 local new_spark_reserve = self.owner:GetConditionStacks("SPARK_RESERVE") or 0
                 local diff = new_spark_reserve - (self.spark_reserve or 0)
-                if diff > 0 then
-                    self.owner:AddCondition("POWER", diff, self)
+                if diff >= 0 then
+                    self.owner:AddCondition("POWER", (diff * self.stacks), self)
                 end
                 self.spark_reserve = new_spark_reserve
             end
@@ -352,8 +344,8 @@ local CONDITIONS =
             if owner == self.owner and condition.id == "SPARK_RESERVE" then
                 local new_spark_reserve = self.owner:GetConditionStacks("SPARK_RESERVE") or 0
                 local diff = new_spark_reserve - (self.spark_reserve or 0)
-                if diff < 0 then
-                    self.owner:AddCondition("POWER", diff, self)  
+                if diff <= 0 then
+                    self.owner:AddCondition("POWER", (diff * self.stacks), self)  
                 end
                 self.spark_reserve = new_spark_reserve
             end
@@ -607,13 +599,13 @@ local CARDS =
         event_handlers =
         {
             [ BATTLE_EVENT.CALC_DAMAGE ] = function(self, card, target, dmgt)
-            if card == self then
-                local total_cost, max_cost = CalculateTotalAndMaxCost(self.engine, self)
-                if total_cost >= self.weight_thresh and max_cost > 0 then
-                    local extra_damage = max_cost * 2
-                    dmgt:AddDamage(extra_damage, extra_damage, self)
+                if card == self then
+                    local total_cost, max_cost = CalculateTotalAndMaxCost(self.engine, self)
+                    if total_cost >= self.weight_thresh and max_cost > 0 then
+                        local extra_damage = max_cost * 2
+                        dmgt:AddDamage(extra_damage, extra_damage, self)
+                    end
                 end
-            end
             end,
         }
     },  
@@ -1128,17 +1120,22 @@ local CARDS =
         name = "Trash",
         icon = "battle/flekfis_junk.tex",
         anim = "throw",
+        desc = "When {EXPEND}, Gain 3 {DEFEND}.",
         flavour = "'…Sorry, I forgot to throw this away. Here, you can have it.'",
         target_type = TARGET_TYPE.SELF,
-
         rarity = CARD_RARITY.UNIQUE,
         cost = 2,
         max_xp = 0,
-        flags = CARD_FLAGS.SKILL | CARD_FLAGS.BURNOUT,
-
-        features =
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.BURNOUT,
+        deck_handlers = ALL_DECKS,
+        event_handlers =
         {
-            DEFEND = 3,
+            [ BATTLE_EVENT.CARD_EXPENDED ] = function( self, battle, card )
+                if card == self then
+                    self:NotifyTriggered()
+                    self.owner:AddCondition( "DEFEND", 3, self )
+                end
+            end,
         },
     },
 
@@ -1147,15 +1144,20 @@ local CARDS =
         name = "Heavy Trash",
         icon = "battle/flekfis_junk.tex",
         anim = "throw",
+        desc = "When {EXPEND}, Gain 5 {DEFEND}.",
         target_type = TARGET_TYPE.SELF,
-
         rarity = CARD_RARITY.UNIQUE,
         cost = 3,
-        flags = CARD_FLAGS.SKILL | CARD_FLAGS.BURNOUT,
-
-        features =
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.BURNOUT,
+        deck_handlers = ALL_DECKS,
+        event_handlers =
         {
-            DEFEND = 3,
+            [ BATTLE_EVENT.CARD_EXPENDED ] = function( self, battle, card )
+                if card == self then
+                    self:NotifyTriggered()
+                    self.owner:AddCondition( "DEFEND", 5, self )
+                end
+            end,
         },
     },
 
@@ -1320,7 +1322,7 @@ local CARDS =
         hit_tags = {"critical"},
         desc = "Gain {1} {DEFEND}.\n{PC_ALAN_WEIGHTED} {2}: Gain 1 Action.",
         desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str,self:CalculateDefendText( self.defend_amount ),self.weight_thresh)
+            return loc.format(fmt_str,self:CalculateDefendText( self.defend_amount ), self.weight_thresh)
         end,  
         flavour = "'A simple use of inertia can send a heavy object flying straight to your face.'",
         rarity = CARD_RARITY.COMMON,
@@ -1373,11 +1375,12 @@ local CARDS =
         max_xp = 9,
         min_damage = 3,
         max_damage = 5,
+        bonus_damage = 3,
         event_handlers =
         {
             [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
                 if self == card and self.owner:HasCondition("LUMIN_RESERVE") then
-                    dmgt:AddDamage( 3, 3, self )
+                    dmgt:AddDamage( self.bonus_damage, self.bonus_damage, self )
                 end
             end,
         },
@@ -1387,14 +1390,7 @@ local CARDS =
     {
         name = "Boosted Lumin Dagger",
         desc = "deal <#UPGRADE>6</> bonus damage  if you have any {LUMIN_RESERVE}.",
-        event_handlers =
-        {
-            [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
-                if self == card and self.owner:HasCondition("LUMIN_RESERVE") then
-                    dmgt:AddDamage( 6, 6, self )
-                end
-            end,
-        },
+        bonus_damage = 6,
     },
 
     PC_ALAN_LUMIN_DAGGER_plus2 =
@@ -1404,19 +1400,15 @@ local CARDS =
         hit_anim = true,
         min_damage = 1,
         max_damage = 3,
-        event_handlers =
-        {
-            [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
-                if self == card and self.owner:HasCondition("LUMIN_RESERVE") then
-                    dmgt:AddDamage( 3, 3, self )
-                    self.hit_count = 2
-                    return true
-                else
-                    self.hit_count = 1
-                    return false
-                end
-            end,
-        },
+        PreReq = function( self, battle )
+            if self.owner:HasCondition("LUMIN_RESERVE") then
+                self.hit_count = 2
+                return true
+            else
+                self.hit_count = 1
+                return false
+            end
+        end,
     },
 
     PC_ALAN_SPARK_PROPULSION =
@@ -1697,11 +1689,13 @@ local CARDS =
         end,
         light_thresh = 2,
         wou_amt = 2,
-        OnPostResolve = function(self, battle, attack)
+        OnPreResolve = function(self, battle, attack)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost <= self.light_thresh then
                 attack.target:AddCondition("WOUND", self.wou_amt, self)
             end
+        end,
+        OnPostResolve = function(self, battle, attack)
         end,
     },
 
@@ -1832,17 +1826,18 @@ local CARDS =
         max_damage = 5, 
         light_thresh = 3,
         action_bonus = -1,
+        bonus_damage = 3,
         event_handlers =
         {
             [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
-            if card == self then
-                local total_cost, max_cost = CalculateTotalAndMaxCost(self.engine, self)
-                if total_cost <= self.light_thresh then
-                    dmgt:AddDamage(3, 3, self)
+                if card == self then
+                    local total_cost, max_cost = CalculateTotalAndMaxCost(self.engine, self)
+                    if total_cost <= self.light_thresh then
+                        dmgt:AddDamage(self.bonus_damage, self.bonus_damage, self)
+                    end
                 end
-            end
-        end,
-    },
+            end,
+        },
         OnPreResolve = function(self, battle)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost <= self.light_thresh then
@@ -1858,23 +1853,7 @@ local CARDS =
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.light_thresh)
         end,
-        event_handlers =
-        {
-            [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
-            if card == self then
-                local total_cost, max_cost = CalculateTotalAndMaxCost(self.engine, self)
-                if total_cost <= self.light_thresh then
-                    dmgt:AddDamage(5, 5, self)
-                end
-            end
-        end,
-    },
-        OnPreResolve = function(self, battle)
-            local total_cost= CalculateTotalAndMaxCost(self.engine, self)
-            if total_cost <= self.light_thresh then
-                self.engine:ModifyActionCount(self.action_bonus)
-            end
-        end
+        bonus_damage = 5,
     },
 
     PC_ALAN_DISRUPTIVE_ATTACK_plus2 =
@@ -1887,8 +1866,11 @@ local CARDS =
         end,
         weight_thresh = 7,
         action_bonus = 0,
-        OnPostResolve = function(self, battle, attack)
-            self.owner:AddCondition("ADRENALINE", 2, self)
+        OnPreResolve = function(self, battle, attack)
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
+            if total_cost >= self.weight_thresh then
+                self.owner:AddCondition("ADRENALINE", 2, self)
+            end
         end,
 
     },
@@ -2186,8 +2168,13 @@ local CARDS =
             return loc.format(fmt_str, self.light_thresh)
         end,
         light_thresh = 3,
+        OnPreResolve = function(self, battle)
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
+            if total_cost >= self.weight_thresh then
+                self.owner:AddCondition("ADRENALINE", 1, self) 
+            end
+        end,
         OnPostResolve = function(self, battle, attack)
-            self.owner:AddCondition("ADRENALINE", 1, self) 
             self.owner:AddCondition("WARM_UP", 3, self) 
         end,
     },
@@ -2260,7 +2247,7 @@ local CARDS =
         target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
         cost = 0,
         max_xp = 7, 
-        defend_amount = 4,
+        defend_amount = 5,
         fixed_cost = 0,
         event_handlers =
         {
@@ -2299,7 +2286,7 @@ local CARDS =
         name = "Heavy Goods",
         desc = "Apply <#UPGRADE>{1}</> {DEFEND}.\nThe cost of this card is equal to the cost of the most expensive card in your hand while turn start.",
         cost = 1,
-        defend_amount = 8,
+        defend_amount = 9,
     },
 
     PC_ALAN_SHODDY_SHIELD =
@@ -2474,8 +2461,8 @@ local CARDS =
         rarity = CARD_RARITY.UNIQUE,
         flags = CARD_FLAGS.RANGED | CARD_FLAGS.EXPEND,
         cost = 0,
-        min_damage = 2,
-        max_damage = 4,
+        min_damage = 1,
+        max_damage = 3,
         quick_amt = 1,
         event_handlers =
         {
@@ -2556,30 +2543,34 @@ local CARDS =
             return loc.format(fmt_str, self.light_thresh)
         end,
         light_thresh = 3,
-        OnPostResolve = function( self, battle, attack)
-            battle:DrawCards(3)
+        OnPreResolve = function( self, battle, attack)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost <= self.light_thresh then
                 battle:DrawCards(1)
             end
+        end,
+        OnPostResolve = function( self, battle, attack)
+            battle:DrawCards(3)
         end
     },
 
     PC_ALAN_BACKUP_WEAPON_plus2 =
     {
         name = "Weighted Backup Weapon",
-        desc = "Draw 3 cards.\n<#UPGRADE>{PC_ALAN_WEIGHTED}{1}: Gain 1 Action</>.",
+        desc = "Draw 3 cards.\n<#UPGRADE>{PC_ALAN_WEIGHTED}{1}: Remove a random debuff</>.",
         desc_fn = function(self, fmt_str)
             return loc.format(fmt_str, self.weight_thresh)
         end,
         weight_thresh = 6,
         action_bonus = 1,
         OnPreResolve = function( self, battle, attack)
-            battle:DrawCards(3)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost >= self.weight_thresh then
-                self.engine:ModifyActionCount(self.action_bonus)
+                attack.target:RemoveDebuff( self )
             end
+        end,
+        OnPostResolve = function( self, battle, attack)
+            battle:DrawCards(3)
         end
     },
 
@@ -2660,12 +2651,14 @@ local CARDS =
             return loc.format(fmt_str, self.weight_thresh)
         end,
         weight_thresh = 7,
-        OnPostResolve = function( self, battle, attack)
-            self.owner:AddCondition("NEXT_TURN_ACTION_ALAN",1 , self)
+        OnPreResolve = function( self, battle, attack)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost >= self.weight_thresh then
-
+                self.owner:AddCondition("NEXT_TURN_ACTION_ALAN", 1 , self)
             end
+        end,
+        OnPostResolve = function( self, battle, attack)
+            self.owner:AddCondition("NEXT_TURN_ACTION_ALAN", 2 , self)
         end,
     },
 
@@ -2674,8 +2667,8 @@ local CARDS =
         name = "Seize more Initiative",
         desc = "Gain 2 actions and <#UPGRADE>draw a card</> at next turn.",
         OnPostResolve = function( self, battle, attack)
-            self.owner:AddCondition("NEXT_TURN_ACTION_ALAN",2 , self)
-            self.owner:AddCondition("NEXT_TURN_CARD_ALAN",1 , self)
+            self.owner:AddCondition("NEXT_TURN_ACTION_ALAN", 2 , self)
+            self.owner:AddCondition("NEXT_TURN_CARD_ALAN", 1 , self)
         end,
     },
 
@@ -2736,12 +2729,12 @@ local CARDS =
         event_handlers =
         {
             [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
-            if card == self then
-            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
-            if total_cost <= self.light_thresh then
-                dmgt:AddDamage(dmgt.min_damage, dmgt.max_damage, self)
-            end
-            end
+                if card == self then
+                    local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
+                    if total_cost <= self.light_thresh then
+                        dmgt:AddDamage(dmgt.min_damage, dmgt.max_damage, self)
+                    end
+                end
             end 
         },    
     },
@@ -2754,11 +2747,11 @@ local CARDS =
         {
             [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
             if card == self then
-            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
-            if total_cost <= self.light_thresh then
-                dmgt:AddDamage(dmgt.min_damage * 2, dmgt.max_damage * 2, self)
-            end
-            end
+                local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
+                if total_cost <= self.light_thresh then
+                    dmgt:AddDamage(dmgt.min_damage * 2, dmgt.max_damage * 2, self)
+                end
+                end
             end 
         }  
     },
@@ -2768,11 +2761,8 @@ local CARDS =
         name = "Mirror Rapid Throw",
         hit_anim = true,
         desc = "{PC_ALAN_LIGHTWEIGHT}{1}: <#UPGRADE>Attack twice</>.",
-        event_handlers =
-        {
-            [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
-            if card == self then
-            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
+        PreReq = function( self, battle )
+            local total_cost , _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost <= self.light_thresh then
                 self.hit_count = 2
                 return true
@@ -2780,7 +2770,10 @@ local CARDS =
                 self.hit_count = 1
                 return false
             end
-            end
+        end,
+        event_handlers =
+        {
+            [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
             end 
         } 
     },
@@ -2835,12 +2828,10 @@ local CARDS =
     {
         name = "Spark Storm",
         icon = "battle/firestorm.tex",
-        anim = "throw",
+        anim = "shoot",
         hit_tags = {"spark"},
+        anims = {"anim/weapon_blaster_stungun.zip"},
         desc = "Spend all {SPARK_RESERVE}: Attack one for each two {SPARK_RESERVE}.",
-        desc_fn = function(self, fmt_str)
-            return loc.format(fmt_str, CalculateConditionText(self, "SPARK_RESERVE", self.spark_amt))
-        end,
         flavour = "'Ready to enjoy some fireworks? The Spark-made kind.'",
         rarity = CARD_RARITY.UNCOMMON,
         flags = CARD_FLAGS.RANGED,
@@ -2848,18 +2839,23 @@ local CARDS =
         max_xp = 9,
         min_damage = 3,
         max_damage = 5,   
+        hit_count = 1,
         PreReq = function( self, minigame )
             local stack_count = self.owner:GetConditionStacks("SPARK_RESERVE") or 0 
             local count = math.min(stack_count, 9) 
             if count > 0 then
-                self.hit_count = 1 + (count/2)
+                self.hit_count = 1 + math.floor(count / 2)
             else
                 self.hit_count = 1
             end
             return stack_count > 0 
         end,
+        OnPreResolve = function( self, battle, attack)
+            self.spark_reserve = self.owner:GetConditionStacks( "SPARK_RESERVE" ) or 0
+        end,
         OnPostResolve = function( self, battle, attack )
-            self.hit_count = 1
+            self.hit_count = self.def.hit_count
+            self.owner:RemoveCondition("SPARK_RESERVE", self.spark_reserve, self)
         end,
     },
 
@@ -2989,9 +2985,9 @@ local CARDS =
         action_bonus = 2,
         OnPreResolve = function(self, battle)
         local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
-        if total_cost >= self.weight_thresh then
-            self.engine:ModifyActionCount(self.action_bonus)
-        end
+            if total_cost >= self.weight_thresh then
+                self.engine:ModifyActionCount(self.action_bonus)
+            end
         end,
         OnPostResolve = function( self, battle, attack )
             local card = Battle.Card("PC_ALAN_HAMMER_SWING_II", self.owner)
@@ -3021,10 +3017,10 @@ local CARDS =
         action_bonus = 1,
         weight_thresh = 7,
         OnPreResolve = function(self, battle)
-        local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
-        if total_cost >= self.weight_thresh then
-            self.engine:ModifyActionCount(self.action_bonus)
-        end
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
+            if total_cost >= self.weight_thresh then
+                self.engine:ModifyActionCount(self.action_bonus)
+            end
         end,
         OnPostResolve = function( self, battle, attack )
             local card = Battle.Card("PC_ALAN_HAMMER_SWING_III", self.owner)
@@ -3063,11 +3059,13 @@ local CARDS =
         min_damage = 8,
         max_damage = 8,
         weight_thresh = 6,
-        OnPostResolve = function( self, battle, attack )
+        OnPreResolve = function(self, battle)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost >= self.weight_thresh then
                 battle:DrawCards(1)
             end
+        end,
+        OnPostResolve = function( self, battle, attack )
             local card = Battle.Card("PC_ALAN_HAMMER_SWING_IV", self.owner)
             card.base_card = self.base_card
             card.auto_deal = true
@@ -3105,6 +3103,12 @@ local CARDS =
         max_damage = 10,
         weight_thresh = 5,
         deck_handlers = { DECK_TYPE.DISCARDS },
+        OnPreResolve = function(self, battle)
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
+            if total_cost >= self.weight_thresh then
+                battle:DrawCards(1)
+            end
+        end,
         event_handlers =
         {
             [ BATTLE_EVENT.CARD_MOVED ] = function( self, card, source_deck, source_idx, target_deck, target_idx )
@@ -3120,12 +3124,6 @@ local CARDS =
                 end
             end
         },
-        OnPostResolve = function( self, battle, attack )
-            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
-            if total_cost >= self.weight_thresh then
-                battle:DrawCards(1)
-            end
-        end
     },
 
     PC_ALAN_FINALE =
@@ -3229,8 +3227,6 @@ local CARDS =
         max_xp = 9,
         min_damage = 4,
         max_damage = 6,   
-        OnPreResolve = function( self, battle, attack )
-        end,
         event_handlers =
         {
             [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
@@ -3303,7 +3299,7 @@ local CARDS =
     PC_ALAN_SUDDEN_STRIKE_plus2 =
     {
         name = "Twisted Sudden Strike",
-        desc = "<#UPGRADE>Attack a random enemy\nEvoke: Play 4 Attack cards in a single turn</>.",
+        desc = "<#UPGRADE>Attack a random enemy\nPlay this card when you play 4 attack cards in a single turn</>.",
         flags = CARD_FLAGS.RANGED | CARD_FLAGS.UNPLAYABLE,
         min_damage = 10,
         max_damage = 10,
@@ -3348,7 +3344,7 @@ local CARDS =
         end,  
         flavour = "'Well, let’s go for another round.'",
         rarity = CARD_RARITY.UNCOMMON,
-        flags = CARD_FLAGS.RANGED,
+        flags = CARD_FLAGS.MELEE,
         cost = 1,
         max_xp = 9,
         min_damage = 3,
@@ -3652,16 +3648,21 @@ local CARDS =
         max_xp = 9,
         min_damage = 4,
         max_damage = 6,
+        bonus_damage = 3,
+        PreReq = function( self, battle )
+            if self.owner:HasCondition("SPARK_RESERVE") then
+                self.hit_count = 2
+                return true
+            else
+                self.hit_count = 1
+                return false
+            end
+        end,
         event_handlers =
         {
             [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
                 if self == card and self.owner:HasCondition("SPARK_RESERVE") then
-                    dmgt:AddDamage( 3, 3, self )
-                    self.hit_count = 2
-                    return true
-                else
-                    self.hit_count = 1
-                    return false
+                    dmgt:AddDamage( self.bonus_damage, self.bonus_damage, self )
                 end
             end,
         },
@@ -3671,19 +3672,7 @@ local CARDS =
     {
         name = "Boosted Spark Barrage",
         desc = "This card will attack twice, each hits deal <#UPGRADE>6</> bonus damage if you have any {SPARK_RESERVE}.",
-        event_handlers =
-        {
-            [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
-                if self == card and self.owner:HasCondition("SPARK_RESERVE") then
-                    dmgt:AddDamage( 6, 6, self )
-                    self.hit_count = 2
-                    return true
-                else
-                    self.hit_count = 1
-                    return false
-                end
-            end,
-        },
+        bonus_damage = 6,
     },
 
     PC_ALAN_SPARK_BARRAGE_plus2 =
@@ -3691,19 +3680,15 @@ local CARDS =
         name = "Heavy Spark Barrage",
         desc = "This card will attack <#UPGRADE>three times</>, each hits deal 3 bonus damage if you have any {SPARK_RESERVE}.",
         cost = 2,
-        event_handlers =
-        {
-            [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
-                if self == card and self.owner:HasCondition("SPARK_RESERVE") then
-                    dmgt:AddDamage( 3, 3, self )
-                    self.hit_count = 3
-                    return true
-                else
-                    self.hit_count = 1
-                    return false
-                end
-            end,
-        },
+        PreReq = function( self, battle )
+            if self.owner:HasCondition("SPARK_RESERVE") then
+                self.hit_count = 3
+                return true
+            else
+                self.hit_count = 1
+                return false
+            end
+        end,
     },
 
     PC_ALAN_LIMIT_REACTION =
@@ -3768,6 +3753,7 @@ local CARDS =
         max_xp = 9,
         min_damage = 3,
         max_damage = 5,
+        lumin_reserve = 0,
         OnPreResolve = function( self, battle, attack)
             self.lumin_reserve = self.owner:GetConditionStacks( "LUMIN_RESERVE" ) or 0
         end,
@@ -3775,6 +3761,7 @@ local CARDS =
             if self.lumin_reserve > 0 then
                 self.owner:AddCondition("LUMIN_RESERVE", self.lumin_reserve, self)
             end
+            self.lumin_reserve = self.def.lumin_reserve
         end
     },
 
@@ -3795,6 +3782,7 @@ local CARDS =
         weight_thresh = 5,
         action_bonus = 1, 
         OnPreResolve = function(self, battle)
+            self.lumin_reserve = self.owner:GetConditionStacks( "LUMIN_RESERVE" ) or 0
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost >= self.weight_thresh then
                 self.engine:ModifyActionCount(self.action_bonus)
@@ -4051,15 +4039,29 @@ local CARDS =
         rarity = CARD_RARITY.UNCOMMON,
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.UNPLAYABLE,
         target_type = TARGET_TYPE.SELF,
+        again = false,
         event_handlers = 
         {
             [ BATTLE_EVENT.DRAW_CARD ] = function(self, battle, card)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self) 
-            if card.owner == self.owner then
+            if card.owner == self.owner and not self.again then
                 if total_cost >= self.weight_thresh then
                     self:ClearFlags(CARD_FLAGS.UNPLAYABLE)
                     battle:PlayCard(self, self.owner)
                     self:SetFlags(CARD_FLAGS.UNPLAYABLE)
+                    self.again = true
+                end
+            end
+            end,
+
+            [ BATTLE_EVENT.POST_RESOLVE ] = function(self, battle, card)
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self) 
+            if card.owner == self.owner and not self.again then
+                if total_cost >= self.weight_thresh then
+                    self:ClearFlags(CARD_FLAGS.UNPLAYABLE)
+                    battle:PlayCard(self, self.owner)
+                    self:SetFlags(CARD_FLAGS.UNPLAYABLE)
+                    self.again = true
                 end
             end
             end
@@ -4425,7 +4427,7 @@ local CARDS =
         target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
         flags = CARD_FLAGS.SKILL,
         rarity = CARD_RARITY.UNCOMMON,
-        defend_amount = 7,
+        defend_amount = 8,
         OnPostResolve = function( self, battle, attack )
             attack.target:AddCondition("DEFEND", self.defend_amount, self)
         end,
@@ -4450,7 +4452,7 @@ local CARDS =
     {
         name = "Stone Anchor",
         desc = "Apply <#UPGRADE>{1}</> {DEFEND}.\nAt the start of your turn, this card's cost increases by 1 for each other card in your hand that costs at least 2.",
-        defend_amount = 10,
+        defend_amount = 12,
     },
 
     PC_ALAN_PERFORMANCE =
@@ -4513,36 +4515,57 @@ local CARDS =
         name = "Focus",
         icon = "battle/concentrate.tex",
         anim = "taunt",
-        desc = "Draw 5 cards.",
+        desc = "Draw 1 card.\n{PC_ALAN_WEIGHTED}{1}: Draw additional 2 cards.\n{PC_ALAN_LIGHTWEIGHT}{1}: Draw additional 2 cards.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.weight_thresh, self.light_thresh )
+        end,
         flavour = "'Remember to take a deep breath.'",
         cost = 0,
         max_xp = 10,
+        weight_thresh = 6,
+        light_thresh = 3,
         rarity = CARD_RARITY.UNCOMMON,
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
         target_type = TARGET_TYPE.SELF,
+        OnPreResolve = function( self, battle, attack)
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self) 
+            if total_cost >= self.weight_thresh or total_cost <= self.light_thresh then
+                battle:DrawCards(2)
+            end
+        end,
         OnPostResolve = function( self, battle, attack)
-            battle:DrawCards(5)
+            battle:DrawCards(1)
         end,
     },
 
     PC_ALAN_FOCUS_plus =
     {
         name = "Boosted Focus",
-        desc = "Draw 5 cards <#UPGRADE>and Gain 1 action</>.",
+        desc = "Draw 1 card <#UPGRADE>and gain 1 action</>.\n{PC_ALAN_WEIGHTED}{1}: Draw additional 2 cards.\n{PC_ALAN_LIGHTWEIGHT}{1}: Draw additional 2 cards.",
+        OnPreResolve = function( self, battle, attack)
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self) 
+            if total_cost >= self.weight_thresh or total_cost <= self.light_thresh then
+                battle:DrawCards(2)
+            end
+        end,
         OnPostResolve = function( self, battle, attack)
-            battle:DrawCards(5)
+            battle:DrawCards(1)
             self.engine:ModifyActionCount(1)
         end,
     },
 
     PC_ALAN_FOCUS_plus2 =
     {
-        name = "Enduring Focus",
-        desc = "Draw <#DOWNGRADE>4</> cards.",
-        cost = 1,
-        flags = CARD_FLAGS.SKILL,
+        name = "Visionary Focus",
+        desc = "Draw <#UPGRADE>2</> card.\n{PC_ALAN_WEIGHTED} {1}: Draw additional 2 cards.\n{PC_ALAN_LIGHTWEIGHT} {1}: Draw additional 2 cards.",
+        OnPreResolve = function( self, battle, attack)
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self) 
+            if total_cost >= self.weight_thresh or total_cost <= self.light_thresh then
+                battle:DrawCards(2)
+            end
+        end,
         OnPostResolve = function( self, battle, attack)
-            battle:DrawCards(4)
+            battle:DrawCards(2)
         end,
     }, 
 
@@ -4711,6 +4734,7 @@ local CARDS =
         },
         OnPostResolve = function( self, battle, attack )
             attack.target:AddCondition("DEFEND", self.defend_amount, self)
+            self.defend_amount = self.def.defend_amount
         end
     },
 
@@ -4775,28 +4799,56 @@ local CARDS =
         name = "Deep Pockets",
         icon = "battle/rummage.tex",
         anim = "taunt",
-        desc = "{ABILITY}: At turn start, draw a card.",
+        desc = "Insert {1} {PC_ALAN_QUICK_THROW} into your hand.\nGain 1 fewer {PC_ALAN_QUICK_THROW} from this card whenever you play this card.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.num_cards)
+        end,
         flavour = "'I keep a few things in here—just in case.'",
         cost = 2,
         max_xp = 7,
         rarity = CARD_RARITY.UNCOMMON,
-        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        flags = CARD_FLAGS.SKILL,
         target_type = TARGET_TYPE.SELF,
+        num_cards = 4,
+        decrease_card = true,
         OnPostResolve = function( self, battle, attack )
-            self.owner:AddCondition("PA_DEEP_POCKETS", 1, self)
+            local cards = {}
+            for i = 1, self.num_cards do
+                local incepted_card = Battle.Card( "PC_ALAN_QUICK_THROW", self:GetOwner() )
+                incepted_card.auto_deal = true
+                table.insert( cards, incepted_card )
+            end
+            battle:DealCards( cards , battle:GetHandDeck() )
+
+            if self.decrease_card and self.num_cards > 0 then
+                self.num_cards = self.num_cards - 1
+            end
+            self.decrease_card = true
         end
     },
 
     PC_ALAN_DEEP_POCKETS_plus =
     {
-        name = "Initial Deep Pockets", 
-        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+        name = "Pale Deep Pockets", 
+        desc = "Insert <#DOWNGRADE>{1}</> {PC_ALAN_QUICK_THROW} into your hand.\nGain 1 fewer {PC_ALAN_QUICK_THROW} from this card whenever you play this card.",
+        cost = 1,
+        num_cards = 3,
     },
 
     PC_ALAN_DEEP_POCKETS_plus2 =
     {
-        name = "Pale Deep Pockets",
-        cost = 1,       
+        name = "Lightweight Deep Pockets",
+        desc = "Insert {1} {PC_ALAN_QUICK_THROW} into your hand.\nGain 1 fewer {PC_ALAN_QUICK_THROW} from this card whenever you play this card.\n<#UPGRADE>{PC_ALAN_LIGHTWEIGHT}{2}:Ignore the negative effect of this card</>.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.num_cards, self.light_thresh)
+        end,
+        light_thresh = 2,
+        OnPreResolve = function(self, battle)
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
+            if total_cost <= self.light_thresh then
+                self.decrease_card = false
+            end
+        end,
     },
 
     PC_ALAN_IMPROVEMENT =
@@ -4945,9 +4997,9 @@ local CARDS =
         name = "Supreme Strike",
         icon = "battle/crushing_blow.tex",
         anim = "stomp",
-        desc = "At the end of your turn, if this card is still in your hand, decrease the cost by 1 until played.",
+        desc = "At the end of your turn, if this card is still in your hand, decrease the cost by 2 until played.",
         flavour = "'Meet the Hesh!'",
-        cost = 3,
+        cost = 4,
         max_xp = 3,
         rarity = CARD_RARITY.RARE,
         flags = CARD_FLAGS.MELEE | CARD_FLAGS.STICKY,
@@ -4958,7 +5010,7 @@ local CARDS =
             [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
             if self.deck == battle:GetHandDeck() and battle:GetBattleResult() == nil then
                 self:NotifyTriggered()
-                self.cost = self.cost - 1
+                self.cost = self.cost - 2
             end
             end
         },
@@ -4969,18 +5021,36 @@ local CARDS =
 
     PC_ALAN_SUPREME_STRIKE_plus =
     {
-        name = "Pale Supreme Strike",
-        cost = 2,
-        min_damage = 5,
-        max_damage = 9
+        name = "Heavy Supreme Strike",
+        cost = 6,
+        min_damage = 11,
+        max_damage = 17,
     },
 
     PC_ALAN_SUPREME_STRIKE_plus2 =
     {
-        name = "Heavy Supreme Strike",
-        cost = 4,
-        min_damage = 11,
-        max_damage = 17,
+        name = "Twisted Supreme Strike",
+        desc = "At the end of your turn, if this card is still in your hand, <#DOWNGRADE>increase</> the cost by 1 and <#UPGRADE>its damage by 6</> until played.",
+        cost = 2,
+        min_damage = 2,
+        max_damage = 6,
+        strength_gain = 6,
+        event_handlers = 
+        {
+            [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
+            if self.deck == battle:GetHandDeck() and battle:GetBattleResult() == nil then
+                self:NotifyTriggered()
+                self.cost = self.cost + 2
+                self.min_damage = self.min_damage + self.strength_gain
+                self.max_damage = self.max_damage + self.strength_gain
+            end
+            end
+        },
+        OnPostResolve = function( self, battle, attack )
+            self.cost = self.def.cost
+            self.min_damage = self.def.min_damage
+            self.max_damage = self.def.max_damage
+        end, 
     },
 
     PC_ALAN_WARNING_SHOT =
@@ -5112,11 +5182,14 @@ local CARDS =
         end,
         flags = CARD_FLAGS.MELEE,
         light_thresh = 1,
-        OnPostResolve = function( self, battle, attack )
+        OnPreResolve = function(self, battle)
             local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self)
             if total_cost <= self.light_thresh then
                 attack.target:AddCondition("STUN", 1, self)
             end
+        end,
+        OnPostResolve = function( self, battle, attack )
+
         end
     },
 
@@ -5315,7 +5388,7 @@ local CARDS =
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
         target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
         OnPostResolve = function( self, battle, attack)
-            self.target:HealHealth( self.heal_amount, self )
+            self.target:HealHealth( self.heal_amt, self )
         end,
     },
 
@@ -5331,7 +5404,7 @@ local CARDS =
         name = "Visionary First Aid",
         desc = "<#UPGRADE>Draw a card</>\n{1} {HEAL}",
         OnPostResolve = function( self, battle, attack)
-            self.target:HealHealth( self.heal_amount, self )
+            self.target:HealHealth( self.heal_amt, self )
             battle:DrawCards(1)
         end,
     },
@@ -5419,6 +5492,19 @@ local CARDS =
                     self:ClearFlags(CARD_FLAGS.UNPLAYABLE)
                     battle:PlayCard(self, self.owner)
                     self:SetFlags(CARD_FLAGS.UNPLAYABLE)
+                    self.again = true
+                end
+            end
+            end,
+
+            [ BATTLE_EVENT.POST_RESOLVE ] = function(self, battle, card)
+            local total_cost, _ = CalculateTotalAndMaxCost(self.engine, self) 
+            if card.owner == self.owner and not self.again then
+                if total_cost >= self.weight_thresh then
+                    self:ClearFlags(CARD_FLAGS.UNPLAYABLE)
+                    battle:PlayCard(self, self.owner)
+                    self:SetFlags(CARD_FLAGS.UNPLAYABLE)
+                    self.again = true
                 end
             end
             end

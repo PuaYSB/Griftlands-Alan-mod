@@ -19,7 +19,7 @@ msgstr "火花储备"
 #. BATTLE_FEATURE.SPARK_RESERVE.DESC
 msgctxt "BATTLE_FEATURE.SPARK_RESERVE.DESC"
 msgid ""
-msgstr "至多拥有10层，当拥有10层火花储备时便立即使层数清零并使承受体力上限25%的伤害。"
+msgstr "至多拥有10层，当拥有10层火花储备时便立即使层数清零并承受等同于体力上限25%的伤害。"
 
 #. BATTLE_FEATURE.LUMIN_RESERVE.NAME
 msgctxt "BATTLE_FEATURE.LUMIN_RESERVE.NAME"
@@ -91,16 +91,6 @@ msgctxt "BATTLE_FEATURE.PA_LUMIN_SHIELD_GENERATOR.DESC"
 msgid ""
 msgstr "每回合结束时获得{LUMIN_RESERVE}层数的{DEFEND}。"
 
-#. BATTLE_FEATURE.PA_DEEP_POCKETS.NAME
-msgctxt "BATTLE_FEATURE.PA_DEEP_POCKETS.NAME"
-msgid ""
-msgstr "深口袋"
-
-#. BATTLE_FEATURE.PA_DEEP_POCKETS.DESC
-msgctxt "BATTLE_FEATURE.PA_DEEP_POCKETS.DESC"
-msgid ""
-msgstr "回合开始时抽<#HILITE>{1}</>张牌。"
-
 #. BATTLE_FEATURE.PA_RHYTHM.NAME
 msgctxt "BATTLE_FEATURE.PA_RHYTHM.NAME"
 msgid ""
@@ -139,7 +129,7 @@ msgstr "过载核心"
 #. BATTLE_FEATURE.PA_OVERLOADED_CORE.DESC
 msgctxt "BATTLE_FEATURE.PA_OVERLOADED_CORE.DESC"
 msgid ""
-msgstr "获得与{SPARK_RESERVE}层数相同的{POWER}，{SPARK_RESERVE}被增加或者减少时由该能力提供的{POWER}也会随着增加或者减少。"
+msgstr "获得相当于{SPARK_RESERVE}层数{1}倍的{POWER}，{SPARK_RESERVE}被增加或者减少时由该能力提供的{POWER}也会同步增加或者减少。"
 
 #. BATTLE_FEATURE.PA_PERFECT_ACCURACY.NAME
 msgctxt "BATTLE_FEATURE.PA_PERFECT_ACCURACY.NAME"
@@ -744,7 +734,7 @@ msgstr "垃圾"
 #. ATTACK.PC_ALAN_MEDICINE_D.DESC 
 msgctxt "ATTACK.PC_ALAN_MEDICINE_D.DESC" 
 msgid "" 
-msgstr "获得{1}{DEFEND}。" 
+msgstr "被消耗时获得3{DEFEND}。" 
 
 #. ATTACK.PC_ALAN_MEDICINE_D.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_MEDICINE_D.FLAVOUR" 
@@ -759,7 +749,7 @@ msgstr "沉重垃圾"
 #. ATTACK.PC_ALAN_MEDICINE_D_UPGRADED.DESC 
 msgctxt "ATTACK.PC_ALAN_MEDICINE_D_UPGRADED.DESC" 
 msgid "" 
-msgstr "获得{1}{DEFEND}。" 
+msgstr "被消耗时获得5{DEFEND}。" 
 
 #. ATTACK.PC_ALAN_MEDICINE_D_UPGRADED.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_MEDICINE_D_UPGRADED.FLAVOUR" 
@@ -2049,7 +2039,7 @@ msgstr "备用重武器"
 #. ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS2.DESC 
 msgctxt "ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS2.DESC" 
 msgid "" 
-msgstr "抽3张牌\n<#UPGRADE>{PC_ALAN_WEIGHTED}{1}：获得1点行动点</>。" 
+msgstr "抽3张牌\n<#UPGRADE>{PC_ALAN_WEIGHTED}{1}：移除随机1个减益</>。" 
 
 #. ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS2.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_BACKUP_WEAPON_PLUS2.FLAVOUR" 
@@ -2634,7 +2624,7 @@ msgstr "扭曲突然一击"
 #. ATTACK.PC_ALAN_SUDDEN_STRIKE_PLUS2.DESC 
 msgctxt "ATTACK.PC_ALAN_SUDDEN_STRIKE_PLUS2.DESC" 
 msgid "" 
-msgstr "<#UPGRADE>随机攻击1个敌人\n激活：一回合内打出4张攻击牌</>。" 
+msgstr "<#UPGRADE>随机攻击1个敌人\n当你一回合内打出4张攻击牌，自动打出该牌</>。" 
 
 #. ATTACK.PC_ALAN_SUDDEN_STRIKE_PLUS2.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_SUDDEN_STRIKE_PLUS2.FLAVOUR" 
@@ -3204,7 +3194,7 @@ msgstr "货物倾倒"
 #. ATTACK.PC_ALAN_CARGO_SPILL.DESC 
 msgctxt "ATTACK.PC_ALAN_CARGO_SPILL.DESC" 
 msgid "" 
-msgstr "回合结束后，若任然在手中则使本牌的伤害提高3，打出后复原。" 
+msgstr "回合结束后，若仍然在手中则使本牌的伤害提高3，打出后复原。" 
 
 #. ATTACK.PC_ALAN_CARGO_SPILL.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_CARGO_SPILL.FLAVOUR" 
@@ -3219,7 +3209,7 @@ msgstr "沉重货物倾倒"
 #. ATTACK.PC_ALAN_CARGO_SPILL_PLUS.DESC 
 msgctxt "ATTACK.PC_ALAN_CARGO_SPILL_PLUS.DESC" 
 msgid "" 
-msgstr "回合结束后，若任然在手中则使本牌的伤害提高<#UPGRADE>6</>，打出后复原。" 
+msgstr "回合结束后，若仍然在手中则使本牌的伤害提高<#UPGRADE>6</>，打出后复原。" 
 
 #. ATTACK.PC_ALAN_CARGO_SPILL_PLUS.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_CARGO_SPILL_PLUS.FLAVOUR" 
@@ -3234,7 +3224,7 @@ msgstr "增强货物倾倒"
 #. ATTACK.PC_ALAN_CARGO_SPILL_PLUS2.DESC 
 msgctxt "ATTACK.PC_ALAN_CARGO_SPILL_PLUS2.DESC" 
 msgid "" 
-msgstr "回合结束后若任然在手中则使本牌在本场战斗的伤害提高3。" 
+msgstr "回合结束后若仍然在手中则使本牌在本场战斗的伤害提高3。" 
 
 #. ATTACK.PC_ALAN_CARGO_SPILL_PLUS2.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_CARGO_SPILL_PLUS2.FLAVOUR" 
@@ -3804,7 +3794,7 @@ msgstr "专注"
 #. ATTACK.PC_ALAN_FOCUS.DESC 
 msgctxt "ATTACK.PC_ALAN_FOCUS.DESC" 
 msgid "" 
-msgstr "抽5张牌。" 
+msgstr "抽1张牌。\n{PC_ALAN_WEIGHTED}{1}：额外抽2张牌。\n{PC_ALAN_LIGHTWEIGHT}{2}：额外抽2张牌。" 
 
 #. ATTACK.PC_ALAN_FOCUS.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_FOCUS.FLAVOUR" 
@@ -3819,7 +3809,7 @@ msgstr "增强专注"
 #. ATTACK.PC_ALAN_FOCUS_PLUS.DESC 
 msgctxt "ATTACK.PC_ALAN_FOCUS_PLUS.DESC" 
 msgid "" 
-msgstr "抽5张牌<#UPGRADE>并获得1点行动点</>。" 
+msgstr "抽1张牌<#UPGRADE>并获得1行动点</>。\n{PC_ALAN_WEIGHTED}{1}：额外抽2张牌。\n{PC_ALAN_LIGHTWEIGHT}{2}：额外抽2张牌。" 
 
 #. ATTACK.PC_ALAN_FOCUS_PLUS.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_FOCUS_PLUS.FLAVOUR" 
@@ -3829,12 +3819,12 @@ msgstr "'记得深呼吸。'"
 #. ATTACK.PC_ALAN_FOCUS_PLUS2.NAME 
 msgctxt "ATTACK.PC_ALAN_FOCUS_PLUS2.NAME" 
 msgid "" 
-msgstr "持续专注"
+msgstr "远见专注"
 
 #. ATTACK.PC_ALAN_FOCUS_PLUS2.DESC 
 msgctxt "ATTACK.PC_ALAN_FOCUS_PLUS2.DESC" 
 msgid "" 
-msgstr "抽<#DOWNGRADE>3</>张牌。" 
+msgstr "抽<#UPGRADE>2</>张牌。\n{PC_ALAN_WEIGHTED}{1}：额外抽2张牌。\n{PC_ALAN_LIGHTWEIGHT}{2}：额外抽2张牌。" 
 
 #. ATTACK.PC_ALAN_FOCUS_PLUS2.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_FOCUS_PLUS2.FLAVOUR" 
@@ -3894,7 +3884,7 @@ msgstr "随时提防"
 #. ATTACK.PC_ALAN_STAY_ALERT.DESC 
 msgctxt "ATTACK.PC_ALAN_STAY_ALERT.DESC" 
 msgid "" 
-msgstr "施加{1}{DEFEND}，回合结束后若任然在手中则使本牌提供的{DEFEND}提高{2}，打出后复原。" 
+msgstr "施加{1}{DEFEND}，回合结束后若仍然在手中则使本牌提供的{DEFEND}提高{2}，打出后复原。" 
 
 #. ATTACK.PC_ALAN_STAY_ALERT.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_STAY_ALERT.FLAVOUR" 
@@ -3909,7 +3899,7 @@ msgstr "专注随时提防"
 #. ATTACK.PC_ALAN_STAY_ALERT_PLUS.DESC 
 msgctxt "ATTACK.PC_ALAN_STAY_ALERT_PLUS.DESC" 
 msgid "" 
-msgstr "施加{1}{DEFEND}，回合结束后若任然在手中则使本牌提供的{DEFEND}提高<#UPGRADE>{2}</>，打出后复原。" 
+msgstr "施加{1}{DEFEND}，回合结束后若仍然在手中则使本牌提供的{DEFEND}提高<#UPGRADE>{2}</>，打出后复原。" 
 
 #. ATTACK.PC_ALAN_STAY_ALERT_PLUS.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_STAY_ALERT_PLUS.FLAVOUR" 
@@ -3924,7 +3914,7 @@ msgstr "增强随时提防"
 #. ATTACK.PC_ALAN_STAY_ALERT_PLUS2.DESC 
 msgctxt "ATTACK.PC_ALAN_STAY_ALERT_PLUS2.DESC" 
 msgid "" 
-msgstr "施加<#UPGRADE>{1}</>{DEFEND}，回合结束后若任然在手中则使本牌提供的{DEFEND}提高{2}，打出后复原。" 
+msgstr "施加<#UPGRADE>{1}</>{DEFEND}，回合结束后若仍然在手中则使本牌提供的{DEFEND}提高{2}，打出后复原。" 
 
 #. ATTACK.PC_ALAN_STAY_ALERT_PLUS2.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_STAY_ALERT_PLUS2.FLAVOUR" 
@@ -3984,7 +3974,7 @@ msgstr "深口袋"
 #. ATTACK.PC_ALAN_DEEP_POCKETS.DESC 
 msgctxt "ATTACK.PC_ALAN_DEEP_POCKETS.DESC" 
 msgid "" 
-msgstr "{ABILITY}：回合开始时抽1张牌。" 
+msgstr "往手牌中加入{1}{PC_ALAN_QUICK_THROW}。\n每次打出使获得的{PC_ALAN_QUICK_THROW}数减少1。" 
 
 #. ATTACK.PC_ALAN_DEEP_POCKETS.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_DEEP_POCKETS.FLAVOUR" 
@@ -3994,12 +3984,12 @@ msgstr "'我会放点东西在这口袋，以备不时之需。'"
 #. ATTACK.PC_ALAN_DEEP_POCKETS_PLUS.NAME 
 msgctxt "ATTACK.PC_ALAN_DEEP_POCKETS_PLUS.NAME" 
 msgid "" 
-msgstr "初始深口袋"
+msgstr "黯淡深口袋"
 
 #. ATTACK.PC_ALAN_DEEP_POCKETS_PLUS.DESC 
 msgctxt "ATTACK.PC_ALAN_DEEP_POCKETS_PLUS.DESC" 
 msgid "" 
-msgstr "{ABILITY}：回合开始时抽1张牌。" 
+msgstr "往手牌中加入<#DOWNGRADE>{1}</>{PC_ALAN_QUICK_THROW}。\n每次打出使获得的{PC_ALAN_QUICK_THROW}数减少1。" 
 
 #. ATTACK.PC_ALAN_DEEP_POCKETS_PLUS.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_DEEP_POCKETS_PLUS.FLAVOUR" 
@@ -4009,12 +3999,12 @@ msgstr "'我会放点东西在这口袋，以备不时之需。'"
 #. ATTACK.PC_ALAN_DEEP_POCKETS_PLUS2.NAME 
 msgctxt "ATTACK.PC_ALAN_DEEP_POCKETS_PLUS2.NAME" 
 msgid "" 
-msgstr "黯淡深口袋"
+msgstr "轻量深口袋"
 
 #. ATTACK.PC_ALAN_DEEP_POCKETS_PLUS2.DESC 
 msgctxt "ATTACK.PC_ALAN_DEEP_POCKETS_PLUS2.DESC" 
 msgid "" 
-msgstr "{ABILITY}：回合开始时抽1张牌。" 
+msgstr "往手牌中加入{1}{PC_ALAN_QUICK_THROW}。\n每次打出使获得的{PC_ALAN_QUICK_THROW}数减少1。\n<#UPGRADE>{PC_ALAN_LIGHTWEIGHT}{2}：无视该牌的负面效果</>。" 
 
 #. ATTACK.PC_ALAN_DEEP_POCKETS_PLUS2.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_DEEP_POCKETS_PLUS2.FLAVOUR" 
@@ -4179,7 +4169,7 @@ msgstr "至高打击"
 #. ATTACK.PC_ALAN_SUPREME_STRIKE.DESC 
 msgctxt "ATTACK.PC_ALAN_SUPREME_STRIKE.DESC" 
 msgid "" 
-msgstr "回合结束后若任然在手中则使本牌的费用-1，打出后复原。" 
+msgstr "回合结束后若仍然在手中则使本牌花费减少2，打出后复原。" 
 
 #. ATTACK.PC_ALAN_SUPREME_STRIKE.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_SUPREME_STRIKE.FLAVOUR" 
@@ -4189,12 +4179,12 @@ msgstr "'去见黑石吧！'"
 #. ATTACK.PC_ALAN_SUPREME_STRIKE_PLUS.NAME 
 msgctxt "ATTACK.PC_ALAN_SUPREME_STRIKE_PLUS.NAME" 
 msgid "" 
-msgstr "黯淡至高打击"
+msgstr "沉重至高打击"
 
 #. ATTACK.PC_ALAN_SUPREME_STRIKE_PLUS.DESC 
 msgctxt "ATTACK.PC_ALAN_SUPREME_STRIKE_PLUS.DESC" 
 msgid "" 
-msgstr "回合结束后若任然在手中则使本牌的费用-1，打出后复原。" 
+msgstr "回合结束后若仍然在手中则使本牌花费减少2，打出后复原。" 
 
 #. ATTACK.PC_ALAN_SUPREME_STRIKE_PLUS.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_SUPREME_STRIKE_PLUS.FLAVOUR" 
@@ -4204,12 +4194,12 @@ msgstr "'去见黑石吧！'"
 #. ATTACK.PC_ALAN_SUPREME_STRIKE_PLUS2.NAME 
 msgctxt "ATTACK.PC_ALAN_SUPREME_STRIKE_PLUS2.NAME" 
 msgid "" 
-msgstr "沉重至高打击"
+msgstr "扭曲至高打击"
 
 #. ATTACK.PC_ALAN_SUPREME_STRIKE_PLUS2.DESC 
 msgctxt "ATTACK.PC_ALAN_SUPREME_STRIKE_PLUS2.DESC" 
 msgid "" 
-msgstr "回合结束后若任然在手中则使本牌的费用-1，打出后复原。" 
+msgstr "回合结束后若仍然在手中则使本牌花费<#DOWNGRADE>增加1</><#UPGRADE>且使伤害提高6</>，打出后复原。" 
 
 #. ATTACK.PC_ALAN_SUPREME_STRIKE_PLUS2.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_SUPREME_STRIKE_PLUS2.FLAVOUR" 
@@ -4629,7 +4619,7 @@ msgstr "过载核心"
 #. ATTACK.PC_ALAN_OVERLOADED_CORE.DESC 
 msgctxt "ATTACK.PC_ALAN_OVERLOADED_CORE.DESC" 
 msgid "" 
-msgstr "{ABILITY}：获得与{SPARK_RESERVE}层数相同的{POWER}，{SPARK_RESERVE}被增加或者减少时由该能力提供的{POWER}也会随着增加或者减少。" 
+msgstr "{ABILITY}：获得与{SPARK_RESERVE}层数相同的{POWER}，{SPARK_RESERVE}被增加或者减少时由该能力提供的{POWER}也会同步增加或者减少。" 
 
 #. ATTACK.PC_ALAN_OVERLOADED_CORE.FLAVOUR 
 msgctxt "ATTACK.PC_ALAN_OVERLOADED_CORE.FLAVOUR" 
@@ -5019,7 +5009,7 @@ msgstr "鬼步舞"
 #. GRAFT.PC_ALAN_SHUFFLE_STEP.DESC
 msgctxt "GRAFT.PC_ALAN_SHUFFLE_STEP.DESC"
 msgid ""
-msgstr "每当打出0费牌时获得1{DEFEND}。"
+msgstr "每当打出0费牌时获得2{DEFEND}。"
 
 #. GRAFT.PC_ALAN_SHUFFLE_STEP.FLAVOUR
 msgctxt "GRAFT.PC_ALAN_SHUFFLE_STEP.FLAVOUR"
@@ -5034,7 +5024,7 @@ msgstr "广泛鬼步舞"
 #. GRAFT.PC_ALAN_SHUFFLE_STEP_PLUS.DESC
 msgctxt "GRAFT.PC_ALAN_SHUFFLE_STEP_PLUS.DESC"
 msgid ""
-msgstr "每当打出0费牌<#UPGRADE>或者1费牌</>时获得1{DEFEND}。"
+msgstr "每当打出0费牌<#UPGRADE>或者1费牌</>时获得2{DEFEND}。"
 
 #. GRAFT.PC_ALAN_SHUFFLE_STEP_PLUS.FLAVOUR
 msgctxt "GRAFT.PC_ALAN_SHUFFLE_STEP_PLUS.FLAVOUR"
@@ -5589,7 +5579,7 @@ msgstr "初版充电器"
 #. GRAFT.PC_ALAN_PROTOTYPR_CHARGER.DESC
 msgctxt "GRAFT.PC_ALAN_PROTOTYPR_CHARGER.DESC"
 msgid ""
-msgstr "回合开始时获得1行动点。每当你洗牌时，将1张{PC_ALAN_MEDICINE_d}加入在你的抽牌堆和手牌中。"
+msgstr "回合开始时获得1行动点。每当你洗牌时，将2张{PC_ALAN_MEDICINE_d}加入在你的抽牌堆中。"
 
 #. GRAFT.PC_ALAN_PROTOTYPR_CHARGER.FLAVOUR
 msgctxt "GRAFT.PC_ALAN_PROTOTYPR_CHARGER.FLAVOUR"
@@ -5659,7 +5649,7 @@ msgstr "风轻云淡"
 #. NEGOTIATION_FEATURE.PA_BREEZY.DESC
 msgctxt "NEGOTIATION_FEATURE.PA_BREEZY.DESC"
 msgid ""
-msgstr "回合开始时对随机1个论点施加<#HILITE>{1}</>淡定。"
+msgstr "回合结束时，将自身意志值恢复至最大值。"
 
 #. NEGOTIATION_FEATURE.PA_SHUFFLE.NAME
 msgctxt "NEGOTIATION_FEATURE.PA_SHUFFLE.NAME"
@@ -5819,7 +5809,7 @@ msgstr "风轻云淡"
 #. MODIFIER.PA_BREEZY.DESC
 msgctxt "MODIFIER.PA_BREEZY.DESC"
 msgid ""
-msgstr "回合开始时对随机1个论点施加<#HILITE>{1}</>淡定。"
+msgstr "回合结束时，将自身意志值恢复至最大值。"
 
 #. MODIFIER.PA_SHUFFLE.NAME
 msgctxt "MODIFIER.PA_SHUFFLE.NAME"
@@ -5869,7 +5859,7 @@ msgstr "倒打一耙"
 #. MODIFIER.PA_TURN_THE_TABLES.DESC
 msgctxt "MODIFIER.PA_TURN_THE_TABLES.DESC"
 msgid ""
-msgstr "每当你打出任意牌时，获得1{PC_ALAN_FALLACY}。"
+msgstr "每当你打出任意牌时，对随机1个敌方论点造成{1}点伤害。\n回合结束时失去所有层数。"
 
 #. MODIFIER.PA_PUMP.NAME
 msgctxt "MODIFIER.PA_PUMP.NAME"
@@ -6784,7 +6774,7 @@ msgstr "'来，坐好了，请开始听我瞎......分析了！'"
 #. CARD.PC_ALAN_STRAIGHT_FORWARD.NAME
 msgctxt "CARD.PC_ALAN_STRAIGHT_FORWARD.NAME"
 msgid ""
-msgstr "直戳了当"
+msgstr "直截了当"
 
 #. CARD.PC_ALAN_STRAIGHT_FORWARD.DESC
 msgctxt "CARD.PC_ALAN_STRAIGHT_FORWARD.DESC"
@@ -6799,7 +6789,7 @@ msgstr "'你个蠢货！'"
 #. CARD.PC_ALAN_STRAIGHT_FORWARD_PLUS.NAME
 msgctxt "CARD.PC_ALAN_STRAIGHT_FORWARD_PLUS.NAME"
 msgid ""
-msgstr "猛烈直戳了当"
+msgstr "猛烈直截了当"
 
 #. CARD.PC_ALAN_STRAIGHT_FORWARD_PLUS.DESC
 msgctxt "CARD.PC_ALAN_STRAIGHT_FORWARD_PLUS.DESC"
@@ -6814,7 +6804,7 @@ msgstr "'你个蠢货！'"
 #. CARD.PC_ALAN_STRAIGHT_FORWARD_PLUS2.NAME
 msgctxt "CARD.PC_ALAN_STRAIGHT_FORWARD_PLUS2.NAME"
 msgid ""
-msgstr "强力直戳了当"
+msgstr "强力直截了当"
 
 #. CARD.PC_ALAN_STRAIGHT_FORWARD_PLUS2.DESC
 msgctxt "CARD.PC_ALAN_STRAIGHT_FORWARD_PLUS2.DESC"
@@ -7014,7 +7004,7 @@ msgstr "风轻云淡"
 #. CARD.PC_ALAN_BREEZY.DESC
 msgctxt "CARD.PC_ALAN_BREEZY.DESC"
 msgid ""
-msgstr "{PA_BREEZY|}创建：回合结束时对随机1个论点施加1{COMPOSURE}。"
+msgstr "{PA_BREEZY|}创建：回合结束时，将自身意志值恢复至最大值。"
 
 #. CARD.PC_ALAN_BREEZY.FLAVOUR
 msgctxt "CARD.PC_ALAN_BREEZY.FLAVOUR"
@@ -7029,7 +7019,7 @@ msgstr "黯淡风轻云淡"
 #. CARD.PC_ALAN_BREEZY_PLUS.DESC
 msgctxt "CARD.PC_ALAN_BREEZY_PLUS.DESC"
 msgid ""
-msgstr "{PA_BREEZY|}创建：回合结束时对随机1个论点施加1{COMPOSURE}。"
+msgstr "{PA_BREEZY|}创建：回合结束时，将自身意志值恢复至最大值。"
 
 #. CARD.PC_ALAN_BREEZY_PLUS.FLAVOUR
 msgctxt "CARD.PC_ALAN_BREEZY_PLUS.FLAVOUR"
@@ -7044,7 +7034,7 @@ msgstr "镜像风轻云淡"
 #. CARD.PC_ALAN_BREEZY_PLUS2.DESC
 msgctxt "CARD.PC_ALAN_BREEZY_PLUS2.DESC"
 msgid ""
-msgstr "{PA_BREEZY|}创建<#UPGRADE>2</>：回合结束时对随机1个论点施加1{COMPOSURE}。"
+msgstr "{PA_BREEZY|}创建<#UPGRADE>2</>：回合结束时，将自身意志值恢复至最大值。"
 
 #. CARD.PC_ALAN_BREEZY_PLUS2.FLAVOUR
 msgctxt "CARD.PC_ALAN_BREEZY_PLUS2.FLAVOUR"

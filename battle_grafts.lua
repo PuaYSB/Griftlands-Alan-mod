@@ -34,10 +34,10 @@ local BATTLE_GRAFTS =
     {
         name = "Shuffle Step",
         flavour = "'There’s another version of this implant that suits me much better.'",
-        desc = "Whenever you play a 0-cost card, gain 1 {DEFEND}.",
+        desc = "Whenever you play a 0-cost card, gain 2 {DEFEND}.",
         rarity = CARD_RARITY.COMMON,
         img = engine.asset.Texture("icons/items/graft_shuffle_step.tex"),
-        defend_amt = 1,
+        defend_amt = 2,
         battle_condition =
         {
             hidden = true,
@@ -56,8 +56,8 @@ local BATTLE_GRAFTS =
     {
         name = "Wide Shuffle Step",
         icon_override = "shuffle_step_plus",
-        desc = "Whenever you play a 0-cost card <#UPGRADE>or a 1-cost card</>, gain 1 {DEFEND}.",
-        defend_amt = 1,
+        desc = "Whenever you play a 0-cost card <#UPGRADE>or a 1-cost card</>, gain 2 {DEFEND}.",
+        defend_amt = 2,
         battle_condition =
         {
             hidden = true,
@@ -132,8 +132,6 @@ local BATTLE_GRAFTS =
         rarity = CARD_RARITY.COMMON,
         img = engine.asset.Texture("icons/items/graft_dark_cowl.tex"),
         defend_amt = 6,
-        pwr_amt = 1,
-        update = false,
         battle_condition =
         {
             hidden = true,
@@ -142,9 +140,6 @@ local BATTLE_GRAFTS =
                 [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
                     if not self.owner:HasCondition("DEFEND") then
                         self.owner:AddCondition("DEFEND", self.graft:GetDef().defend_amt, self)
-                        if update then
-                            self.owner:AddCondition( "POWER", self.graft:GetDef().pwr_amt, self )
-                        end
                         battle:BroadcastEvent( BATTLE_EVENT.GRAFT_TRIGGERED, self.graft )
                     end
                 end
@@ -157,7 +152,21 @@ local BATTLE_GRAFTS =
         name = "Boosted Cloak",
         icon_override = "dark_cowl_plus",
         desc = "At the end of your turn, gain 6 {DEFEND} <#UPGRADE>and 1 {POWER}</> if you have not any {DEFEND}.",
-        update = true,
+        pwr_amt = 1,
+        battle_condition =
+        {
+            hidden = true,
+            event_handlers =
+            {
+                [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
+                    if not self.owner:HasCondition("DEFEND") then
+                        self.owner:AddCondition("DEFEND", self.graft:GetDef().defend_amt, self)
+                        self.owner:AddCondition("POWER", self.graft:GetDef().pwr_amt, self)
+                        battle:BroadcastEvent( BATTLE_EVENT.GRAFT_TRIGGERED, self.graft )
+                    end
+                end
+            },
+        },
     },
 
     PC_ALAN_SPARK_POUCH =
@@ -796,7 +805,7 @@ local BATTLE_GRAFTS =
     {
         name = "Visionary Prototype Charger",
         icon_override = "perpetual_recycler_plus",
-        desc = "Gain 1 action <#UPGRADE>and draw a card</> at the start of your turn. Whenever you shuffle your deck, insert 1 {PC_ALAN_MEDICINE_d} into your draw pile and 1 into your hand deck.",
+        desc = "Gain 1 action <#UPGRADE>and draw a card</> at the start of your turn. Whenever you shuffle your deck, insert 2 {PC_ALAN_MEDICINE_d} into your draw pile.",
         card_draw = 1,
     },
 }

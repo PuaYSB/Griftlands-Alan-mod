@@ -178,21 +178,18 @@ local MODIFIERS =
     PA_BREEZY =
     {
         name = "Breezy",
-        desc = "At the end of your turn, give <#HILITE>{1}</> {COMPOSURE} to a random friendly argument.",
+        desc = "At the end of your turn, restore this argument's resolve until it's max resolve.",
         desc_fn = function( self, fmt_str )
             return loc.format( fmt_str, self.stacks )
         end,
         icon = "negotiation/modifiers/airtight.tex",        
         modifier_type = MODIFIER_TYPE.ARGUMENT,
-        max_resolve = 4,
+        max_resolve = 6,
         sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
-        target_self = TARGET_ANY_RESOLVE,
         event_handlers =
         {
             [ EVENT.END_PLAYER_TURN ] = function( self, minigame )
-                local target = minigame:CollectPrimaryTarget(self)
-                target:DeltaComposure(self.stacks, self)
-                self:ClearTarget()
+                self:RestoreResolve(self.max_resolve, self)
             end,
         },
     },
@@ -353,6 +350,7 @@ local MODIFIERS =
                             card:TransferCard(minigame:GetDiscardDeck())
                         end
                     end
+                    ReleaseWorkTable(cards)
                 end
             end
         },
@@ -576,6 +574,9 @@ local CARDS =
             return loc.format(fmt_str, self.tentative_amt)
         end,
         tentative_amt = 1,
+        PreReq = function( self, minigame )
+            return self.negotiator:GetModifierStacks("PA_DRAW_CARD") > self.tentative_amt
+        end,
         event_handlers = 
         {
             [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
@@ -762,6 +763,9 @@ local CARDS =
             return loc.format(fmt_str, self:CalculateComposureText( self.composure_amt ) , self.tentative_amt)
         end,
         tentative_amt = 1,
+        PreReq = function( self, minigame )
+            return self.negotiator:GetModifierStacks("PA_DRAW_CARD") > self.tentative_amt
+        end,
         OnPostResolve = function( self, minigame, targets )
             local draw_cards = self.negotiator:GetModifierStacks("PA_DRAW_CARD")
             for i,target in ipairs(targets) do
@@ -967,6 +971,9 @@ local CARDS =
         max_persuasion = 3,
         tentative_amt = 2,
         bonus_damage = 3,
+        PreReq = function( self, minigame )
+            return self.negotiator:GetModifierStacks("PA_DRAW_CARD") > self.tentative_amt
+        end,
         OnPostResolve = function( self, minigame, targets )
             local draw_cards = self.negotiator:GetModifierStacks("PA_DRAW_CARD")
             if draw_cards > self.tentative_amt then
@@ -1082,6 +1089,9 @@ local CARDS =
             [ EVENT.CALC_ACTION_COST ] = EVENT_PRIORITY_PRESETTOR
         },
         deck_handlers = ALL_DECKS,
+        PreReq = function( self, minigame )
+            return self.negotiator:GetModifierStacks("PA_DRAW_CARD") > 1
+        end,
         event_handlers =
         {
             [ EVENT.CALC_ACTION_COST ] = function( self, cost_acc, card, target )
@@ -1356,6 +1366,7 @@ local CARDS =
         flags = CARD_FLAGS.HOSTILE,
         rarity = CARD_RARITY.COMMON,
         precursor_amt = 5,
+        precursor_active = false,
         event_priorities =
         {
             [ EVENT.CALC_ACTION_COST ] = EVENT_PRIORITY_SETTOR,
@@ -1365,7 +1376,7 @@ local CARDS =
         {
             [ EVENT.CARD_MOVED ] = function( self, card, source_deck, source_idx, target_deck, target_idx )
                 local discards_count = DiscardPileCount(self)
-                if card == self and discards_count ~= nil then
+                if discards_count ~= nil then
                     if discards_count >= self.precursor_amt then
                         self.precursor_active = true
                     else
@@ -1405,6 +1416,9 @@ local CARDS =
         min_persuasion = 4,
         max_persuasion = 5,
         tentative_amt = 1,
+        PreReq = function( self, minigame )
+            return self.negotiator:GetModifierStacks("PA_DRAW_CARD") > self.tentative_amt
+        end,
         event_handlers = 
         {
             [ EVENT.CALC_ACTION_COST ] = function( self, acc, card, target )
@@ -1682,7 +1696,7 @@ local CARDS =
         {
             [ EVENT.CARD_MOVED ] = function( self, card, source_deck, source_idx, target_deck, target_idx )
                 local discards_count = DiscardPileCount(self)
-                if card == self and discards_count ~= nil then
+                if discards_count ~= nil then
                     if discards_count >= self.precursor_amt then
                         self.precursor_active = true
                     else
@@ -1852,6 +1866,9 @@ local CARDS =
         max_xp = 9,
         bonus_damage = 2,
         deck_handlers = ALL_DECKS,
+        PreReq = function( self, minigame )
+            return self.negotiator:GetModifierStacks("PA_DRAW_CARD") > 1
+        end,
         event_handlers =
         {
             [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
@@ -2512,6 +2529,7 @@ local CARDS =
                     card:TransferCard(minigame:GetDiscardDeck())
                 end
             end
+            ReleaseWorkTable(cards)
         end
     },
 
@@ -3004,6 +3022,7 @@ local CARDS =
         rarity = CARD_RARITY.UNCOMMON,
         min = 2,
         max = 4,
+        target_enemy = TARGET_ANY_RESOLVE,
         OnPostResolve = function( self, minigame, targets )
             for i,target in ipairs(targets) do
                 minigame:ApplyPersuasion( self, target, self.min, self.max )
@@ -3011,7 +3030,18 @@ local CARDS =
 
             if self.damage_dealt then
                 for i = 1, self.damage_dealt do
+                    local cards = ObtainWorkTable()
+                    for i,card in minigame:GetDrawDeck():Cards() do
+                        table.insert(cards, card)
+                    end
+
+                    if #cards > 0 then
+                        for i,card in ipairs(cards) do
+                            card:TransferCard(minigame:GetDiscardDeck())
+                        end
+                    end
                     minigame:ShuffleDiscardToDraw()
+                    ReleaseWorkTable(cards)
                 end
             end
             self.damage_dealt = nil
@@ -3099,6 +3129,7 @@ local CARDS =
         rarity = CARD_RARITY.UNCOMMON,
         max_xp = 10,
         composure_amt = 3,
+        target_self = TARGET_FLAG.ARGUMENT | TARGET_FLAG.INCEPTION | TARGET_FLAG.BOUNTY,
         Reconsider = function( self, minigame, targets )
             for i, target in ipairs( targets ) do
                 target:GetNegotiator():RemoveModifier( target )
@@ -3483,6 +3514,9 @@ local CARDS =
             return loc.format(fmt_str, self.tentative_amt)
         end,
         tentative_amt = 2,
+        PreReq = function( self, minigame )
+            return self.negotiator:GetModifierStacks("PA_DRAW_CARD") > self.tentative_amt
+        end,
         event_handlers = 
         {
             [ EVENT.ATTACK_RESOLVE ] = function( self, source, target, damage, params, defended )
@@ -3558,6 +3592,7 @@ local CARDS =
                         card:TransferCard(minigame:GetDiscardDeck())
                     end
                 end
+                ReleaseWorkTable(cards)
             end
 
             local discards_count = math.floor(DiscardPileCount(self) / 4)
@@ -3634,6 +3669,7 @@ local CARDS =
         {
             [ EVENT.DRAW_CARD ] = function( self, minigame, card )
                 if card == self and self.active then
+                    self.active = false
                     self:NotifyTriggeredPre()
 
                     local tbl = ObtainWorkTable()
@@ -3650,15 +3686,11 @@ local CARDS =
                     minigame:DrawCards(5)
 
                     self:NotifyTriggeredPost()
-
-                    self.active = false
                 end
             end,
 
-            [ EVENT.END_TURN ] = function( self, minigame, negotiator )
-                if negotiator == self.negotiator then
-                    self.active = true
-                end
+            [ EVENT.END_PLAYER_TURN ] = function( self, minigame, negotiator )
+                self.active = true
             end,
         },
     },
@@ -3672,6 +3704,9 @@ local CARDS =
         end,
         tentative = true,
         tentative_amt = 1,
+        PreReq = function( self, minigame )
+            return self.negotiator:GetModifierStacks("PA_DRAW_CARD") > self.tentative_amt
+        end,
     },
 
     PC_ALAN_PROHIBIT =
