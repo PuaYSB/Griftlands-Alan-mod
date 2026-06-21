@@ -56,12 +56,15 @@ local function OnLoad( mod )
     ------------------------------------------------------------------------------------------
     -- Characters
 
-    require "ALANMOD:alan"
+    require "ALANMOD:characters/alan"
+    require "ALANMOD:characters/for_test"
 
     ------------------------------------------------------------------------------------------
     -- Convos / Quests
 
     require "ALANMOD:alan_brawl"
+    require "ALANMOD:alan_single_target_alpha"
+    require "ALANMOD:alan_negotiation_test"
 
     if not TheGame:GetGameProfile().values["unlocked_flourishes"]["PC_ALAN"] then
         TheGame:GetGameProfile().values["unlocked_flourishes"]["PC_ALAN"] = {BATTLE = {},NEGOTIATION = {},}

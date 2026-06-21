@@ -81,6 +81,7 @@ local GRAFTS =
                             card:TransferCard(minigame:GetDiscardDeck())
                         end
                         minigame:BroadcastEvent( EVENT.GRAFT_TRIGGERED, self )
+                        ReleaseWorkTable(cards)
                     end
                 end
             },
@@ -118,6 +119,7 @@ local GRAFTS =
                     cards = table.multipick(cards, self.graft:GetDef().pool_size)
                     minigame:BroadcastEvent( EVENT.GRAFT_TRIGGERED, self )
                     minigame:ImproviseCards(cards, 1, nil, nil, nil, self )
+                    ReleaseWorkTable(cards)
                     self.negotiator:RemoveModifier(self, self.stacks, self)
                 end
             },
@@ -159,6 +161,7 @@ local GRAFTS =
                         end
                     end
                     minigame:BroadcastEvent( EVENT.GRAFT_TRIGGERED, self )
+                    ReleaseWorkTable(cards)
                     self.negotiator:RemoveModifier(self, self.stacks, self)
                 end
             },
@@ -229,9 +232,9 @@ local GRAFTS =
 
     PC_ALAN_HEADPHONES_plus =
     {
-        name = "Visionary Headphones",
+        name = "Healing Headphones",
         icon_override = "easy_listening_plus",
-        desc = "At the start of every negotiation, Create 2 {PA_BREEZY} <#UPGRADE>and gain 3 {PA_CAUSE_AND_EFFECT}</>.",
+        desc = "At the start of every negotiation, Create 2 {PA_BREEZY} <#UPGRADE>and gain 3 resolve.",
         negotiation_modifier =
         {
             hidden = true,
@@ -241,7 +244,7 @@ local GRAFTS =
                     for i=1,2 do
                         self.negotiator:CreateModifier("PA_BREEZY", 1)
                     end
-                    self.negotiator:AddModifier("PA_CAUSE_AND_EFFECT", 3)
+                    self.negotiator:ModifyResolve( 3, self )
                     minigame:BroadcastEvent( EVENT.GRAFT_TRIGGERED, self )
                     self.negotiator:RemoveModifier(self, self.stacks, self)
                 end
@@ -403,6 +406,7 @@ local GRAFTS =
                             end
                         end
                         self:NotifyTriggered()
+                        ReleaseWorkTable(cards)
                         self.negotiator:RemoveModifier(self, self.stacks, self)
                     end
                 end

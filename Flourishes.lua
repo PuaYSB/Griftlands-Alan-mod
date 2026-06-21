@@ -13,7 +13,7 @@ local RARITY_TABLE = {
 
 local NEGOTIATION_FLOURISHES = 
 {
-		PC_ALAN_COMPOSURE =
+	PC_ALAN_COMPOSURE =
 	{
 		name = "Composure",
 		desc = "Gain 1 {INFLUENCE} and 3 {DOMINANCE}.",
@@ -28,47 +28,27 @@ local NEGOTIATION_FLOURISHES =
 		end,
 	},
 
-	PC_ALAN_TESTING =
+	PC_ALAN_PONDER =
 	{
-		name = "Testing",
-		desc = "Attack a random opponent argument once for every card in your hand.",
-		icon = "negotiation/just_the_facts.tex",
-		flavour = "'Is that so?'",
+		name = "Ponder",
+		desc = "{PA_PONDER|}For the rest of this negotiation, the effect of the core argument will be additionally triggered 2 times.",
+		icon = "negotiation/strategy.tex",
+		flavour = "'That's it, I understand.'",
 		flags = NEGOTIATION_FLAGS.MANIPULATE,
 		series = "ALAN",
-		target_mod = TARGET_MOD.RANDOM1,
-        auto_target = true,
-        min_persuasion = 2,
-        max_persuasion = 2,
 		OnPostResolve = function( self, minigame, targets )
-			local count = minigame:GetHandDeck():CountCards()
-            if count > 0 then
-            	for i = 1, count do
-            		minigame:ApplyPersuasion( self )
-            		self:AssignTarget( nil )
-            	end
-            end
+			self.negotiator:AddModifier("PA_PONDER", 2, self)
 		end,
 	},
 
-	PC_ALAN_TESTING_ii =
+	PC_ALAN_PONDER_ii =
 	{
-		name = "Testing II",
-		desc = "Deal 3 damage to a random opponent argument for every card in your hand.",
+		name = "Ponder II",
+		desc = "{PA_PONDER|}For the rest of this negotiation, the effect of the core argument will be additionally triggered 3 times.",
 		flags = NEGOTIATION_FLAGS.MANIPULATE,
 		series = "ALAN",
-		target_mod = TARGET_MOD.RANDOM1,
-        auto_target = true,
-        min_persuasion = 3,
-        max_persuasion = 3,
 		OnPostResolve = function( self, minigame, targets )
-			local count = minigame:GetHandDeck():CountCards()
-            if count > 0 then
-            	for i = 1, count do
-            		minigame:ApplyPersuasion( self )
-            		self:AssignTarget( nil )
-            	end
-            end
+			self.negotiator:AddModifier("PA_PONDER", 3, self)
 		end,
 	},
 

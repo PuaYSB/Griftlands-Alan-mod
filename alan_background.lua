@@ -42,6 +42,38 @@ AddPlayerCharacter(
             agent:DeltaMoney( 70 )
         end,
     }
+
+    :AddAct{
+            id = "ALAN_COMBAT_TEST",
+            name = "Combat Test: Alan",
+            title = "Alan vs Code",
+            desc = "What were they thinking?!",
+        
+            act_image = engine.asset.Texture("UI/char_2_brawl.tex"),
+            colour_frame = "0x0CD864ff",
+            colour_text = "0x9BEFD8ff",
+            colour_background = "0xFFDE5Aff",
+        
+            world_region = "brawl_region",
+            main_quest = "ALAN_SINGLE_TARGET_ALPHA",
+            game_type = GAME_TYPE.CAMPAIGN,
+        }
+            
+    :AddAct{
+            id = "ALAN_NEGOTIATION_TEST",
+            name = "Negotiation Test: Alan",
+            title = "Alan vs Code",
+            desc = "I mean, really?!",
+        
+            act_image = engine.asset.Texture("UI/char_2_brawl.tex"),
+            colour_frame = "0x0CD864ff",
+            colour_text = "0x9BEFD8ff",
+            colour_background = "0xFFDE5Aff",
+        
+            world_region = "brawl_region",
+            main_quest = "ALAN_NEGOTIATION_TEST",
+            game_type = GAME_TYPE.CAMPAIGN,
+            }
 )
 
 

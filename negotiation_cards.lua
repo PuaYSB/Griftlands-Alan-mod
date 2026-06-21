@@ -380,26 +380,6 @@ local MODIFIERS =
         }
     },
 
-    PA_CAUSE_AND_EFFECT =
-    {
-        name = "Cause and Effect",
-        desc = "After you play a card, draw a card and lose 1 stacks.",
-        icon = "negotiation/modifiers/tactical_mind.tex",        
-        modifier_type = MODIFIER_TYPE.ARGUMENT,
-        max_resolve = 3,
-        sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
-
-        event_handlers = 
-        {
-            [ EVENT.PRE_RESOLVE ] = function( self, minigame, card )
-                if self.owner == card.owner then
-                    minigame:DrawCards(1)
-                    self.negotiator:RemoveModifier( "PA_CAUSE_AND_EFFECT", 1 )
-                end 
-            end
-        }
-    },
-
     PA_SQUARE_TABLE_MEETING =
     {
         name = "Square Table Meeting",
@@ -500,6 +480,29 @@ local MODIFIERS =
                 end 
             end
         }
+    },
+
+    PA_PONDER =
+    {
+        name = "Ponder",
+        desc = "Whenever you shuffle your deck, Gain 2 compure and deal 2 damage to a random opponent argument for each stacks.",
+        modifier_type = MODIFIER_TYPE.ARGUMENT,
+        icon = "negotiation/modifiers/all_business.tex",
+        target_enemy = TARGET_ANY_RESOLVE,
+        target_mod = TARGET_MOD.RANDOM1,
+        max_resolve = 6,
+        sound = "event:/sfx/battle/cards/neg/create_argument/enforcement",
+        event_handlers = 
+        {
+            [ EVENT.SHUFFLE_DISCARDS ] = function( self, num_cards )
+                for i = 1, self.stacks do
+                    self.negotiator:DeltaComposure( 2, self )
+                    self.min_persuasion, self.max_persuasion = 2, 2
+                    self.engine:ApplyPersuasion( self )
+                    self.min_persuasion, self.max_persuasion = nil, nil
+                end
+            end
+        },
     },
 }
 
@@ -667,6 +670,8 @@ local CARDS =
     {
         name = "Fluent Bluff",
         desc = "<#UPGRADE>{EVOKE}: Play a same-named cards</>.",
+        min_persuasion = 0,
+        max_persuasion = 2,
         evoke_max = 1,
         deck_handlers = { DECK_TYPE.DRAW, DECK_TYPE.DISCARDS },
         event_handlers = 
@@ -1520,27 +1525,14 @@ local CARDS =
     {
         name = "Archive",
         icon = "negotiation/stool_pigeon.tex",
-        desc = "Draw a card and duplicate it, the copy have {EXPEND}.",
+        desc = "{IMPROVISE} a card from your draw pile and duplicate it, the copy have {EXPEND}.",
         flavour = "'Don't ask why there's a pigeon here. That's our court reporter!'",
         cost = 1,
         max_xp = 9,
         flags = CARD_FLAGS.MANIPULATE,
         rarity = CARD_RARITY.COMMON,
         draw = 1,
-        OnPostResolve = function( self, minigame, targets )
-            local cards = minigame:DrawCards(self.draw)
-            for i,card in ipairs(cards) do
-                local clone = card:Duplicate()
-                clone:SetFlags(CARD_FLAGS.EXPEND)
-                clone:TransferCard( minigame:GetHandDeck() )
-            end
-        end
-    },
-
-    PC_ALAN_ARCHIVE_plus =
-    {
-        name = "Improvised Archive",
-        desc = "<#UPGRADE>{IMPROVISE} a card from your draw pile</> and duplicate it, the copy have {EXPEND}.",
+        pool_size = 3,
         OnPostResolve = function( self, minigame, targets )
             local cards = {}
             for i, card in minigame:GetDrawDeck():Cards() do
@@ -1553,7 +1545,7 @@ local CARDS =
                 end
             end
 
-            local chosen_cards = minigame:ImproviseCards(table.multipick(cards, 3), 1, nil, nil, nil, self)
+            local chosen_cards = minigame:ImproviseCards(table.multipick(cards, self.pool_size), 1, nil, nil, nil, self)
             if chosen_cards[1] then
                 local clone = chosen_cards[1]:Duplicate()
                 clone:SetFlags(CARD_FLAGS.EXPEND)
@@ -1562,12 +1554,37 @@ local CARDS =
         end
     },
 
+    PC_ALAN_ARCHIVE_plus =
+    {
+        name = "Boosted Archive",
+        desc = "<#UPGRADE>{IMPROVISE_PLUS}</> a card from your draw pile and duplicate it, the copy have {EXPEND}.",
+        pool_size = 5,
+    },
+
     PC_ALAN_ARCHIVE_plus2 =
     {
-        name = "Visionary Archive",
-        desc = "Draw <#UPGRADE>2</> card and duplicate it, the copy have {EXPEND}.",
-        cost = 2,
-        draw = 2,
+        name = "Clarity Archive",
+        desc = "<#UPGRADE>{IMPROVISE_PLUS}</>  a card from your draw pile and duplicate it.",
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
+        pool_size = 5,
+        OnPostResolve = function( self, minigame, targets )
+            local cards = {}
+            for i, card in minigame:GetDrawDeck():Cards() do
+                table.insert(cards, card)
+            end
+            if #cards == 0 then
+                minigame:ShuffleDiscardToDraw()
+                for i, card in minigame:GetDrawDeck():Cards() do
+                    table.insert(cards, card)
+                end
+            end
+
+            local chosen_cards = minigame:ImproviseCards(table.multipick(cards, self.pool_size), 1, nil, nil, nil, self)
+            if chosen_cards[1] then
+                local clone = chosen_cards[1]:Duplicate()
+                clone:TransferCard( minigame:GetHandDeck() )
+            end
+        end
     },
 
     PC_ALAN_BREEZY =
@@ -2853,7 +2870,7 @@ local CARDS =
     PC_ALAN_SELF_PROCLAIMED_EXPERT =
     {
         name = "Self-Proclaimed Expert",
-        icon = "negotiation/notion.tex",
+        icon = "negotiation/immunity.tex",
         desc = "Add a copy of {PC_ALAN_BLUFF} to your hand for each action available. They cost 0 until played.",
         flavour = "'You don’t know how? Well, that’s just perfect.'",
         cost = 0,
@@ -2942,9 +2959,9 @@ local CARDS =
     {
         name = "Hold It",
         icon = "negotiation/reconsider.tex",
-        desc = "Shuffle your deck, then draw {1} cards.",
+        desc = "Draw {1} cards.\n{PA_PRECURSUR} {1}: Shuffle your deck.",
         desc_fn = function( self, fmt_str )
-            return loc.format( fmt_str, self.draw_count)
+            return loc.format( fmt_str, self.draw_count, self.precursor_amt)
         end,
         flavour = "'I need to regroup my thoughts.'",
         cost = 1,
@@ -2952,23 +2969,43 @@ local CARDS =
         flags = CARD_FLAGS.MANIPULATE,
         rarity = CARD_RARITY.UNCOMMON,
         draw_count = 3,
+        precursor_amt = 6,
         OnPostResolve = function( self, minigame )
-            minigame:ShuffleDiscardToDraw()
             minigame:DrawCards( self.draw_count )
+            if self.precursor_active then
+                minigame:ShuffleDiscardToDraw()
+            end
         end,
+        event_handlers =
+        {
+            [ EVENT.CARD_MOVED ] = function( self, card, source_deck, source_idx, target_deck, target_idx )
+                local discards_count = DiscardPileCount(self)
+                if discards_count ~= nil then
+                    if discards_count >= self.precursor_amt then
+                        self.precursor_active = true
+                    else
+                        self.precursor_active = false
+                    end
+                end
+            end,
+
+            [ EVENT.SHUFFLE_DISCARDS ] = function( self, num_cards )
+                self.precursor_active = false
+            end,
+        }
     },
 
     PC_ALAN_HOLD_IT_plus =
     {
         name = "Visionary Hold It",
-        desc = "Shuffle your deck, then draw <#UPGRADE>{1}</> cards.",
+        desc = "Draw <#UPGRADE>{1}</> cards.\n{PA_PRECURSUR} {1}: Shuffle your deck.",
         draw_count = 4,
     },
 
     PC_ALAN_HOLD_IT_plus2 =
     {
         name = "Pale Hold It",
-        desc = "Shuffle your deck, then draw <#DOWNGRADE>{1}</> cards.",
+        desc = "Draw <#DOWNGRADE>{1}</> cards.\n{PA_PRECURSUR} {1}: Shuffle your deck.",
         cost = 0,
         draw_count = 2,
     },
@@ -2977,34 +3014,59 @@ local CARDS =
     {
         name = "Cause and Effect",
         icon = "negotiation/tactical_mind.tex",
-        desc = "{PA_CAUSE_AND_EFFECT|}Gain {1} {PA_CAUSE_AND_EFFECT}.",
-        desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self.count)
-        end,
+        desc = "Draw a card\nIf that card is a diplomacy card, gain 1 {INFLUENCE}\nIf that card is a hostile card, gain 2 {DOMINANCE}\nOtherwise, gain 1 {SMARTS}.",
         flavour = "'Smith squinted again—after all, nothing pairs with a full stomach quite like a nap.'",
         cost = 1,
         rarity = CARD_RARITY.UNCOMMON,
         flags = CARD_FLAGS.MANIPULATE,
         max_xp = 9,
-        count = 3,
         OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("PA_CAUSE_AND_EFFECT", self.count, self)
+            local drawn_cards = minigame:DrawCards(self.card_draw)
+            for i,card in ipairs(drawn_cards) do
+                if CheckBits(card.flags, CARD_FLAGS.DIPLOMACY) then
+                    self.negotiator:AddModifier( "INFLUENCE", 1, self )
+                elseif CheckBits(card.flags, CARD_FLAGS.HOSTILE) then
+                    self.negotiator:AddModifier( "DOMINANCE", 2, self )
+                else
+                    self.negotiator:AddModifier( "SMARTS", 1, self )
+                end
+            end
         end
     },
 
     PC_ALAN_CAUSE_AND_EFFECT_plus =
     {
-        name = "Boosted Cause and Effect",
-        desc = "{PA_CAUSE_AND_EFFECT|}Gain <#UPGRADE>{1}</> {PA_CAUSE_AND_EFFECT}.",
-        count = 4,
+        name = "Visionary Cause and Effect",
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.REPLENISH,
     },
 
     PC_ALAN_CAUSE_AND_EFFECT_plus2 =
     {
-        name = "Mirrored Cause and Effect",
-        desc = "{PA_CAUSE_AND_EFFECT|}Gain <#UPGRADE>{1}</> {PA_CAUSE_AND_EFFECT}.",
-        cost = 2,
-        count = 7,
+        name = "Improvised Cause and Effect",
+        desc = "<#UPGRADE>{IMPROVISE} a card from your draw pile</>\nIf that card is a diplomacy card, gain 1 {INFLUENCE}\nIf that card is a hostile card, gain 2 {DOMINANCE}\nOtherwise, gain 1 {SMARTS}.",
+        OnPostResolve = function( self, minigame, targets )
+            local cards = {}
+            for i, card in minigame:GetDrawDeck():Cards() do
+                table.insert(cards, card)
+            end
+            if #cards == 0 then
+                minigame:ShuffleDiscardToDraw()
+                for i, card in minigame:GetDrawDeck():Cards() do
+                    table.insert(cards, card)
+                end
+            end
+
+            local chosen_cards = minigame:ImproviseCards(table.multipick(cards, 3), 1, nil, nil, nil, self)
+            for i,card in ipairs(chosen_cards) do
+                if CheckBits(card.flags, CARD_FLAGS.DIPLOMACY) then
+                    self.negotiator:AddModifier( "INFLUENCE", 1, self )
+                elseif CheckBits(card.flags, CARD_FLAGS.HOSTILE) then
+                    self.negotiator:AddModifier( "DOMINANCE", 2, self )
+                else
+                    self.negotiator:AddModifier( "SMARTS", 1, self )
+                end
+            end
+        end
     },
 
     PC_ALAN_REDUNDANT_REMINDER =
@@ -3772,7 +3834,7 @@ local CARDS =
     {
         name = "Vicious Words",
         icon = "negotiation/improvise_mean.tex",
-        desc = "This card costs the absolute difference between its initial cost of this card and the number of cards in the discard pile.",
+        desc = "This card costs the absolute difference between its initial cost of this card and the number of cards in the discard pile.\nWhen you play this card with costs 0, attack with this card three times.",
         flavour = "'Brainless idiot!'",
         cost = 13,
         flags = CARD_FLAGS.HOSTILE,
@@ -3780,6 +3842,7 @@ local CARDS =
         min_persuasion = 13,
         max_persuasion = 13,
         max_xp = 3,
+        trigger = false,
         event_priorities =
         {
             [ EVENT.CALC_ACTION_COST ] = EVENT_PRIORITY_PRESETTOR
@@ -3793,7 +3856,21 @@ local CARDS =
                     cost_acc:ModifyValue( math.abs(card.def.cost - discards_count), self )
                 end
             end,
+
+            [ EVENT.START_RESOLVE ] = function( self, minigame, card )
+                if card.owner == self.owner and card == self and minigame:CalculateActionCost(card) == 0 then
+                    self.trigger = true
+                end
+            end,
         },
+        OnPostResolve = function( self, minigame, targets )
+            if self.trigger then
+                for i = 1, 2 do
+                    minigame:ApplyPersuasion( self )
+                end
+                self.trigger = false
+            end
+        end,
     },
 
     PC_ALAN_VICIOUS_WORDS_plus =
@@ -3804,8 +3881,23 @@ local CARDS =
 
     PC_ALAN_VICIOUS_WORDS_plus2 =
     {
-        name = "Pale Pressure",
-        cost = 7,
+        name = "Wide Pressure",
+        desc = "This card costs the absolute difference between its initial cost of this card and the number of cards in the discard pile.\nWhen you play this card with costs 0 <#UPGRADE>or 1</>, attack with this card three times.",
+        event_handlers =
+        {
+            [ EVENT.CALC_ACTION_COST ] = function( self, cost_acc, card, target )
+                if card == self then
+                    local discards_count = DiscardPileCount(self)
+                    cost_acc:ModifyValue( math.abs(card.def.cost - discards_count), self )
+                end
+            end,
+
+            [ EVENT.START_RESOLVE ] = function( self, minigame, card )
+                if card.owner == self.owner and card == self and (minigame:CalculateActionCost(card) == 0 or minigame:CalculateActionCost(card) == 1) then
+                    self.trigger = true
+                end
+            end,
+        },
     },
 
     PC_ALAN_PRESSURE =

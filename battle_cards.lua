@@ -2294,10 +2294,10 @@ local CARDS =
         name = "Shoddy Shield",
         icon = "battle/bouldering_charge.tex",
         anim = "taunt",
-        desc = "Gain 0 {DEFEND}, Increase by 2 for each card played this turn.",
+        desc = "Gain 2 {DEFEND}, Increase by 1 for each card played this turn.",
         loc_strings =
         {
-            ALT_DESC = "({1} cards played).\n(Gain {2} {DEFEND}).\nGain 0 {DEFEND}, Increase by 2 for each card played this turn.",
+            ALT_DESC = "({1} cards played).\n(Gain {2} {DEFEND}).\nGain 2 {DEFEND}, Increase by 1 for each card played this turn.",
         },
         desc_fn = function( self, fmt_str )
             if self.engine then
@@ -2313,8 +2313,8 @@ local CARDS =
         target_type = TARGET_TYPE.SELF,
         cost = 0,
         max_xp = 10, 
-        defend_amount = 0,
-        defend_bonus = 2,
+        defend_amount = 2,
+        defend_bonus = 1,
         OnPostResolve = function( self, battle, attack)
             self.owner:AddCondition( "DEFEND", self.defend_amount + (self.defend_bonus * self.engine:CountCardsPlayed()), self )
         end,
@@ -2323,18 +2323,18 @@ local CARDS =
     PC_ALAN_SHODDY_SHIELD_plus =
     {
         name = "Shoddy Stone Shield",
-        desc = "Gain 0 {DEFEND}, Increase by <#UPGRADE>3</> for each card played this turn.",
+        desc = "Gain 2 {DEFEND}, Increase by <#UPGRADE>2</> for each card played this turn.",
         loc_strings =
         {
-            ALT_DESC = "({1} cards played).\n(Gain {2} {DEFEND}).\nGain 0 {DEFEND}, Increase by 3 for each card played this turn.",
+            ALT_DESC = "({1} cards played).\n(Gain {2} {DEFEND}).\nGain 2 {DEFEND}, Increase by 2 for each card played this turn.",
         },
-        defend_bonus = 3,
+        defend_bonus = 2,
     },
 
     PC_ALAN_SHODDY_SHIELD_plus2 =
     {
         name = "Shoddy Spiked Shield",
-        desc = "Gain 0 {DEFEND} and <#UPGRADE>0 {RIPOSTE}</>, Increase by 2 for each card played this turn.",
+        desc = "Gain 2 {DEFEND} and <#UPGRADE>2 {RIPOSTE}</>, Increase by 1 for each card played this turn.",
         loc_strings =
         {
             ALT_DESC = "({1} cards played).\n(Gain {2} {DEFEND} and {3} {RIPOSTE})\nGain 0 {DEFEND} and 0 {RIPOSTE}, Increase by 2 for each card played this turn.",
@@ -3147,9 +3147,9 @@ local CARDS =
         {
             [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
             if card == self then
-            local total_damage = self.bonus_damage * self.engine:CountCardsPlayed()
-            dmgt:AddDamage(total_damage, total_damage, self)
-            end
+                local total_damage = self.bonus_damage * self.engine:CountCardsPlayed()
+                    dmgt:AddDamage(total_damage, total_damage, self)
+                end
             end
         },
     },
@@ -3165,7 +3165,7 @@ local CARDS =
     {
         name = "Grand Finale",
         desc = "Deal <#UPGRADE>{1}</> bonus damage for each cards played this turn.",
-        bonus_damage = 5,
+        bonus_damage = 4,
         flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND,
     },
 
