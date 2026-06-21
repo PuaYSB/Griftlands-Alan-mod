@@ -140,6 +140,7 @@ Content.AddCharacterDef
 						:AddID("NPC_PA_Startup_complete", 1)
 
 					self.fighter:AddCondition("NPC_PA_boss_charges", 3)
+					self.fighter:AddCondition("METALLIC")
 					
                     self:SetPattern(self.ComboCycle)
                 end,
