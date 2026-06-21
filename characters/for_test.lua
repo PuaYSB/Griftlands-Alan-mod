@@ -115,11 +115,11 @@ Content.AddCharacterDef
                     anim = "shoot",
                     flags = BATTLE_CARD_FLAGS.RANGED,
                     target_type = TARGET_TYPE.ENEMY,
-                    target_mod = TARGET_MOD.RANDOM1,
-					target_count = 4,
+                    target_mod = TARGET_MOD.TEAM,
+					target_count = 3,
 
-                    min_damage = 2,
-                    max_damage = 4,
+                    min_damage = 1,
+                    max_damage = 3,
 				},
             },
 
