@@ -57,7 +57,9 @@ local function OnLoad( mod )
     -- Characters
 
     require "ALANMOD:characters/alan"
-    require "ALANMOD:characters/for_test"
+    require "ALANMOD:characters/drone_c4"
+    require "ALANMOD:characters/trio_boss"
+    require "ALANMOD:characters/fake_smith"
 
     ------------------------------------------------------------------------------------------
     -- Convos / Quests

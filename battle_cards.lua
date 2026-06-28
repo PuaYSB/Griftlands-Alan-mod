@@ -1120,7 +1120,10 @@ local CARDS =
         name = "Trash",
         icon = "battle/flekfis_junk.tex",
         anim = "throw",
-        desc = "When {EXPEND}, Gain 3 {DEFEND}.",
+        desc = "When {EXPEND}, Gain {1} {DEFEND}.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str,self:CalculateDefendText( self.defend_amount ))
+        end,
         flavour = "'…Sorry, I forgot to throw this away. Here, you can have it.'",
         target_type = TARGET_TYPE.SELF,
         rarity = CARD_RARITY.UNIQUE,
@@ -1128,12 +1131,13 @@ local CARDS =
         max_xp = 0,
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.BURNOUT,
         deck_handlers = ALL_DECKS,
+        defend_amount = 3,
         event_handlers =
         {
             [ BATTLE_EVENT.CARD_EXPENDED ] = function( self, battle, card )
                 if card == self then
                     self:NotifyTriggered()
-                    self.owner:AddCondition( "DEFEND", 3, self )
+                    self.owner:AddCondition( "DEFEND", self.defend_amount, self )
                 end
             end,
         },
@@ -1144,18 +1148,22 @@ local CARDS =
         name = "Heavy Trash",
         icon = "battle/flekfis_junk.tex",
         anim = "throw",
-        desc = "When {EXPEND}, Gain 5 {DEFEND}.",
+        desc = "When {EXPEND}, Gain {1} {DEFEND}.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str,self:CalculateDefendText( self.defend_amount ))
+        end,  
         target_type = TARGET_TYPE.SELF,
         rarity = CARD_RARITY.UNIQUE,
         cost = 3,
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.BURNOUT,
         deck_handlers = ALL_DECKS,
+        defend_amount = 5,
         event_handlers =
         {
             [ BATTLE_EVENT.CARD_EXPENDED ] = function( self, battle, card )
                 if card == self then
                     self:NotifyTriggered()
-                    self.owner:AddCondition( "DEFEND", 5, self )
+                    self.owner:AddCondition( "DEFEND", self.defend_amount, self )
                 end
             end,
         },
@@ -1744,7 +1752,7 @@ local CARDS =
         name = "Focus Casual Toss",
         desc = "<#UPGRADE>Discard {1} card from your hand</>.",
         target_mod = TARGET_MOD.SINGLE,
-        OnPreResolve = function ( self, battle, attack )
+        OnPostResolve = function ( self, battle, attack )
             battle:DiscardCards(1, nil, self)
         end,
     },
@@ -4168,7 +4176,7 @@ local CARDS =
                     end
                 end
             end
-            if defend_amt + self.bonus > 0 then
+            if defend_amt >= 0 then
                 self.owner:AddCondition("DEFEND", defend_amt, self)
                 self.owner:AddCondition("RIPOSTE", defend_amt, self) 
             end
@@ -4203,7 +4211,7 @@ local CARDS =
                     end
                 end
             end
-            if defend_amt > 0 then
+            if defend_amt >= 0 then
                 self.owner:AddCondition("DEFEND", defend_amt, self)
                 self.owner:AddCondition("RIPOSTE", defend_amt, self) 
             end
@@ -5630,4 +5638,56 @@ local FEATURES =
 for id, data in pairs( FEATURES ) do
     local def = BattleFeatureDef(id, data)
     Content.AddBattleCardFeature(id, def)
+end
+
+local BATTLE_CARDS =
+{
+    PC_ALAN_SUSPICIOUS_POWER_SOURCE =
+    {
+        name = "Suspicious power source",
+        icon = "battle/hanbis_power_supply.tex",
+        anim = "taunt",
+        desc = "Gain 1 {POWER} once per action available.\nIf you spend at least 3 action at once, gain {1} {DEFEND}.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str,self:CalculateDefendText( self.defend_amount ))
+        end,
+        flavour = "'It seems that in order to maintain high-frequency output, this drone has an additional external power supply, which I have removed.'",
+        cost = 0,
+        rarity = CARD_RARITY.UNIQUE,
+        target_type = TARGET_TYPE.SELF,
+        flags = CARD_FLAGS.ITEM | CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.VARIABLE_COST,
+        defend_amount = 10,
+        OnPostResolve = function(self, battle)
+            local action_bonus = battle:GetActionCount()
+            for i = 1, action_bonus do
+                self.owner:AddCondition("POWER", 1, self)
+            end
+            if action_bonus >= 3 then
+                self.owner:AddCondition("DEFEND", self.defend_amount, self)
+            end
+            battle:ModifyActionCount( -action_bonus )
+        end,
+    },
+
+    PC_ALAN_BLOOD_PACT_CLAW =
+    {
+        name = "Blood-Pact Claw",
+        icon = "battle/crayote_claw.tex",
+        anim = "throw",
+        anims = { "anim/weapon_grenade_crayote_claw.zip"},
+        desc = "Draw a card.\nApply 2 {TRAUMA}.",
+        flavour = "'The three brothers carried this thing with them, but there were no traces of blood on it.'",
+        cost = 0,
+        rarity = CARD_RARITY.UNIQUE,
+        flags = CARD_FLAGS.ITEM | CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        OnPostResolve = function(self, battle, attack)
+            battle:DrawCards( 1 )
+            attack:AddCondition("TRAUMA", 2, self)
+        end,
+    },
+}
+
+for i, id, card_def in sorted_pairs(BATTLE_CARDS) do
+    card_def.series = card_def.series or CARD_SERIES.GENERAL
+    Content.AddBattleCard(id, card_def)
 end

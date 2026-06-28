@@ -1633,9 +1633,7 @@ local CARDS =
         rarity = CARD_RARITY.COMMON,
         count = 2,
         OnPostResolve = function( self, minigame, targets )
-            for i=1,self.count do
-                self.negotiator:AddModifier("PA_SHUFFLE", 1, self)
-            end
+            self.negotiator:AddModifier("PA_SHUFFLE", self.count, self)
         end
     },
 
@@ -2959,7 +2957,7 @@ local CARDS =
     {
         name = "Hold It",
         icon = "negotiation/reconsider.tex",
-        desc = "Draw {1} cards.\n{PA_PRECURSUR} {1}: Shuffle your deck.",
+        desc = "Draw {1} cards.\n{PA_PRECURSUR} {2}: Shuffle your deck.",
         desc_fn = function( self, fmt_str )
             return loc.format( fmt_str, self.draw_count, self.precursor_amt)
         end,
@@ -2998,14 +2996,14 @@ local CARDS =
     PC_ALAN_HOLD_IT_plus =
     {
         name = "Visionary Hold It",
-        desc = "Draw <#UPGRADE>{1}</> cards.\n{PA_PRECURSUR} {1}: Shuffle your deck.",
+        desc = "Draw <#UPGRADE>{1}</> cards.\n{PA_PRECURSUR} {2}: Shuffle your deck.",
         draw_count = 4,
     },
 
     PC_ALAN_HOLD_IT_plus2 =
     {
         name = "Pale Hold It",
-        desc = "Draw <#DOWNGRADE>{1}</> cards.\n{PA_PRECURSUR} {1}: Shuffle your deck.",
+        desc = "Draw <#DOWNGRADE>{1}</> cards.\n{PA_PRECURSUR} {2}: Shuffle your deck.",
         cost = 0,
         draw_count = 2,
     },

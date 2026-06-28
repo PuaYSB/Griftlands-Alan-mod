@@ -4,7 +4,6 @@ AddPlayerCharacter(
             id = "ALAN",
 
             player_agent = "PC_ALAN",
-            --player_agent_skin = "f5c5bf85-1e7b-4f40-9ab3-5794f4d37f0a",
 
             name = "Alan",
             title = "The Smuggler",--走私犯

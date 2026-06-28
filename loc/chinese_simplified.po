@@ -5771,6 +5771,16 @@ msgctxt "NEGOTIATION_FEATURE.PA_ECHO.DESC"
 msgid ""
 msgstr "每当你打出1张牌时，将1张该牌加入弃牌堆并使层数减少1。"
 
+#. NEGOTIATION_FEATURE.PA_PONDER.NAME
+msgctxt "NEGOTIATION_FEATURE.PA_PONDER.NAME"
+msgid ""
+msgstr "沉思"
+
+#. NEGOTIATION_FEATURE.PA_PONDER.DESC
+msgctxt "NEGOTIATION_FEATURE.PA_PONDER.DESC"
+msgid ""
+msgstr "当你的核心论点被触发时，每层使核心论点的效果额外触发1次。"
+
 #. MODIFIER.PC_ALAN_CORE.NAME
 msgctxt "MODIFIER.PC_ALAN_CORE.NAME"
 msgid ""
@@ -5910,6 +5920,16 @@ msgstr "回声"
 msgctxt "MODIFIER.PA_ECHO.DESC"
 msgid ""
 msgstr "每当你打出1张牌时，将1张该牌加入弃牌堆并使层数减少1。"
+
+#. MODIFIER.PA_PONDER.NAME
+msgctxt "MODIFIER.PA_PONDER.NAME"
+msgid ""
+msgstr "沉思"
+
+#. MODIFIER.PA_PONDER.DESC
+msgctxt "MODIFIER.PA_PONDER.DESC"
+msgid ""
+msgstr "当你的核心论点被触发时，每层使核心论点的效果额外触发1次。"
 
 #. CARD.PC_ALAN_DISCUSS.NAME
 msgctxt "CARD.PC_ALAN_DISCUSS.NAME"
@@ -8304,7 +8324,7 @@ msgstr "慢着"
 #. CARD.PC_ALAN_HOLD_IT.DESC
 msgctxt "CARD.PC_ALAN_HOLD_IT.DESC"
 msgid ""
-msgstr "抽{1}张牌。\n{PA_PRECURSUR}{1}：进行1次洗牌。"
+msgstr "抽{1}张牌。\n{PA_PRECURSUR}{2}：进行1次洗牌。"
 
 #. CARD.PC_ALAN_HOLD_IT.FLAVOUR
 msgctxt "CARD.PC_ALAN_HOLD_IT.FLAVOUR"
@@ -8319,7 +8339,7 @@ msgstr "远见慢着"
 #. CARD.PC_ALAN_HOLD_IT_PLUS.DESC
 msgctxt "CARD.PC_ALAN_HOLD_IT_PLUS.DESC"
 msgid ""
-msgstr "抽<#UPGRADE>{1}</>张牌。\n{PA_PRECURSUR}{1}：进行1次洗牌。"
+msgstr "抽<#UPGRADE>{1}</>张牌。\n{PA_PRECURSUR}{2}：进行1次洗牌。"
 
 #. CARD.PC_ALAN_HOLD_IT_PLUS.FLAVOUR
 msgctxt "CARD.PC_ALAN_HOLD_IT_PLUS.FLAVOUR"
@@ -8334,7 +8354,7 @@ msgstr "黯淡慢着"
 #. CARD.PC_ALAN_HOLD_IT_PLUS2.DESC
 msgctxt "CARD.PC_ALAN_HOLD_IT_PLUS2.DESC"
 msgid ""
-msgstr "抽<#DOWNGRADE>{1}</>张牌。\n{PA_PRECURSUR}{1}：进行1次洗牌。"
+msgstr "抽<#DOWNGRADE>{1}</>张牌。\n{PA_PRECURSUR}{2}：进行1次洗牌。"
 
 #. CARD.PC_ALAN_HOLD_IT_PLUS2.FLAVOUR
 msgctxt "CARD.PC_ALAN_HOLD_IT_PLUS2.FLAVOUR"
@@ -10240,3 +10260,178 @@ msgstr "agent:\n让黑石触摸你的思想吧……"
 msgctxt "CONVO.ALAN_BRAWL_9.OPT_SHOP"
 msgid "Buy Negotiation Cards..."
 msgstr "购买协商牌……"
+
+#. CHARACTER.NPC_PA_DRONE_C4.NAME
+msgctxt "CHARACTER.NPC_PA_DRONE_C4.NAME"
+msgid ""
+msgstr "C4"
+
+#. CHARACTER.NPC_PA_DRONE_C4.TITLE
+msgctxt "CHARACTER.NPC_PA_DRONE_C4.TITLE"
+msgid ""
+msgstr "无人机"
+
+#. CHARACTER.NPC_PA_DRONE_C4.BIO
+msgctxt "CHARACTER.NPC_PA_DRONE_C4.BIO"
+msgid ""
+msgstr "也不知道是哪一个黑石教的成员想出来的主意。"
+
+#. ATTACK.NPC_PA_THREE.NAME
+msgctxt "ATTACK.NPC_PA_THREE.NAME"
+msgid ""
+msgstr "三"
+
+#. ATTACK.NPC_PA_TWO.NAME
+msgctxt "ATTACK.NPC_PA_TWO.NAME"
+msgid ""
+msgstr "二"
+
+#. ATTACK.NPC_PA_ONE.NAME
+msgctxt "ATTACK.NPC_PA_ONE.NAME"
+msgid ""
+msgstr "一"
+
+#. ATTACK.NPC_PA_STARTUP_COMPLETE.NAME
+msgctxt "ATTACK.NPC_PA_STARTUP_COMPLETE.NAME"
+msgid ""
+msgstr "启动完毕"
+
+#. ATTACK.PC_ALAN_SUSPICIOUS_POWER_SOURCE.NAME 
+msgctxt "ATTACK.PC_ALAN_SUSPICIOUS_POWER_SOURCE.NAME" 
+msgid "" 
+msgstr "可疑外置电源"
+
+#. ATTACK.PC_ALAN_SUSPICIOUS_POWER_SOURCE.DESC 
+msgctxt "ATTACK.PC_ALAN_SUSPICIOUS_POWER_SOURCE.DESC" 
+msgid "" 
+msgstr "每个可用行动点就获得1{POWER}。\n如果一次性至少花费3行动点则获得{1}{DEFEND}。" 
+
+#. ATTACK.PC_ALAN_SUSPICIOUS_POWER_SOURCE.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_SUSPICIOUS_POWER_SOURCE.FLAVOUR" 
+msgid "" 
+msgstr "'似乎为了保持高频率输出，这架无人机还有一个额外的外接电源，我已经把它拆掉了。'" 
+
+#. CHARACTER.TRIO_BOSS_1.NAME
+msgctxt "CHARACTER.TRIO_BOSS_1.NAME"
+msgid ""
+msgstr "万"
+
+#. CHARACTER.TRIO_BOSS_1.TITLE
+msgctxt "CHARACTER.TRIO_BOSS_1.TITLE"
+msgid ""
+msgstr "三人组"
+
+#. CHARACTER.TRIO_BOSS_1.BIO
+msgctxt "CHARACTER.TRIO_BOSS_1.BIO"
+msgid ""
+msgstr "其实，他叫阿尔杰，但他为了躲避敌人改了名。"
+
+#. CHARACTER.TRIO_BOSS_2.NAME
+msgctxt "CHARACTER.TRIO_BOSS_2.NAME"
+msgid ""
+msgstr "图"
+
+#. CHARACTER.TRIO_BOSS_2.TITLE
+msgctxt "CHARACTER.TRIO_BOSS_2.TITLE"
+msgid ""
+msgstr "三人组"
+
+#. CHARACTER.TRIO_BOSS_2.BIO
+msgctxt "CHARACTER.TRIO_BOSS_2.BIO"
+msgid ""
+msgstr "其实，他叫内森，但加入狂欢后，他换了一个新身份。"
+
+#. CHARACTER.TRIO_BOSS_3.NAME
+msgctxt "CHARACTER.TRIO_BOSS_3.NAME"
+msgid ""
+msgstr "崔"
+
+#. CHARACTER.TRIO_BOSS_3.TITLE
+msgctxt "CHARACTER.TRIO_BOSS_3.TITLE"
+msgid ""
+msgstr "三人组"
+
+#. CHARACTER.TRIO_BOSS_3.BIO
+msgctxt "CHARACTER.TRIO_BOSS_3.BIO"
+msgid ""
+msgstr "而没错——他叫崔，显而易见。"
+
+#. BATTLE_FEATURE.NPC_PA_BACK_DOWN.NAME
+msgctxt "BATTLE_FEATURE.NPC_PA_BACK_DOWN.NAME"
+msgid ""
+msgstr "知难而退"
+
+#. BATTLE_FEATURE.NPC_PA_BACK_DOWN.DESC
+msgctxt "BATTLE_FEATURE.NPC_PA_BACK_DOWN.DESC"
+msgid ""
+msgstr "如果{1}的兄弟死亡或者出现恐慌，使{1}的{SURRENDER}门槛提高{2}。"
+
+#. ATTACK.NPC_PA_SPECIAL_MOVE_ONE.NAME
+msgctxt "ATTACK.NPC_PA_SPECIAL_MOVE_ONE.NAME"
+msgid ""
+msgstr "剁"
+
+#. ATTACK.NPC_PA_ATTACK_ONE.NAME
+msgctxt "ATTACK.NPC_PA_ATTACK_ONE.NAME"
+msgid ""
+msgstr "碾碎"
+
+#. ATTACK.NPC_PA_DEFEND_TRIO.NAME
+msgctxt "ATTACK.NPC_PA_DEFEND_TRIO.NAME"
+msgid ""
+msgstr "嘲讽"
+
+#. ATTACK.NPC_PA_SPECIAL_MOVE_TWO.NAME
+msgctxt "ATTACK.NPC_PA_SPECIAL_MOVE_TWO.NAME"
+msgid ""
+msgstr "阵型防御"
+
+#. ATTACK.NPC_PA_ATTACK_TWO.NAME
+msgctxt "ATTACK.NPC_PA_ATTACK_TWO.NAME"
+msgid ""
+msgstr "挥舞"
+
+#. ATTACK.NPC_PA_SPECIAL_MOVE_THREE.NAME
+msgctxt "ATTACK.NPC_PA_SPECIAL_MOVE_THREE.NAME"
+msgid ""
+msgstr "打击"
+
+#. ATTACK.NPC_PA_ATTACK_THREE.NAME
+msgctxt "ATTACK.NPC_PA_ATTACK_THREE.NAME"
+msgid ""
+msgstr "拳打"
+
+#. ATTACK.PC_ALAN_BLOOD_PACT_CLAW.NAME 
+msgctxt "ATTACK.PC_ALAN_BLOOD_PACT_CLAW.NAME" 
+msgid "" 
+msgstr "血契爪"
+
+#. ATTACK.PC_ALAN_BLOOD_PACT_CLAW.DESC 
+msgctxt "ATTACK.PC_ALAN_BLOOD_PACT_CLAW.DESC" 
+msgid "" 
+msgstr "抽1张牌。\n施加2{TRAUMA}。" 
+
+#. ATTACK.PC_ALAN_BLOOD_PACT_CLAW.FLAVOUR 
+msgctxt "ATTACK.PC_ALAN_BLOOD_PACT_CLAW.FLAVOUR" 
+msgid "" 
+msgstr "'那三兄弟随身带着这玩意，不过上面也没血的痕迹啊。'" 
+
+#. GRAFT.PA_GIFT_PRESTIGE.NAME
+msgctxt "GRAFT.PA_GIFT_PRESTIGE.NAME"
+msgid ""
+msgstr "威望"
+
+#. GRAFT.PA_GIFT_PRESTIGE.DESC
+msgctxt "GRAFT.PA_GIFT_PRESTIGE.DESC"
+msgid ""
+msgstr "战斗开始后所有盟友的{SURRENDER}门槛增加。"
+
+#. GRAFT.PA_GIFT_WIMPY.NAME
+msgctxt "GRAFT.PA_GIFT_WIMPY.NAME"
+msgid ""
+msgstr "软弱"
+
+#. GRAFT.PA_GIFT_WIMPY.DESC
+msgctxt "GRAFT.PA_GIFT_WIMPY.DESC"
+msgid ""
+msgstr "所有敌对牌伤害减少1。"
