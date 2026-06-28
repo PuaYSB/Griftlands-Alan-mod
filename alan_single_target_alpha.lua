@@ -32,7 +32,7 @@ local QDEF = QuestDef.Define{
     }
     :AddCastByAlias{
         cast_id = "spark_baron_boss",
-        alias = "HESH_BOSS",
+        alias = "NPC_PA_TRIO_BOSS_1",
         no_validation = true,
     }
     :AddObjective{
